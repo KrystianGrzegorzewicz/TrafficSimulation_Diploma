@@ -24,13 +24,9 @@ def connect():
 
 # ===== TRANSFORMACJA ŚWIATA -> EKRAN =====
 
-def compute_transform(lanes, cars, blocks):
+def compute_transform(cars, blocks):
     xs = []
     ys = []
-
-    for lane in lanes:
-        xs += [lane["x1"], lane["x2"]]
-        ys += [lane["y1"], lane["y2"]]
 
     for car in cars:
         xs.append(car["x"])
@@ -87,12 +83,6 @@ def draw_car(x, y, vx, vy):
         3
     )
 
-def draw_lanes(min_x, min_y, scale):
-    for lane in lanes:
-        x1, y1 = to_screen(lane["x1"], lane["y1"], min_x, min_y, scale)
-        x2, y2 = to_screen(lane["x2"], lane["y2"], min_x, min_y, scale)
-
-        pygame.draw.line(screen, (80,80,80), (x1, y1), (x2, y2), 6)
 
 def draw_blocks(min_x, min_y, scale):
     for block in blocks:
@@ -111,7 +101,6 @@ sock = connect()
 buffer = ""
 
 cars = []
-lanes = []
 blocks = []
 
 running = True
@@ -135,7 +124,6 @@ while running:
                 continue
 
             cars = world["cars"]
-            lanes = world["lanes"]
             blocks = world["blocks"]
 
     except BlockingIOError:
@@ -146,12 +134,11 @@ while running:
         buffer = ""
 
     # ===== TRANSFORM =====
-    min_x, min_y, scale = compute_transform(lanes, cars, blocks)
+    min_x, min_y, scale = compute_transform(cars, blocks)
 
     # ===== RYSOWANIE =====
     screen.fill((30,30,30))
 
-    draw_lanes(min_x, min_y, scale)
     draw_blocks(min_x, min_y, scale)
 
     for car in cars:

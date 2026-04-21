@@ -45,22 +45,6 @@ std::string Simulation::getWorldJson() {
     std::stringstream ss;
     ss << "{";
 
-    // ===== LANES =====
-    ss << "\"lanes\":[";
-    const auto& lanes = roads[0]->getLanes();
-    for (size_t i = 0; i < lanes.size(); i++) {
-        Vec2 a = lanes[i].getPoint(0.0f);
-        Vec2 b = lanes[i].getPoint(1.0f);
-
-        ss << "{\"x1\":" << a.x
-            << ",\"y1\":" << a.y
-            << ",\"x2\":" << b.x
-            << ",\"y2\":" << b.y << "}";
-
-        if (i != lanes.size() - 1) ss << ",";
-    }
-    ss << "],";
-
     // ===== CARS =====
     ss << "\"cars\":[";
     for (size_t i = 0; i < cars.size(); i++) {
