@@ -13,6 +13,8 @@ private:
     std::vector<std::unique_ptr<Road>> roads;
     std::vector<Block> blocks;
 
+	TJunction thisJunction;
+
 public:
     Simulation();
     void step(float dt);

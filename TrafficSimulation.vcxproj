@@ -129,6 +129,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="core\Block.cpp" />
+    <ClCompile Include="core\Travel.cpp" />
     <ClCompile Include="vehicles\Car.cpp" />
     <ClCompile Include="core\Lane.cpp" />
     <ClCompile Include="main.cpp" />
@@ -141,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\Block.h" />
+    <ClInclude Include="core\Travel.h" />
     <ClInclude Include="vehicles\Car.h" />
     <ClInclude Include="core\Lane.h" />
     <ClInclude Include="core\Road.h" />

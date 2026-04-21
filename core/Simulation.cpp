@@ -7,10 +7,10 @@ std::uniform_int_distribution<int> dist(0, 1);
 
 Simulation::Simulation() {
 
-    roads.push_back(std::make_unique<TJunction>(450, 250));
-    const auto& lanes = roads[0]->getLanes();
+    //roads.push_back(std::make_unique<TJunction>(450, 250));
+    //const auto& lanes = roads[0]->getLanes();
 
-    Lane* straight = (Lane*)&lanes[0];
+    /*Lane* straight = (Lane*)&lanes[0];
     Lane* turn1 = (Lane*)&lanes[1];
     Lane* turn2 = (Lane*)&lanes[2];
 
@@ -23,16 +23,17 @@ Simulation::Simulation() {
 
         if (goStraight) {
             std::vector<Lane*> route = { straight };
-            cars.emplace_back(route, i * 0.1f, 80.0f);
+            cars.emplace_back(route, i * 0.1f, 80.0f, thisJunction.getRandomTravel());
         }
         else {
             std::vector<Lane*> route = { turn1, turn2 };
-            cars.emplace_back(route, i * 0.1f, 80.0f);
+            cars.emplace_back(route, i * 0.1f, 80.0f, thisJunction.getRandomTravel());
         }
+    }*/
+    for (int i = 0; i < 10; i++) {
+        cars.emplace_back( i * 0.2f, 80.0f, thisJunction.getRandomTravel());
     }
-	blocks.push_back(Block(200, 200, 300, 300));
-	blocks.push_back(Block(400, 100, 500, 200));
-    blocks.push_back(Block(-200, -200, -100, -190));
+	blocks = thisJunction.getBlocks();
 }
 
 void Simulation::step(float dt) {

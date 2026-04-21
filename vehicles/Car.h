@@ -1,16 +1,20 @@
 #pragma once
 #include "core/Lane.h"
+#include "core/Travel.h"
 #include <vector>
 
 class Car {
 private:
     std::vector<Lane*> route;
-    int currentLaneIndex;
+    int currentTarget;
     float t;
     float speed;
+	Vec2 position;
+	Travel travel;
+	Vec2 velocity;
 
 public:
-    Car(const std::vector<Lane*>& route, float startT, float speed);
+    Car(float startT, float speed, Travel travel);
 
     void update(float dt);
 
