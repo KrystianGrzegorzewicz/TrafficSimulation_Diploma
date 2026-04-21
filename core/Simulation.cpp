@@ -32,6 +32,7 @@ Simulation::Simulation() {
     }
 	blocks.push_back(Block(200, 200, 300, 300));
 	blocks.push_back(Block(400, 100, 500, 200));
+    blocks.push_back(Block(-200, -200, -100, -190));
 }
 
 void Simulation::step(float dt) {
