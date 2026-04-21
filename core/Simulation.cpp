@@ -30,6 +30,8 @@ Simulation::Simulation() {
             cars.emplace_back(route, i * 0.1f, 80.0f);
         }
     }
+	blocks.push_back(Block(200, 200, 300, 300));
+	blocks.push_back(Block(400, 100, 500, 200));
 }
 
 void Simulation::step(float dt) {
@@ -39,8 +41,26 @@ void Simulation::step(float dt) {
 
 std::string Simulation::getWorldJson() {
     std::stringstream ss;
-    ss << "{\"cars\":[";
+    ss << "{";
 
+    // ===== LANES =====
+    ss << "\"lanes\":[";
+    const auto& lanes = roads[0]->getLanes();
+    for (size_t i = 0; i < lanes.size(); i++) {
+        Vec2 a = lanes[i].getPoint(0.0f);
+        Vec2 b = lanes[i].getPoint(1.0f);
+
+        ss << "{\"x1\":" << a.x
+            << ",\"y1\":" << a.y
+            << ",\"x2\":" << b.x
+            << ",\"y2\":" << b.y << "}";
+
+        if (i != lanes.size() - 1) ss << ",";
+    }
+    ss << "],";
+
+    // ===== CARS =====
+    ss << "\"cars\":[";
     for (size_t i = 0; i < cars.size(); i++) {
         Vec2 pos = cars[i].getPosition();
         Vec2 vel = cars[i].getVelocityVector();
@@ -52,7 +72,20 @@ std::string Simulation::getWorldJson() {
 
         if (i != cars.size() - 1) ss << ",";
     }
+    ss << "],";
+    // ===== BLOCKS =====
+	ss << "\"blocks\":[";
+    for (size_t i = 0; i < blocks.size(); i++)
+    {
+		Vec2 topleft = blocks[i].getTopLeft();
+		Vec2 bottomright = blocks[i].getBottomRight();
 
+        ss << "{\"x1\":" << topleft.x
+            << ",\"y1\":" << topleft.y
+            << ",\"x2\":" << bottomright.x
+            << ",\"y2\":" << bottomright.y << "}";
+        if (i != blocks.size() - 1) ss << ",";
+    }
     ss << "]}\n";
     return ss.str();
 }
