@@ -50,11 +50,14 @@ std::string Simulation::getWorldJson() {
     for (size_t i = 0; i < cars.size(); i++) {
         Vec2 pos = cars[i].getPosition();
         Vec2 vel = cars[i].getVelocityVector();
+        Vec2 acc = cars[i].getAccelerationVector();
 
         ss << "{\"x\":" << pos.x
             << ",\"y\":" << pos.y
             << ",\"vx\":" << vel.x
-            << ",\"vy\":" << vel.y << "}";
+            << ",\"vy\":" << vel.y
+            << ",\"ax\":" << acc.x
+            << ",\"ay\":" << acc.y << "}";
 
         if (i != cars.size() - 1) ss << ",";
     }

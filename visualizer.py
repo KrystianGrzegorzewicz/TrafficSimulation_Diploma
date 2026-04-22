@@ -95,11 +95,18 @@ def draw_car(x, y, vx, vy):
 
     pygame.draw.line(
         screen,
+        (150, 50, 50),
+        (x, y),
+        (x + ax, y + ay),
+        4
+    )
+    pygame.draw.line(
+        screen,
         (50, 200, 50),
         (x, y),
         (x + vx, y + vy),
         2
-    )
+    )    
 
 def draw_blocks():
     for block in blocks:
@@ -187,6 +194,8 @@ while running:
         x, y = to_screen(car["x"], car["y"])
         vx = car["vx"] * scale
         vy = car["vy"] * scale
+        ax = car["ax"] * scale
+        ay = car["ay"] * scale
         draw_car(x, y, vx, vy)
 
     pygame.display.flip()
