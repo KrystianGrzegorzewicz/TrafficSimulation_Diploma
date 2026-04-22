@@ -1,13 +1,9 @@
 #include "vehicles/Car.h"
 #include <iostream>
 
-/*Car::Car(const std::vector<Lane*>& r, float startT, float s, Travel travel)
-    : route(r), currentTarget(0), t(startT), speed(s), travel(travel){
-}*/
-Car::Car(float startT, float speed, Travel travel)
-	: speed(speed), travel(travel), currentTarget(0), t(startT)
+Car::Car(float speed, Travel travel)
+	: speed(speed), travel(travel), currentTarget(0)
 {
-    std::cout << currentTarget << " / " << travel.TravelPoints.size() << std::endl;
     if (!travel.TravelPoints.empty()) {
         position = travel.TravelPoints[0];
     }
@@ -15,25 +11,7 @@ Car::Car(float startT, float speed, Travel travel)
         position = Vec2(0, 0);
     }
 }
-/*
-void Car::update(float dt) {
 
-    Lane* lane = route[currentTarget];
-
-    float distance = speed * dt;
-    float deltaT = distance / lane->getLength();
-    t += deltaT;
-
-    // koniec pasa → przejdź do następnego
-    if (t >= 1.0f) {
-        t = 0.0f;
-        currentTarget++;
-
-        // koniec trasy → restart auta
-        if (currentTarget >= route.size())
-            currentTarget = 0;
-    }
-}*/
 void Car::update(float dt) {
     if (currentTarget >= travel.TravelPoints.size()) {
         velocity = Vec2(0, 0);

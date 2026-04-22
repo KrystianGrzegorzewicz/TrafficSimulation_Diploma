@@ -31,7 +31,7 @@ Simulation::Simulation() {
         }
     }*/
     for (int i = 0; i < 10; i++) {
-        cars.emplace_back( i * 0.2f, 80.0f, thisJunction.getRandomTravel());
+        cars.emplace_back(80.0f, thisJunction.getRandomTravel());
     }
 	blocks = thisJunction.getBlocks();
 }

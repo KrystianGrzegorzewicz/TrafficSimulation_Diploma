@@ -7,14 +7,13 @@ class Car {
 private:
     std::vector<Lane*> route;
     int currentTarget;
-    float t;
     float speed;
 	Vec2 position;
 	Travel travel;
 	Vec2 velocity;
 
 public:
-    Car(float startT, float speed, Travel travel);
+    Car(float speed, Travel travel);
 
     void update(float dt);
 
