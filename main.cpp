@@ -15,7 +15,6 @@ int main() {
     WSAStartup(MAKEWORD(2, 2), &wsa);
     Config conf;
 	int input;
-	float simSpeed;
     std::print("Load default config? 1 - Yes, 0 - No: ");
 	std::cin >> input;
     if (input != 1)

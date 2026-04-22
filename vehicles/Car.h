@@ -6,15 +6,27 @@
 class Car {
 private:
     std::vector<Lane*> route;
-    int currentTarget;
+    //int currentTarget;
     float speed;
 	Vec2 position;
 	Travel travel;
 	Vec2 velocity;
+    int segment = 0;  // zamiast currentTarget
+    float t = 0.0f;
+    std::vector<Vec2> curveSamples;
+    std::vector<float> curveDistances;
+    float totalLength = 0.0f;
+
+    float traveled = 0.0f;
+
 
 public:
     Car(float speed, Travel travel);
-
+    Vec2 catmullRom(const Vec2& p0, const Vec2& p1, const Vec2& p2, const Vec2& p3, float t);
+    Vec2 catmullRomDerivative(const Vec2& p0, const Vec2& p1, const Vec2& p2, const Vec2& p3, float t);
+    Vec2 bezier(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t);
+    Vec2 bezierDerivative(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t);
+    void buildCurve();
     void update(float dt);
 
     Vec2 getPosition() const;
