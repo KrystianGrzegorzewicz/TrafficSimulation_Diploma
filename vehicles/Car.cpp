@@ -13,7 +13,7 @@ Car::Car(float speed, Travel travel)
     t = 0.0f;
     traveled = 0.0f;
 
-    buildCurve(); // 🔥 PRECOMPUTE
+    buildCurve();
 }
 Vec2 Car::bezier(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t) {
     float u = 1.0f - t;
@@ -26,37 +26,43 @@ void Car::buildCurve()
 {
     curveSamples.clear();
     curveDistances.clear();
+    totalLength = 0.0f;
 
     if (travel.TravelPoints.size() < 3)
         return;
 
-    const int RESOLUTION = 50; // im więcej, tym dokładniej
-
-    totalLength = 0.0f;
+    const int RESOLUTION = 300;
 
     Vec2 prev;
+    bool firstPoint = true;
 
-    for (int i = 0; i < RESOLUTION; i++)
+    for (size_t s = 0; s + 2 < travel.TravelPoints.size(); s += 2)
     {
-        float t = (float)i / (RESOLUTION - 1);
+        Vec2 p0 = travel.TravelPoints[s];
+        Vec2 p1 = travel.TravelPoints[s + 1];
+        Vec2 p2 = travel.TravelPoints[s + 2];
 
-        // segment Béziera
-        Vec2 p0 = travel.TravelPoints[segment];
-        Vec2 p1 = travel.TravelPoints[segment + 1];
-        Vec2 p2 = travel.TravelPoints[segment + 2];
-
-        Vec2 p = bezier(p0, p1, p2, t);
-
-        curveSamples.push_back(p);
-
-        if (i > 0)
+        for (int i = 0; i < RESOLUTION; i++)
         {
-            float d = (p - prev).length();
-            totalLength += d;
-            curveDistances.push_back(totalLength);
-        }
+            float t = (float)i / (RESOLUTION - 1);
 
-        prev = p;
+            Vec2 p = bezier(p0, p1, p2, t);
+
+            if (!firstPoint && i == 0)
+                continue;
+
+            curveSamples.push_back(p);
+
+            if (!firstPoint)
+            {
+                float d = (p - prev).length();
+                totalLength += d;
+                curveDistances.push_back(totalLength);
+            }
+
+            prev = p;
+            firstPoint = false;
+        }
     }
 }
 void Car::update(float dt)
@@ -73,14 +79,12 @@ void Car::update(float dt)
         return;
     }
 
-    // 🔥 znajdź indeks po długości
     size_t i = 0;
     while (i < curveDistances.size() && curveDistances[i] < traveled)
         i++;
 
     position = curveSamples[i];
 
-    // 🔥 velocity z różnicy punktów
     if (i > 0)
     {
         Vec2 dir = curveSamples[i] - curveSamples[i - 1];

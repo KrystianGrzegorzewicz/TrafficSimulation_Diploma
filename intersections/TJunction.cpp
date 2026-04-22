@@ -22,6 +22,7 @@ TJunction::TJunction() {
         Vec2(-90.0f, 1.75f),
 
         Vec2(-5.0f, 1.75f),
+        Vec2(0.0f, 0.0f),
         Vec2(-1.75f, 5.0f),
 
         Vec2(-1.75f, 45.0f),
