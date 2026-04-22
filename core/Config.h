@@ -3,7 +3,7 @@
 
 struct Config {
 	bool gui;
-	float simSpeed = 1.0f;
+	float simSpeed;
 
-	Config() : gui(false) {}
+	Config() : gui(true), simSpeed(1.0f) {}
 };

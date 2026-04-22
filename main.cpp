@@ -49,9 +49,7 @@ int main() {
         std::println("Client connected!\n");
 
         auto last = std::chrono::high_resolution_clock::now();
-
         float accumulator = 0.0f;
-
         const float maxDt = 0.05f;
         const float sendInterval = 1.0f / 60.0f;
 
@@ -59,22 +57,19 @@ int main() {
 
         while (true) {
             auto now = std::chrono::high_resolution_clock::now();
-            float frameTime = std::chrono::duration<float>(now - last).count();
+            float realDt = std::chrono::duration<float>(now - last).count();
             last = now;
 
-            if (frameTime > maxDt)
-                frameTime = maxDt;
+            if (realDt > maxDt)
+                realDt = maxDt;
+            float simDt = realDt * conf.simSpeed;
 
-            frameTime *= conf.simSpeed;
-
-            accumulator += frameTime;
-
+            accumulator += simDt;
             while (accumulator >= fixedDt) {
                 sim.step(fixedDt);
                 accumulator -= fixedDt;
             }
-
-            sendTimer += frameTime;
+            sendTimer += realDt;
 
             if (sendTimer >= sendInterval) {
                 std::string msg = sim.getWorldJson();
