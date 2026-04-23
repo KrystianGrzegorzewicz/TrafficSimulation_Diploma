@@ -6,35 +6,33 @@
 class Car {
 private:
     std::vector<Lane*> route;
-    float speed;
-	Vec2 position;
-	Travel travel;
-	Vec2 velocity;
+    Travel travel;
+
+    Vec2 position;
+    Vec2 velocity;
     Vec2 acceleration;
+
+    float speed;
+
+    // parametr na krzywej
     int segment = 0;
     float t = 0.0f;
-    std::vector<Vec2> curveSamples;
-    std::vector<float> curveDistances;
-    float totalLength = 0.0f;
-    float traveled = 0.0f;
-    float desiredSpeed = 0.0f;
-    float maxAccel = 4.0f;
 
+    // tuning
+    float maxAccel = 6.0f;
+    float maxSpeed = 20.0f;
+
+    float lookahead = 0.05f;
+    float aLatMax = 6.0f;     // maks przyspieszenie boczne
+    float lookaheadBase = 0.1f;
+    float lookaheadSpeedFactor = 0.03f;
+
+    // PD controller
+    float kp = 8.0f;
+    float kd = 4.0f;
 
 public:
     Car(float speed, Travel travel);
-    Vec2 bezier(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t);
-    Vec2 bezierDerivative(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t);
-    Vec2 bezierSecondDerivative(const Vec2& p0, const Vec2& p1, const Vec2& p2);
-    void buildCurve();
-    float bezierCurvature(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t);
-    float bezierRadius(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t);
-    int currentBezierSegment(size_t sampleIndex);
-    float maxSpeedFromRadius(float R);
-    float segmentSpeedLimit(int segIndex);
-    float computeDesiredSpeed(size_t currentIndex);
-    void accelerate(float dt, size_t curveIndex);
-    float brakingDistance(float v, float targetV);
 
     void update(float dt);
 

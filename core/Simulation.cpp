@@ -6,30 +6,6 @@ std::mt19937 rng(std::random_device{}());
 std::uniform_int_distribution<int> dist(0, 1);
 
 Simulation::Simulation() {
-
-    //roads.push_back(std::make_unique<TJunction>(450, 250));
-    //const auto& lanes = roads[0]->getLanes();
-
-    /*Lane* straight = (Lane*)&lanes[0];
-    Lane* turn1 = (Lane*)&lanes[1];
-    Lane* turn2 = (Lane*)&lanes[2];
-
-    std::mt19937 rng(std::random_device{}());
-    std::uniform_int_distribution<int> dist(0, 1);
-
-    for (int i = 0; i < 10; i++) {
-
-        bool goStraight = dist(rng);
-
-        if (goStraight) {
-            std::vector<Lane*> route = { straight };
-            cars.emplace_back(route, i * 0.1f, 80.0f, thisJunction.getRandomTravel());
-        }
-        else {
-            std::vector<Lane*> route = { turn1, turn2 };
-            cars.emplace_back(route, i * 0.1f, 80.0f, thisJunction.getRandomTravel());
-        }
-    }*/
     for (int i = 0; i < 10; i++) {
         cars.emplace_back(14.0f, thisJunction.getRandomTravel());
     }
