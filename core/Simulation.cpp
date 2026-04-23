@@ -8,9 +8,7 @@ std::uniform_int_distribution<int> dist(0, 1);
 Simulation::Simulation(float d) {
 	timeAccumulator = 0.0f;
 	period = 1.0f / d;
-    //for (int i = 0; i < 10; i++) {
-        cars.emplace_back(14.0f, thisJunction.getRandomTravel());
-    //}
+    cars.emplace_back(14.0f, thisJunction.getRandomTravel());
 	blocks = thisJunction.getBlocks();
 }
 
