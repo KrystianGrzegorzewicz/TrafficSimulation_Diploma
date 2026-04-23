@@ -9,6 +9,8 @@
 
 class Simulation {
 private:
+    float timeAccumulator;
+	float period;
     std::vector<Car> cars;
     std::vector<std::unique_ptr<Road>> roads;
     std::vector<Block> blocks;
@@ -16,7 +18,7 @@ private:
 	TJunction thisJunction;
 
 public:
-    Simulation();
+    Simulation(float d);
     void step(float dt);
     std::string getWorldJson();
 };

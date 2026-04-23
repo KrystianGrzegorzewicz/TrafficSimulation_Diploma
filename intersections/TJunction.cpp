@@ -39,6 +39,21 @@ TJunction::TJunction() {
         Vec2(-1.75f, 45.0f)   
     };
     travels.push_back(Travel(travelPoints2));
+    std::vector<Vec2> travelPoints3 = {
+        Vec2(90.0f, -1.75f),
+        Vec2(90.0f, -1.75f),
+        Vec2(60.0f, -1.75f),
+        Vec2(30.0f, -1.75f),
+
+        Vec2(5.0f, -1.75f),
+        Vec2(-5.0f, -1.75f),
+
+        Vec2(-30.0f, -1.75f),
+        Vec2(-60.0f, -1.75f),
+        Vec2(-90.0f, -1.75f),
+        Vec2(-90.0f, -1.75f)
+    };
+    travels.push_back(Travel(travelPoints3));
 }
 std::vector<Block> TJunction::getBlocks() {
     return blocks;

@@ -5,14 +5,23 @@
 std::mt19937 rng(std::random_device{}());
 std::uniform_int_distribution<int> dist(0, 1);
 
-Simulation::Simulation() {
-    for (int i = 0; i < 10; i++) {
+Simulation::Simulation(float d) {
+	timeAccumulator = 0.0f;
+	period = 1.0f / d;
+    //for (int i = 0; i < 10; i++) {
         cars.emplace_back(14.0f, thisJunction.getRandomTravel());
-    }
+    //}
 	blocks = thisJunction.getBlocks();
 }
 
 void Simulation::step(float dt) {
+    timeAccumulator += dt;
+    while (timeAccumulator >= period)
+    {
+        cars.emplace_back(14.0f, thisJunction.getRandomTravel());
+        timeAccumulator -= period;
+    }
+
     for (auto& car : cars)
         car.update(dt);
 }

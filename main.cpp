@@ -28,7 +28,7 @@ int main() {
     }
 
     const float fixedDt = 0.01f;
-    Simulation sim;
+    Simulation sim = Simulation(conf.spawnRate);
 
     if (conf.gui)
     {
