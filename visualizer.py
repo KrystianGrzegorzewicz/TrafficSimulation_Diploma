@@ -77,7 +77,7 @@ def to_screen(x, y):
 
 # ===== RYSOWANIE =====
 
-def draw_car(x, y, vx, vy):
+def draw_car(x, y, vx, vy, ax, ay):
     car_length_m = 3.5
     car_width_m = 1.8
 
@@ -89,24 +89,37 @@ def draw_car(x, y, vx, vy):
     car_surf = pygame.Surface((width, height), pygame.SRCALPHA)
     pygame.draw.rect(car_surf, (50, 100, 220), (0, 0, width, height))
 
+    # ---- braking detection ----
+    is_braking = (ax * vx + ay * vy) < 0
+    light_color = (255, 40, 40) if is_braking else (90, 0, 0)
+
+    # ---- rear lights (local space) ----
+    light_w = width * 0.08
+    light_h = height * 0.25
+    margin = height * 0.1
+
+    # left rear light
+    pygame.draw.rect(
+        car_surf,
+        light_color,
+        (0, margin, light_w, light_h)
+    )
+
+    # right rear light
+    pygame.draw.rect(
+        car_surf,
+        light_color,
+        (0, height - margin - light_h, light_w, light_h)
+    )
+
+    # ---- rotate & draw ----
     rotated = pygame.transform.rotate(car_surf, angle)
     rect = rotated.get_rect(center=(x, y))
     screen.blit(rotated, rect.topleft)
 
-    pygame.draw.line(
-        screen,
-        (150, 50, 50),
-        (x, y),
-        (x + ax, y + ay),
-        4
-    )
-    pygame.draw.line(
-        screen,
-        (50, 200, 50),
-        (x, y),
-        (x + vx, y + vy),
-        2
-    )    
+    # ---- debug vectors ----
+    pygame.draw.line(screen, (150, 50, 50), (x, y), (x + ax, y + ay), 4)
+    pygame.draw.line(screen, (50, 200, 50), (x, y), (x + vx, y + vy), 2)
 
 def draw_blocks():
     for block in blocks:
@@ -196,7 +209,7 @@ while running:
         vy = car["vy"] * scale
         ax = car["ax"] * scale
         ay = car["ay"] * scale
-        draw_car(x, y, vx, vy)
+        draw_car(x, y, vx, vy, ax, ay)
 
     pygame.display.flip()
     clock.tick(60)
