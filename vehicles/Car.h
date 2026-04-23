@@ -1,11 +1,9 @@
 #pragma once
-#include "core/Lane.h"
 #include "core/Travel.h"
 #include <vector>
 
 class Car {
 private:
-    std::vector<Lane*> route;
     Travel travel;
 
     Vec2 position;

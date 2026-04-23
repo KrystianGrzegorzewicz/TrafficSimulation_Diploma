@@ -131,9 +131,7 @@
     <ClCompile Include="core\Block.cpp" />
     <ClCompile Include="core\Travel.cpp" />
     <ClCompile Include="vehicles\Car.cpp" />
-    <ClCompile Include="core\Lane.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="core\Road.cpp" />
     <ClCompile Include="core\Simulation.cpp" />
     <ClCompile Include="intersections\TJunction.cpp" />
   </ItemGroup>
@@ -145,8 +143,6 @@
     <ClInclude Include="core\Config.h" />
     <ClInclude Include="core\Travel.h" />
     <ClInclude Include="vehicles\Car.h" />
-    <ClInclude Include="core\Lane.h" />
-    <ClInclude Include="core\Road.h" />
     <ClInclude Include="core\Simulation.h" />
     <ClInclude Include="intersections\TJunction.h" />
     <ClInclude Include="core\Vec2.h" />

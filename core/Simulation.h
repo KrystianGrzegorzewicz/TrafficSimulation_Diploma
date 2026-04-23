@@ -12,7 +12,6 @@ private:
     float timeAccumulator;
 	float period;
     std::vector<Car> cars;
-    std::vector<std::unique_ptr<Road>> roads;
     std::vector<Block> blocks;
 
 	TJunction thisJunction;

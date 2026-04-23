@@ -1,10 +1,9 @@
 #pragma once
 #pragma once
-#include "core/Road.h"
 #include "core/Block.h"
 #include "core/Travel.h"
 
-class TJunction : public Road {
+class TJunction {
 private:
     std::vector<Block> blocks;
 	std::vector<Travel> travels;
