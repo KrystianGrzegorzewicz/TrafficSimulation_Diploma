@@ -37,12 +37,12 @@ float Travel::maxSpeedAt(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t
 }
 float Travel::computeSpeedLimitAhead(int segment, float t, float lookaheadT, float aLatMax)
 {
-    float minSpeed = 999999.0f;
+    float minSpeed = std::numeric_limits<float>::max();
 
     int seg = segment;
     float localT = t;
 
-    const float STEP = 0.05f;
+    const float STEP = 0.02f; // 🔥 było 0.05 (za rzadko)
 
     float traveledT = 0.0f;
 
@@ -64,6 +64,10 @@ float Travel::computeSpeedLimitAhead(int segment, float t, float lookaheadT, flo
             localT = 0.0f;
         }
     }
+
+    // 🔥 zabezpieczenie
+    if (minSpeed == std::numeric_limits<float>::max())
+        return 50.0f;
 
     return minSpeed;
 }

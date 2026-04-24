@@ -1,6 +1,6 @@
 #include "core/Perception.h"
 #include <limits>
-#include <vector>
+#include <cmath>
 
 void updatePerception(Perception& p, const std::vector<CarState>& others)
 {
@@ -9,79 +9,84 @@ void updatePerception(Perception& p, const std::vector<CarState>& others)
     p.relativeSpeed = 0.0f;
     p.relativeAcceleration = 0.0f;
 
-    float bestTTC = std::numeric_limits<float>::max();
-    float bestDist = std::numeric_limits<float>::max();
+    float bestScore = std::numeric_limits<float>::max();
 
-    Vec2 forward = p.self.velocity.length() > 0.001f
+    // =========================
+    // kierunek jazdy
+    // =========================
+    Vec2 forward = (p.self.velocity.length() > 0.5f)
         ? p.self.velocity.normalized()
-        : Vec2(1, 0);
+        : Vec2(1, 0); // fallback (można później poprawić na kierunek z krzywej)
 
-    // 🔥 fallback: jeśli bardzo wolno jedzie → nie ufaj velocity
-    if (p.self.velocity.length() < 0.5f)
-    {
-        forward = Vec2(1, 0); // albo możesz później dać kierunek z krzywej
-    }
     Vec2 right(-forward.y, forward.x);
+
+    // =========================
+    // parametry percepcji
+    // =========================
+    float maxViewDistance = 50.0f;   // ile metrów widzi
+    float laneWidth = 3.0f;          // szerokość pasa
+    float fovDot = 0.3f;             // kąt widzenia (~70°)
 
     for (const auto& o : others)
     {
-        // pomijamy "siebie" po pozycji (bez pointerów!)
-        if ((o.position - p.self.position).length() < 0.0001f)
+        // pomiń siebie
+        if ((o.position - p.self.position).length() < 0.001f)
             continue;
 
         Vec2 relPos = o.position - p.self.position;
-        Vec2 relVel = o.velocity - p.self.velocity;
-
-        float forwardDist = relPos.dot(forward);
-        float lateralDist = std::fabs(relPos.dot(right));
-
-        float laneWidth = 3.5f;
-
-        // auto musi być "przed nami w pasie"
-        if (forwardDist <= 0.0f) continue;
-        if (lateralDist > laneWidth) continue;
-
-        // =========================
-        // TIME TO COLLISION (TTC)
-        // =========================
-        //float closingSpeed = -relPos.dot(relVel) / std::max(relPos.length(), 0.001f);
         float dist = relPos.length();
 
-        float closingSpeed = -(relVel.dot(relPos.normalized()));
-
-        if (closingSpeed <= 0.01f)
+        if (dist > maxViewDistance)
             continue;
 
+        Vec2 dir = relPos / dist;
+
+        // =========================
+        // filtr kąta (FOV)
+        // =========================
+        float dot = forward.dot(dir);
+        if (dot < fovDot)
+            continue;
+
+        // =========================
+        // filtr pasa
+        // =========================
+        float lateral = std::fabs(relPos.dot(right));
+        if (lateral > laneWidth)
+            continue;
+
+        // =========================
+        // względna prędkość
+        // =========================
+        Vec2 relVel = o.velocity - p.self.velocity;
+
+        float closingSpeed = -relVel.dot(dir);
+
+        // jeśli nie zbliżamy się → ignoruj
+        if (closingSpeed <= 0.1f)
+            continue;
+
+        // =========================
+        // TTC (Time To Collision)
+        // =========================
         float ttc = dist / closingSpeed;
 
-        if (closingSpeed > 0.01f)
+        // score = im mniejsze tym groźniejsze
+        float score = ttc;
+
+        if (score < bestScore)
         {
-            float ttc = relPos.length() / closingSpeed;
+            bestScore = score;
 
-            float safeTTC = 2.0f;
+            p.carAhead = o;
+            p.hasCarAhead = true;
+            p.distanceToCarAhead = dist;
 
-            if (forwardDist > 0 && lateralDist < laneWidth)
-            {
-                float dist = relPos.length();
+            p.relativeSpeed =
+                p.self.velocity.length() - o.velocity.length();
 
-                if (dist < bestDist)
-                {
-                    bestDist = dist;
-                    p.carAhead = o;
-                    p.hasCarAhead = true;
-                }
-            }
+            p.relativeAcceleration =
+                p.self.acceleration.length() - o.acceleration.length();
         }
-    }
-
-    if (p.hasCarAhead)
-    {
-        p.distanceToCarAhead = bestDist;
-
-        p.relativeSpeed =
-            p.self.velocity.length() - p.carAhead.velocity.length();
-
-        p.relativeAcceleration =
-            p.self.acceleration.length() - p.carAhead.acceleration.length();
     }
 }
