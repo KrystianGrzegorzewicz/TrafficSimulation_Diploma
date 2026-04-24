@@ -18,7 +18,7 @@ private:
 	TJunction thisJunction;
 
 public:
-    Simulation(float d);
+    Simulation(float d, int junctionIndex);
     void step(float dt);
     std::string getWorldJson();
 };

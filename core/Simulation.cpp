@@ -5,7 +5,8 @@
 std::mt19937 rng(std::random_device{}());
 std::uniform_int_distribution<int> dist(0, 1);
 
-Simulation::Simulation(float d) {
+Simulation::Simulation(float d, int junctionIndex) {
+    this->thisJunction = TJunction(junctionIndex);
 	timeAccumulator = 0.0f;
 	period = 1.0f / d;
     cars.emplace_back(14.0f, thisJunction.getRandomTravel());

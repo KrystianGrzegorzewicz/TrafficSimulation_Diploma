@@ -26,11 +26,11 @@ private:
     float lookahead = 0.05f;
     float aLatMax = 6.0f;     // maks przyspieszenie boczne
     float lookaheadBase = 0.1f;
-    float lookaheadSpeedFactor = 0.03f;
+    float lookaheadSpeedFactor = 0.05f;
 
     // PD controller
-    float kp = 5.0f;
-    float kd = 2.0f;
+    float kp = 8.0f;
+    float kd = 4.0f;
 
     BehaviorModel behavior;
 

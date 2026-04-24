@@ -25,10 +25,12 @@ int main() {
 			conf.gui = true;
         std::print("Set simulation speed (e.g., 1.0 for normal speed): ");
         std::cin >> conf.simSpeed;
+        std::print("Set simulation junction sample (1, 2): ");
+        std::cin >> conf.junction;
     }
 
     const float fixedDt = 0.01f;
-    Simulation sim = Simulation(conf.spawnRate);
+    Simulation sim = Simulation(conf.spawnRate, conf.junction);
 
     if (conf.gui)
     {
