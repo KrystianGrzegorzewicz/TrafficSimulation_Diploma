@@ -22,12 +22,24 @@ void Car::update(float dt)
     Vec2 oldVelocity = velocity;
 
     if (segment + 2 >= travel.TravelPoints.size())
+    {
+        finished = true;
+        velocity = Vec2(0, 0);
         return;
-    Vec2 p0 = travel.TravelPoints[segment];
-    Vec2 p1 = travel.TravelPoints[segment + 1];
-    Vec2 p2 = travel.TravelPoints[segment + 2];
+    }
+
+    auto& p = travel.TravelPoints;
+
+    Vec2 p0 = p[segment];
+    Vec2 p1 = p[segment + 1];
+    Vec2 p2 = p[segment + 2];
+
+    // =========================
+    // znajdź t (BEZ ZMIAN)
+    // =========================
     float bestT = t;
     float bestDist = (travel.bezier(p0, p1, p2, t) - position).length();
+
     for (int i = -2; i <= 2; i++)
     {
         float testT = t + i * 0.02f;
@@ -42,52 +54,76 @@ void Car::update(float dt)
             bestT = testT;
         }
     }
+
     t = bestT;
+
     if (t >= 0.999f)
     {
         segment += 2;
         t = 0.0f;
+
+        if (segment + 2 >= travel.TravelPoints.size())
+        {
+            finished = true;
+            velocity = Vec2(0, 0);
+        }
+
         return;
     }
 
-    float tLook = std::min(t + lookahead, 1.0f);
-    Vec2 target = travel.bezier(p0, p1, p2, tLook);
-    Vec2 tangent = travel.bezierDerivative(p0, p1, p2, tLook);
-    float len = tangent.length();
-    Vec2 forward = (len > 0.0001f) ? tangent / len : Vec2(0, 0);
+    // =========================
+    // BEHAVIOR (NOWE)
+    // =========================
+    BehaviorOutput out = behavior.compute(
+        travel,
+        segment,
+        t,
+        velocity.length(),
+        maxSpeed,
+        aLatMax,
+        lookaheadBase,
+        lookaheadSpeedFactor
+    );
 
-    Vec2 toTarget = target - position;
+    // =========================
+    // kierunek z krzywej (jak było)
+    // =========================
+    float dynamicLookahead = lookaheadBase + velocity.length() * lookaheadSpeedFactor;
+    float tLook = std::min(t + dynamicLookahead, 1.0f);
+    Vec2 tangent = travel.bezierDerivative(p0, p1, p2, tLook);
+    Vec2 forward = tangent.length() > 0.0001f
+        ? tangent / tangent.length()
+        : Vec2(1, 0);
+
+    // =========================
+    // lateral control (jak było)
+    // =========================
+    Vec2 toTarget = out.targetPoint - position;
+
     float forwardMag = toTarget.dot(forward);
     Vec2 forwardVec = forward * forwardMag;
+
     Vec2 lateralError = toTarget - forwardVec;
+
     float lateralVelMag = velocity.dot(Vec2(-forward.y, forward.x));
     Vec2 lateralVel = Vec2(-forward.y, forward.x) * lateralVelMag;
 
     Vec2 a_lateral = lateralError * kp - lateralVel * kd;
+
+    // =========================
+    // forward (z behavior)
+    // =========================
     float currentSpeed = velocity.length();
-    float dynamicLookahead = lookaheadBase + speed * lookaheadSpeedFactor;
+    float dv = out.targetSpeed - currentSpeed;
 
-    float curveSpeed = travel.computeSpeedLimitAhead(
-        segment,
-        t,
-        dynamicLookahead,
-        aLatMax
-    );
-
-    float targetSpeed = std::min(maxSpeed, curveSpeed);
-    float dv = targetSpeed - currentSpeed;
-    float a_forward_scalar = 0.0f;
-    if (dv > 0)
-    {
-        a_forward_scalar = dv * 2.0f;
-    }
-    else
-    {
-        a_forward_scalar = dv * 4.0f;
-    }
+    float a_forward_scalar = (dv > 0) ? dv * 2.0f : dv * 4.0f;
     Vec2 a_forward = forward * a_forward_scalar;
 
+    // =========================
+    // suma
+    // =========================
     acceleration = a_forward + a_lateral;
+
     float accLen = acceleration.length();
     if (accLen > maxAccel)
         acceleration = acceleration / accLen * maxAccel;
@@ -111,3 +147,4 @@ Vec2 Car::getVelocityVector() const {
 Vec2 Car::getAccelerationVector() const {
     return acceleration;
 }
+bool Car::isFinished() const { return finished; }

@@ -22,6 +22,12 @@ void Simulation::step(float dt) {
 
     for (auto& car : cars)
         car.update(dt);
+
+    cars.erase(
+        std::remove_if(cars.begin(), cars.end(),
+            [](const Car& c) { return c.isFinished(); }),
+        cars.end()
+    );
 }
 
 std::string Simulation::getWorldJson() {

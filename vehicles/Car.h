@@ -1,5 +1,6 @@
 #pragma once
 #include "core/Travel.h"
+#include "core/BehaviorModel.h"
 #include <vector>
 
 class Car {
@@ -15,6 +16,7 @@ private:
     // parametr na krzywej
     int segment = 0;
     float t = 0.0f;
+    bool finished = false;
 
     // tuning
     float maxAccel = 6.0f;
@@ -29,12 +31,16 @@ private:
     float kp = 8.0f;
     float kd = 4.0f;
 
+    BehaviorModel behavior;
+
 public:
     Car(float speed, Travel travel);
+    ~Car() {};
 
     void update(float dt);
 
     Vec2 getPosition() const;
     Vec2 getVelocityVector() const;
     Vec2 getAccelerationVector() const;
+    bool isFinished() const;
 };

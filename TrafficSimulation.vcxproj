@@ -128,6 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="core\BehaviorModel.cpp" />
     <ClCompile Include="core\Block.cpp" />
     <ClCompile Include="core\Travel.cpp" />
     <ClCompile Include="vehicles\Car.cpp" />
@@ -139,6 +140,7 @@
     <None Include="visualizer.py" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="core\BehaviorModel.h" />
     <ClInclude Include="core\Block.h" />
     <ClInclude Include="core\Config.h" />
     <ClInclude Include="core\Travel.h" />
