@@ -29,8 +29,8 @@ private:
     float lookaheadSpeedFactor = 0.03f;
 
     // PD controller
-    float kp = 2.0f;
-    float kd = 1.0f;
+    float kp = 5.0f;
+    float kd = 2.0f;
 
     BehaviorModel behavior;
 
