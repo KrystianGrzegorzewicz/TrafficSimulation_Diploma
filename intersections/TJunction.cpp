@@ -86,6 +86,7 @@ TJunction::TJunction(int index) {
             blocks.push_back(Block(3.5f, 3.5f, 100.0f, 4.0f));
             blocks.push_back(Block(-4.0f, 3.5f, -3.5f, 50.0f));
             blocks.push_back(Block(3.5f, 3.5f, 4.0f, 50.0f));
+			//z lewej do prawej
             travelPoints1 = {
                 Vec2(-90.0f, 1.75f),
                 Vec2(-90.0f, 1.75f),
@@ -100,6 +101,7 @@ TJunction::TJunction(int index) {
                 Vec2(90.0f, 1.75f),
                 Vec2(90.0f, 1.75f)
             };
+            //z lewej w dol
             travels.push_back(Travel(travelPoints1));
             travelPoints2 = {
                 Vec2(-90.0f, 1.75f),
@@ -116,12 +118,14 @@ TJunction::TJunction(int index) {
                 Vec2(-1.75f, 45.0f),
                 Vec2(-1.75f, 45.0f)
             };
+            //z prawej do lewej
             travels.push_back(Travel(travelPoints2));
             travelPoints3 = {
                 Vec2(90.0f, -1.75f),
                 Vec2(90.0f, -1.75f),
                 Vec2(60.0f, -1.75f),
                 Vec2(30.0f, -1.75f),
+                Vec2(15.0f, -1.75f),
 
                 Vec2(5.0f, -1.75f),
                 Vec2(-5.0f, -1.75f),
@@ -194,22 +198,20 @@ TJunction::TJunction(int index) {
 			//srodkowy z lewej w gore
             travels.push_back(Travel(travelPoints2));
             travelPoints3 = {
-                Vec2(-100.0f, 1.75f),
-                Vec2(-100.0f, 1.75f),
+                Vec2(-90.0f, 1.75f),
                 Vec2(-90.0f, 1.75f),
                 Vec2(-60.0f, 1.75f),
                 Vec2(-30.0f, 1.75f),
-                Vec2(-10.0f, 1.75f),
+                //Vec2(-10.0f, 1.75f),
 
                 Vec2(-1.5f, 1.75f),
                 Vec2(1.75f, 1.75f),
                 Vec2(1.75f, -1.5f),
 
-                Vec2(1.75f, -20.0f),
-                Vec2(1.75f, -50.0f),
-                Vec2(1.75f, -70.0f),   
-                Vec2(1.75f, -100.0f),
-                Vec2(1.75f, -100.0f),
+                Vec2(1.75f, -30.0f),
+                Vec2(1.75f, -60.0f),
+                Vec2(1.75f, -90.0f),   
+                Vec2(1.75f, -90.0f)
             };
             travels.push_back(Travel(travelPoints3));
 			break;
