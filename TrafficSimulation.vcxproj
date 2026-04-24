@@ -130,6 +130,7 @@
   <ItemGroup>
     <ClCompile Include="core\BehaviorModel.cpp" />
     <ClCompile Include="core\Block.cpp" />
+    <ClCompile Include="core\Perception.cpp" />
     <ClCompile Include="core\Travel.cpp" />
     <ClCompile Include="vehicles\Car.cpp" />
     <ClCompile Include="main.cpp" />
@@ -142,7 +143,9 @@
   <ItemGroup>
     <ClInclude Include="core\BehaviorModel.h" />
     <ClInclude Include="core\Block.h" />
+    <ClInclude Include="core\CarState.h" />
     <ClInclude Include="core\Config.h" />
+    <ClInclude Include="core\Perception.h" />
     <ClInclude Include="core\Travel.h" />
     <ClInclude Include="vehicles\Car.h" />
     <ClInclude Include="core\Simulation.h" />

@@ -9,7 +9,8 @@ BehaviorOutput BehaviorModel::compute(
     float maxSpeed,
     float aLatMax,
     float lookaheadBase,
-    float lookaheadSpeedFactor
+    float lookaheadSpeedFactor,
+    const Perception& perception
 )
 {
     BehaviorOutput out;
@@ -22,33 +23,53 @@ BehaviorOutput BehaviorModel::compute(
     }
 
     auto& p = travel.TravelPoints;
-
-    // =========================
-    // dynamic lookahead (TAK JAK MIAŁEŚ)
-    // =========================
     float dynamicLookahead = lookaheadBase + currentSpeed * lookaheadSpeedFactor;
 
     float tLook = std::min(t + dynamicLookahead, 1.0f);
 
-    // =========================
-    // target point (TO SAMO CO BYŁO)
-    // =========================
     out.targetPoint = travel.bezier(
-        p[segment],
-        p[segment + 1],
-        p[segment + 2],
-        tLook
-    );
-
-    // =========================
-    // speed limit (TAK SAMO)
-    // =========================
+        p[segment], p[segment + 1], p[segment + 2], tLook);
     float curveSpeed = travel.computeSpeedLimitAhead(
         segment,
         t,
         dynamicLookahead,
         aLatMax
     );
+
+    // =========================
+    // OGRANICZENIE PRZEZ AUTO Z PRZODU
+    // =========================
+    // =========================
+// REAKCJA NA AUTO Z PRZODU (rozszerzona)
+// =========================
+    if (perception.hasCarAhead)
+    {
+        float safeDist = 2.0f + currentSpeed * 1.5f;
+
+        // 1. klasyczne dopasowanie dystansu
+        if (perception.distanceToCarAhead < safeDist)
+        {
+            out.targetSpeed = std::min(
+                out.targetSpeed,
+                perception.carAhead.velocity.length()
+            );
+        }
+
+        // 2. 🔥 NOWE: reakcja na hamowanie auta z przodu
+        float frontAcc = perception.carAhead.acceleration.length();
+
+        if (frontAcc < -1.0f) // auto przed nami hamuje
+        {
+            // reaguj wcześniej
+            float brakeFactor = std::clamp(
+                (-frontAcc) / 5.0f,
+                0.0f,
+                1.0f
+            );
+
+            out.targetSpeed *= (1.0f - 0.7f * brakeFactor);
+        }
+    }
 
     out.targetSpeed = std::min(maxSpeed, curveSpeed);
 

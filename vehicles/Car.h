@@ -37,7 +37,7 @@ public:
     Car(float speed, Travel travel);
     ~Car() {};
 
-    void update(float dt);
+    void update(float dt, const Perception& perception);
 
     Vec2 getPosition() const;
     Vec2 getVelocityVector() const;

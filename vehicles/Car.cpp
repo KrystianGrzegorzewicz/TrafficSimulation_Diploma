@@ -14,7 +14,7 @@ Car::Car(float speed, Travel travel)
     acceleration = Vec2(0, 0);
 }
 
-void Car::update(float dt)
+void Car::update(float dt, const Perception& perception)
 {
     if (travel.TravelPoints.size() < 3)
         return;
@@ -82,7 +82,8 @@ void Car::update(float dt)
         maxSpeed,
         aLatMax,
         lookaheadBase,
-        lookaheadSpeedFactor
+        lookaheadSpeedFactor,
+        perception
     );
 
     // =========================

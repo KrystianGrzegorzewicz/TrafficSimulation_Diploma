@@ -1,5 +1,6 @@
 #pragma once
 #include "core/Travel.h"
+#include "core/Perception.h"
 
 struct BehaviorOutput
 {
@@ -18,6 +19,7 @@ public:
         float maxSpeed,
         float aLatMax,
         float lookaheadBase,
-        float lookaheadSpeedFactor
+        float lookaheadSpeedFactor,
+        const Perception& perception
     );
 };

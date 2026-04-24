@@ -4,6 +4,7 @@
 #include <string>
 #include "vehicles/Car.h"
 #include "intersections/TJunction.h"
+#include "core/Perception.h"
 #include "core/Block.h"
 #include <memory>
 

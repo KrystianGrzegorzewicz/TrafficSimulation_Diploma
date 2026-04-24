@@ -20,8 +20,29 @@ void Simulation::step(float dt) {
         timeAccumulator -= period;
     }
 
-    for (auto& car : cars)
-        car.update(dt);
+    // 1. zbierz stany aut
+    std::vector<CarState> states;
+    states.reserve(cars.size());
+
+    for (const auto& car : cars)
+    {
+        states.push_back({
+            car.getPosition(),
+            car.getVelocityVector(),
+            car.getAccelerationVector()
+            });
+    }
+
+    // 2. aktualizuj każde auto z perception
+    for (size_t i = 0; i < cars.size(); i++)
+    {
+        Perception p;
+        p.self = states[i];
+
+        updatePerception(p, states);
+
+        cars[i].update(dt, p);
+    }
 
     cars.erase(
         std::remove_if(cars.begin(), cars.end(),
