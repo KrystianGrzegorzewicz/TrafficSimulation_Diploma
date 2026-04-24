@@ -5,51 +5,61 @@
 void updatePerception(Perception& p, const std::vector<CarState>& others)
 {
     p.hasCarAhead = false;
-    float bestDist = (std::numeric_limits<float>::max)();
+    p.distanceToCarAhead = 0.0f;
+    p.relativeSpeed = 0.0f;
+    p.relativeAcceleration = 0.0f;
 
-    Vec2 forward = p.self.velocity.length() > 0.001f
+    float bestTTC = std::numeric_limits<float>::max();
+    float bestDist = std::numeric_limits<float>::max();
+
+    Vec2 forward = (p.self.velocity.length() > 0.001f)
         ? p.self.velocity.normalized()
         : Vec2(1, 0);
 
+    Vec2 right(-forward.y, forward.x);
+
     for (const auto& o : others)
     {
-        // nie porównuj z samym sobą
-        if (&o == &p.self) continue;
+        // pomijamy "siebie" po pozycji (bez pointerów!)
+        if ((o.position - p.self.position).length() < 0.0001f)
+            continue;
 
-        Vec2 to = o.position - p.self.position;
+        Vec2 relPos = o.position - p.self.position;
+        Vec2 relVel = o.velocity - p.self.velocity;
 
-        float forwardDot = to.dot(forward);
+        float forwardDist = relPos.dot(forward);
+        float lateralDist = std::fabs(relPos.dot(right));
 
-        // szerokość "pasa percepcji"
-        float lateral = fabs(to.dot(Vec2(-forward.y, forward.x)));
+        float laneWidth = 2.5f;
 
-        float laneWidth = 2.5f; // dostrój
+        // auto musi być "przed nami w pasie"
+        if (forwardDist <= 0.0f) continue;
+        if (lateralDist > laneWidth) continue;
 
-        if (forwardDot <= 0) continue;
-        if (lateral > laneWidth) continue;
+        // =========================
+        // TIME TO COLLISION (TTC)
+        // =========================
+        float closingSpeed = -relPos.dot(relVel);
 
-        float dist = to.length();
+        if (closingSpeed < 0.01f)
+            continue;
 
-        if (dist < bestDist)
+        if (closingSpeed > 0.01f)
         {
-            bestDist = dist;
-            p.carAhead = o;
-            p.hasCarAhead = true;
-        }
-        float relSpeed = (p.self.velocity - o.velocity).length();
+            float ttc = relPos.length() / closingSpeed;
 
-        if (relSpeed > 0.1f)
-        {
-            float ttc = bestDist / relSpeed;
+            float safeTTC = 2.0f;
 
-            if (ttc < 2.0f) // 2 sekundy
+            if (ttc < safeTTC && ttc < bestTTC)
             {
+                bestTTC = ttc;
+                bestDist = relPos.length();
+
+                p.carAhead = o;
                 p.hasCarAhead = true;
-                break;
             }
         }
     }
-
 
     if (p.hasCarAhead)
     {

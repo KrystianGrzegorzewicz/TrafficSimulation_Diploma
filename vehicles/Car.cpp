@@ -137,6 +137,29 @@ void Car::update(float dt, const Perception& perception)
         acceleration = (velocity - oldVelocity) / dt;
     else
         acceleration = Vec2(0, 0);
+    if (perception.hasCarAhead)
+    {
+        Vec2 forward = velocity.length() > 0.001f
+            ? velocity.normalized()
+            : Vec2(1, 0);
+
+        float dist = perception.distanceToCarAhead;
+
+        float safeDist = computeSafeDistance(speed, maxAccel) + 1.0f;
+
+        if (dist < safeDist)
+        {
+            float safeSpeed = std::sqrt(
+                2.0f * maxAccel * std::max(0.0f, dist - 0.5f)
+            );
+
+            float currentSpeed = velocity.length();
+
+            float clampedSpeed = std::min(currentSpeed, safeSpeed);
+
+            velocity = forward * clampedSpeed;
+        }
+    }
 }
 
 Vec2 Car::getPosition() const {

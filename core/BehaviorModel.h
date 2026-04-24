@@ -23,3 +23,5 @@ public:
         const Perception& perception
     );
 };
+
+float computeSafeDistance(float speed, float maxDecel);

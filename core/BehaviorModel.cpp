@@ -44,7 +44,11 @@ BehaviorOutput BehaviorModel::compute(
 // =========================
     if (perception.hasCarAhead)
     {
-        float safeDist = 2.0f + currentSpeed * 1.5f;
+        float safeDist = computeSafeDistance(
+            currentSpeed,
+            aLatMax   // albo lepiej maxDecel jeśli masz
+        );
+        safeDist *= 1.2f; // safety buffer
 
         // 1. klasyczne dopasowanie dystansu
         if (perception.distanceToCarAhead < safeDist)
@@ -71,7 +75,42 @@ BehaviorOutput BehaviorModel::compute(
         }
     }
 
-    out.targetSpeed = std::min(maxSpeed, curveSpeed);
+    float finalSpeed = std::min(maxSpeed, curveSpeed);
+
+    // uwzględnij przeszkody NA KOŃCU (nie nadpisuj)
+    if (perception.hasCarAhead)
+    {
+        float safeDist = computeSafeDistance(
+            currentSpeed,
+            aLatMax   // albo lepiej maxDecel jeśli masz
+        );
+        safeDist *= 1.2f; // safety buffer
+
+        if (perception.distanceToCarAhead < safeDist)
+        {
+            finalSpeed = std::min(finalSpeed,
+                perception.carAhead.velocity.length());
+        }
+
+        float frontAcc = perception.carAhead.acceleration.length();
+
+        if (frontAcc < 0.0f)
+        {
+            finalSpeed *= 0.7f;
+        }
+    }
+
+    out.targetSpeed = finalSpeed;
 
     return out;
+}
+
+float computeSafeDistance(float speed, float maxDecel)
+{
+    float reactionTime = 0.5f;
+
+    float reactionDist = speed * reactionTime;
+    float brakingDist = (speed * speed) / (2.0f * maxDecel);
+
+    return reactionDist + brakingDist;
 }
