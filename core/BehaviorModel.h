@@ -4,8 +4,8 @@
 
 struct BehaviorOutput
 {
-    float targetSpeed;
-    Vec2 targetPoint;
+    Vec2 acceleration;   // IDM output
+    Vec2 targetPoint;    // dalej używane do ścieżki
 };
 
 class BehaviorModel
@@ -17,7 +17,8 @@ public:
         float t,
         float currentSpeed,
         float maxSpeed,
-        float aLatMax,
+        float maxAccel,
+        float maxDecel,
         float lookaheadBase,
         float lookaheadSpeedFactor,
         const Perception& perception

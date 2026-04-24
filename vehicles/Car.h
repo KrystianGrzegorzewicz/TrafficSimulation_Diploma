@@ -20,6 +20,7 @@ private:
 
     // tuning
     float maxAccel = 6.0f;
+    float maxDecel = 6.0f;
     float maxSpeed = 20.0f;
 
     float lookahead = 0.05f;
@@ -27,9 +28,7 @@ private:
     float lookaheadBase = 0.1f;
     float lookaheadSpeedFactor = 0.03f;
 
-    // PD controller
-    float kp = 8.0f;
-    float kd = 4.0f;
+
 
     BehaviorModel behavior;
 

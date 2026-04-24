@@ -19,8 +19,6 @@ void Car::update(float dt, const Perception& perception)
     if (travel.TravelPoints.size() < 3)
         return;
 
-    Vec2 oldVelocity = velocity;
-
     if (segment + 2 >= travel.TravelPoints.size())
     {
         finished = true;
@@ -34,8 +32,9 @@ void Car::update(float dt, const Perception& perception)
     Vec2 p1 = p[segment + 1];
     Vec2 p2 = p[segment + 2];
 
+
     // =========================
-    // znajdź t (BEZ ZMIAN)
+    // TRACKING KRZYWEJ (BEZ ZMIAN)
     // =========================
     float bestT = t;
     float bestDist = (travel.bezier(p0, p1, p2, t) - position).length();
@@ -72,94 +71,52 @@ void Car::update(float dt, const Perception& perception)
     }
 
     // =========================
-    // BEHAVIOR (NOWE)
+    // IDM BEHAVIOR (JEDYNE ŹRÓDŁO DECYZJI)
     // =========================
+    Vec2 oldVelocity = velocity;
     BehaviorOutput out = behavior.compute(
         travel,
         segment,
         t,
         velocity.length(),
         maxSpeed,
-        aLatMax,
+        maxAccel,
+        maxDecel,
         lookaheadBase,
         lookaheadSpeedFactor,
         perception
     );
 
     // =========================
-    // kierunek z krzywej (jak było)
+    // KIERUNEK RUCHU Z KRZYWEJ
     // =========================
     float dynamicLookahead = lookaheadBase + velocity.length() * lookaheadSpeedFactor;
     float tLook = std::min(t + dynamicLookahead, 1.0f);
+
     Vec2 tangent = travel.bezierDerivative(p0, p1, p2, tLook);
-    Vec2 forward = tangent.length() > 0.0001f
-        ? tangent / tangent.length()
-        : Vec2(1, 0);
+    Vec2 forward = tangent.normalized();
 
     // =========================
-    // lateral control (jak było)
+    // IDM -> PRZYSPIESZENIE (BEZ PD, BEZ SPEED CONTROL)
     // =========================
-    Vec2 toTarget = out.targetPoint - position;
+    Vec2 accelerationCmd = out.acceleration;
 
-    float forwardMag = toTarget.dot(forward);
-    Vec2 forwardVec = forward * forwardMag;
-
-    Vec2 lateralError = toTarget - forwardVec;
-
-    float lateralVelMag = velocity.dot(Vec2(-forward.y, forward.x));
-    Vec2 lateralVel = Vec2(-forward.y, forward.x) * lateralVelMag;
-
-    Vec2 a_lateral = lateralError * kp - lateralVel * kd;
+    // projekcja na kierunek jazdy
+    acceleration = forward * accelerationCmd.dot(forward);
 
     // =========================
-    // forward (z behavior)
+    // integracja fizyki
     // =========================
-    float currentSpeed = velocity.length();
-    float dv = out.targetSpeed - currentSpeed;
-
-    float a_forward_scalar = (dv > 0) ? dv * 2.0f : dv * 4.0f;
-    Vec2 a_forward = forward * a_forward_scalar;
-
-    // =========================
-    // suma
-    // =========================
-    acceleration = a_forward + a_lateral;
-
-    float accLen = acceleration.length();
-    if (accLen > maxAccel)
-        acceleration = acceleration / accLen * maxAccel;
-
     velocity += acceleration * dt;
     position += velocity * dt;
+
     speed = velocity.length();
 
+    // debug acceleration
     if (dt > 0.00001f)
         acceleration = (velocity - oldVelocity) / dt;
     else
         acceleration = Vec2(0, 0);
-    if (perception.hasCarAhead)
-    {
-        Vec2 forward = velocity.length() > 0.001f
-            ? velocity.normalized()
-            : Vec2(1, 0);
-
-        float dist = perception.distanceToCarAhead;
-
-        float safeDist = computeSafeDistance(speed, maxAccel) + 1.0f;
-
-        if (dist < safeDist)
-        {
-            float safeSpeed = std::sqrt(
-                2.0f * maxAccel * std::max(0.0f, dist - 0.5f)
-            );
-
-            float currentSpeed = velocity.length();
-
-            float clampedSpeed = std::min(currentSpeed, safeSpeed);
-
-            velocity = forward * clampedSpeed;
-        }
-    }
 }
 
 Vec2 Car::getPosition() const {
