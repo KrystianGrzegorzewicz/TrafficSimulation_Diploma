@@ -12,10 +12,15 @@ void updatePerception(Perception& p, const std::vector<CarState>& others)
     float bestTTC = std::numeric_limits<float>::max();
     float bestDist = std::numeric_limits<float>::max();
 
-    Vec2 forward = (p.self.velocity.length() > 0.001f)
+    Vec2 forward = p.self.velocity.length() > 0.001f
         ? p.self.velocity.normalized()
         : Vec2(1, 0);
 
+    // 🔥 fallback: jeśli bardzo wolno jedzie → nie ufaj velocity
+    if (p.self.velocity.length() < 0.5f)
+    {
+        forward = Vec2(1, 0); // albo możesz później dać kierunek z krzywej
+    }
     Vec2 right(-forward.y, forward.x);
 
     for (const auto& o : others)
@@ -30,7 +35,7 @@ void updatePerception(Perception& p, const std::vector<CarState>& others)
         float forwardDist = relPos.dot(forward);
         float lateralDist = std::fabs(relPos.dot(right));
 
-        float laneWidth = 2.5f;
+        float laneWidth = 3.5f;
 
         // auto musi być "przed nami w pasie"
         if (forwardDist <= 0.0f) continue;
@@ -39,10 +44,15 @@ void updatePerception(Perception& p, const std::vector<CarState>& others)
         // =========================
         // TIME TO COLLISION (TTC)
         // =========================
-        float closingSpeed = -relPos.dot(relVel);
+        //float closingSpeed = -relPos.dot(relVel) / std::max(relPos.length(), 0.001f);
+        float dist = relPos.length();
 
-        if (closingSpeed < 0.01f)
+        float closingSpeed = -(relVel.dot(relPos.normalized()));
+
+        if (closingSpeed <= 0.01f)
             continue;
+
+        float ttc = dist / closingSpeed;
 
         if (closingSpeed > 0.01f)
         {
@@ -50,13 +60,16 @@ void updatePerception(Perception& p, const std::vector<CarState>& others)
 
             float safeTTC = 2.0f;
 
-            if (ttc < safeTTC && ttc < bestTTC)
+            if (forwardDist > 0 && lateralDist < laneWidth)
             {
-                bestTTC = ttc;
-                bestDist = relPos.length();
+                float dist = relPos.length();
 
-                p.carAhead = o;
-                p.hasCarAhead = true;
+                if (dist < bestDist)
+                {
+                    bestDist = dist;
+                    p.carAhead = o;
+                    p.hasCarAhead = true;
+                }
             }
         }
     }

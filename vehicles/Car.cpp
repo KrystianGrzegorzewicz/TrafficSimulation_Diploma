@@ -26,23 +26,23 @@ void Car::update(float dt, const Perception& perception)
         return;
     }
 
+    Vec2 oldVelocity = velocity;
+
     auto& p = travel.TravelPoints;
 
     Vec2 p0 = p[segment];
     Vec2 p1 = p[segment + 1];
     Vec2 p2 = p[segment + 2];
 
-
     // =========================
-    // TRACKING KRZYWEJ (BEZ ZMIAN)
+    // 1. TRACKING t
     // =========================
     float bestT = t;
     float bestDist = (travel.bezier(p0, p1, p2, t) - position).length();
 
     for (int i = -2; i <= 2; i++)
     {
-        float testT = t + i * 0.02f;
-        testT = std::clamp(testT, 0.0f, 1.0f);
+        float testT = std::clamp(t + i * 0.02f, 0.0f, 1.0f);
 
         Vec2 pt = travel.bezier(p0, p1, p2, testT);
         float d = (pt - position).length();
@@ -60,20 +60,12 @@ void Car::update(float dt, const Perception& perception)
     {
         segment += 2;
         t = 0.0f;
-
-        if (segment + 2 >= travel.TravelPoints.size())
-        {
-            finished = true;
-            velocity = Vec2(0, 0);
-        }
-
         return;
     }
 
     // =========================
-    // IDM BEHAVIOR (JEDYNE ŹRÓDŁO DECYZJI)
+    // 2. BEHAVIOR (jedyny mózg)
     // =========================
-    Vec2 oldVelocity = velocity;
     BehaviorOutput out = behavior.compute(
         travel,
         segment,
@@ -88,44 +80,54 @@ void Car::update(float dt, const Perception& perception)
     );
 
     // =========================
-    // KIERUNEK RUCHU Z KRZYWEJ
+    // 3. KIERUNEK
     // =========================
-    float dynamicLookahead = lookaheadBase + velocity.length() * lookaheadSpeedFactor;
-    float tLook = std::min(t + dynamicLookahead, 1.0f);
+    float lookahead = lookaheadBase + velocity.length() * lookaheadSpeedFactor;
+    float tLook = std::min(t + lookahead, 1.0f);
 
     Vec2 tangent = travel.bezierDerivative(p0, p1, p2, tLook);
     Vec2 forward = tangent.normalized();
 
     // =========================
-    // IDM -> PRZYSPIESZENIE (BEZ PD, BEZ SPEED CONTROL)
+    // 4. LATERAL PD (skręt)
     // =========================
-    Vec2 accelerationCmd = out.acceleration;
+    Vec2 toTarget = out.targetPoint - position;
 
-    // projekcja na kierunek jazdy
-    acceleration = forward * accelerationCmd.dot(forward);
+    float forwardMag = toTarget.dot(forward);
+    Vec2 lateralError = toTarget - forward * forwardMag;
+
+    Vec2 right(-forward.y, forward.x);
+
+    float lateralVelMag = velocity.dot(right);
+    Vec2 lateralVel = right * lateralVelMag;
+
+    Vec2 a_lateral = lateralError * kp - lateralVel * kd;
 
     // =========================
-    // integracja fizyki
+    // 5. FINAL ACCELERATION
+    // =========================
+    acceleration = out.acceleration + a_lateral;
+
+    float accLen = acceleration.length();
+    if (accLen > maxAccel)
+        acceleration = acceleration / accLen * maxAccel;
+
+    // =========================
+    // 6. INTEGRATION
     // =========================
     velocity += acceleration * dt;
     position += velocity * dt;
 
     speed = velocity.length();
 
-    // debug acceleration
     if (dt > 0.00001f)
         acceleration = (velocity - oldVelocity) / dt;
     else
         acceleration = Vec2(0, 0);
 }
 
-Vec2 Car::getPosition() const {
-    return position;
-}
-Vec2 Car::getVelocityVector() const {
-    return velocity;
-}
-Vec2 Car::getAccelerationVector() const {
-    return acceleration;
-}
+
+Vec2 Car::getPosition() const { return position; }
+Vec2 Car::getVelocityVector() const { return velocity; }
+Vec2 Car::getAccelerationVector() const { return acceleration; }
 bool Car::isFinished() const { return finished; }
