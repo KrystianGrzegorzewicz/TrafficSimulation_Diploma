@@ -24,4 +24,10 @@ public:
 private:
     float kp;
     float kd;
+
+    // maksymalne dopuszczalne przyspieszenie boczne (fizyka / komfort)
+    float aLatMax = 6.0f;
+
+    // minimalny promień skrętu (metry)
+    float minTurnRadius = 2.0f;
 };

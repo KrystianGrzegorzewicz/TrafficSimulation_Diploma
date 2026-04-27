@@ -1,5 +1,6 @@
 #include "core/SteeringModel.h"
 #include <algorithm>
+#include <cmath>
 
 Vec2 SteeringModel::computeLateralAcceleration(
     const Travel& travel,
@@ -18,8 +19,13 @@ Vec2 SteeringModel::computeLateralAcceleration(
     Vec2 p1 = p[segment + 1];
     Vec2 p2 = p[segment + 2];
 
+    float speed = velocity.length();
+
+    // =========================
+    // LOOKAHEAD
+    // =========================
     float lookahead =
-        lookaheadBase + velocity.length() * lookaheadSpeedFactor;
+        lookaheadBase + speed * lookaheadSpeedFactor;
 
     float tLook = std::min(t + lookahead, 1.0f);
 
@@ -29,6 +35,9 @@ Vec2 SteeringModel::computeLateralAcceleration(
     Vec2 forward = tangent.normalized();
     Vec2 right(-forward.y, forward.x);
 
+    // =========================
+    // BŁĄD LATERALNY (PD)
+    // =========================
     Vec2 toTarget = behaviorOut.targetPoint - position;
 
     float forwardMag = toTarget.dot(forward);
@@ -36,5 +45,37 @@ Vec2 SteeringModel::computeLateralAcceleration(
 
     float lateralVel = velocity.dot(right);
 
-    return lateralError * kp - right * lateralVel * kd;
+    Vec2 a_lateral =
+        lateralError * kp - right * lateralVel * kd;
+
+    // =========================
+    // OGRANICZENIE PROMIENIA SKRĘTU
+    // a_lat = v^2 / R
+    // =========================
+    float safeSpeed = std::max(speed, 0.1f);
+
+    float maxFromRadius =
+        (safeSpeed * safeSpeed) / minTurnRadius;
+
+    float maxLatAcc =
+        std::min(aLatMax, maxFromRadius);
+
+    // =========================
+    // CLAMP PRZYSPIESZENIA
+    // =========================
+    float latLen = a_lateral.length();
+    if (latLen > maxLatAcc)
+    {
+        a_lateral = a_lateral / latLen * maxLatAcc;
+    }
+
+    // =========================
+    // TŁUMIENIE PRZY NISKIEJ PRĘDKOŚCI
+    // =========================
+    float lowSpeedDamping =
+        std::clamp(speed / 5.0f, 0.0f, 1.0f);
+
+    a_lateral *= lowSpeedDamping;
+
+    return a_lateral;
 }
