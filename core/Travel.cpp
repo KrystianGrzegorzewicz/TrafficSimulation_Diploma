@@ -4,15 +4,15 @@
 Travel::Travel(std::vector<Vec2> points){
 	Travel::TravelPoints = points;
 }
-Vec2 Travel::bezier(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t) {
+Vec2 Travel::bezier(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t) const {
     float u = 1.0f - t;
     return p0 * (u * u) + p1 * (2 * u * t) + p2 * (t * t);
 }
 
-Vec2 Travel::bezierDerivative(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t) {
+Vec2 Travel::bezierDerivative(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t) const {
     return (p1 - p0) * (2 * (1 - t)) + (p2 - p1) * (2 * t);
 }
-float Travel::bezierCurvature(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t)
+float Travel::bezierCurvature(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t) const
 {
     Vec2 d1 = bezierDerivative(p0, p1, p2, t);
     Vec2 d2 = (p2 - p1 * 2.0f + p0) * 2.0f;
@@ -23,19 +23,19 @@ float Travel::bezierCurvature(const Vec2& p0, const Vec2& p1, const Vec2& p2, fl
     if (denom < 0.0001f) return 0.0f;
     return numerator / denom;
 }
-float Travel::bezierRadius(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t)
+float Travel::bezierRadius(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t) const
 {
     float k = bezierCurvature(p0, p1, p2, t);
     if (k < 0.00001f) return 999999.0f;
     return 1.0f / k;
 }
 
-float Travel::maxSpeedAt(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t, float aLatMax)
+float Travel::maxSpeedAt(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t, float aLatMax) const
 {
     float R = bezierRadius(p0, p1, p2, t);
     return sqrt(aLatMax * R);
 }
-float Travel::computeSpeedLimitAhead(int segment, float t, float lookaheadT, float aLatMax)
+float Travel::computeSpeedLimitAhead(int segment, float t, float lookaheadT, float aLatMax) const
 {
     float minSpeed = std::numeric_limits<float>::max();
 

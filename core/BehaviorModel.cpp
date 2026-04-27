@@ -16,7 +16,6 @@ BehaviorOutput BehaviorModel::compute(
 )
 {
     BehaviorOutput out;
-
     auto& p = travel.TravelPoints;
 
     if (segment + 2 >= p.size())
@@ -26,52 +25,69 @@ BehaviorOutput BehaviorModel::compute(
         return out;
     }
 
-    // =========================
-    // 1. LOOKAHEAD + TARGET
-    // =========================
-    float lookahead = lookaheadBase + currentSpeed * lookaheadSpeedFactor;
-    float tLook = std::min(t + lookahead, 1.0f);
+    float lookahead =
+        lookaheadBase + currentSpeed * lookaheadSpeedFactor;
 
-    Vec2 p0 = p[segment];
-    Vec2 p1 = p[segment + 1];
-    Vec2 p2 = p[segment + 2];
+    out.targetPoint =
+        computeTargetPoint(travel, segment, t, lookahead);
 
-    out.targetPoint = travel.bezier(p0, p1, p2, tLook);
+    Vec2 tangent =
+        travel.bezierDerivative(
+            p[segment], p[segment + 1], p[segment + 2],
+            std::min(t + lookahead, 1.0f)
+        );
 
-    Vec2 tangent = travel.bezierDerivative(p0, p1, p2, tLook);
     Vec2 forward = tangent.normalized();
 
-    // =========================
-    // 2. SPEED LIMIT (curve)
-    // =========================
-    float curveSpeed = travel.computeSpeedLimitAhead(
-        segment,
-        t,
-        lookahead,
-        6.0f   // aLatMax
-    );
+    float curveSpeed =
+        travel.computeSpeedLimitAhead(segment, t, lookahead, 6.0f);
 
     float v0 = std::min(maxSpeed, curveSpeed);
-    float v = currentSpeed;
 
-    // =========================
-    // 3. IDM PARAMS
-    // =========================
-    float a = maxAccel;
-    float b = maxDecel;
+    float accel =
+        computeIDMAcceleration(
+            currentSpeed,
+            v0,
+            maxAccel,
+            maxDecel,
+            perception
+        );
 
-    float delta = 4.0f;
-    float s0 = 3.0f;      // minimalny dystans
-    float T = 1.2f;       // czas reakcji
+    out.acceleration = forward * accel;
+    return out;
+}
 
-    // =========================
-    // 4. FREE ROAD
-    // =========================
-    float freeTerm = std::pow(v / v0, delta);
+Vec2 BehaviorModel::computeTargetPoint(
+    Travel& travel,
+    int segment,
+    float t,
+    float lookahead
+)
+{
+    auto& p = travel.TravelPoints;
+    float tLook = std::min(t + lookahead, 1.0f);
 
-    // =========================
-    // 5. INTERACTION
-    // =========================
+    return travel.bezier(
+        p[segment],
+        p[segment + 1],
+        p[segment + 2],
+        tLook
+    );
+}
+
+float BehaviorModel::computeIDMAcceleration(
+    float v,
+    float v0,
+    float maxAccel,
+    float maxDecel,
+    const Perception& perception
+)
+{
+    constexpr float delta = 4.0f;
+    constexpr float s0 = 3.0f;
+    constexpr float T = 1.2f;
+
+    float freeRoad = std::pow(v / v0, delta);
     float interaction = 0.0f;
 
     if (perception.hasCarAhead)
@@ -80,21 +96,14 @@ BehaviorOutput BehaviorModel::compute(
         float dv = perception.relativeSpeed;
 
         float desiredGap =
-            s0 + v * T + (v * dv) / (2.0f * std::sqrt(a * b + 0.001f));
+            s0 + v * T +
+            (v * dv) / (2.0f * std::sqrt(maxAccel * maxDecel + 0.001f));
 
-        float ratio = desiredGap / s;
-
-        interaction = ratio * ratio;
+        interaction = (desiredGap / s) * (desiredGap / s);
     }
 
-    // =========================
-    // 6. FINAL ACCEL (IDM)
-    // =========================
-    float accelScalar = a * (1.0f - freeTerm - interaction);
+    float accel =
+        maxAccel * (1.0f - freeRoad - interaction);
 
-    accelScalar = std::clamp(accelScalar, -b, a);
-
-    out.acceleration = forward * accelScalar;
-
-    return out;
+    return std::clamp(accel, -maxDecel, maxAccel);
 }

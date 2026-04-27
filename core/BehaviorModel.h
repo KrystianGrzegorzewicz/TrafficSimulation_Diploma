@@ -1,11 +1,12 @@
 #pragma once
-#include "core/Travel.h"
+#include "core/Vec2.h"
 #include "core/Perception.h"
+#include "core/Travel.h"
 
 struct BehaviorOutput
 {
-    Vec2 acceleration;   // IDM output
-    Vec2 targetPoint;    // dalej używane do ścieżki
+    Vec2 acceleration;
+    Vec2 targetPoint;
 };
 
 class BehaviorModel
@@ -21,6 +22,22 @@ public:
         float maxDecel,
         float lookaheadBase,
         float lookaheadSpeedFactor,
+        const Perception& perception
+    );
+
+private:
+    Vec2 computeTargetPoint(
+        Travel& travel,
+        int segment,
+        float t,
+        float lookahead
+    );
+
+    float computeIDMAcceleration(
+        float v,
+        float v0,
+        float maxAccel,
+        float maxDecel,
         const Perception& perception
     );
 };
