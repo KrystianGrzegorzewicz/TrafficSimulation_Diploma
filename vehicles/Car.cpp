@@ -41,17 +41,22 @@ void Car::update(float dt, const Perception& perception)
     );
 
     Vec2 lateralAccel =
-        computeLateralAcceleration(behaviorOut);
+        steering.computeLateralAcceleration(
+            travel,
+            segment,
+            t,
+            position,
+            velocity,
+            lookaheadBase,
+            lookaheadSpeedFactor,
+            behaviorOut
+        );
 
     integrate(
         behaviorOut.acceleration + lateralAccel,
         dt
     );
 }
-
-// =====================================================
-// INTERNAL STEPS
-// =====================================================
 
 bool Car::isPathValid() const
 {
@@ -110,44 +115,7 @@ bool Car::advanceSegmentIfNeeded()
     return false;
 }
 
-Vec2 Car::computeLateralAcceleration(
-    const BehaviorOutput& behaviorOut
-)
-{
-    auto& p = travel.TravelPoints;
-
-    Vec2 p0 = p[segment];
-    Vec2 p1 = p[segment + 1];
-    Vec2 p2 = p[segment + 2];
-
-    float lookahead =
-        lookaheadBase + velocity.length() * lookaheadSpeedFactor;
-
-    float tLook = std::min(t + lookahead, 1.0f);
-
-    Vec2 tangent =
-        travel.bezierDerivative(p0, p1, p2, tLook);
-
-    Vec2 forward = tangent.normalized();
-    Vec2 right(-forward.y, forward.x);
-
-    Vec2 toTarget =
-        behaviorOut.targetPoint - position;
-
-    float forwardMag = toTarget.dot(forward);
-    Vec2 lateralError =
-        toTarget - forward * forwardMag;
-
-    float lateralVel =
-        velocity.dot(right);
-
-    return lateralError * kp - right * lateralVel * kd;
-}
-
-void Car::integrate(
-    const Vec2& desiredAcceleration,
-    float dt
-)
+void Car::integrate(const Vec2& desiredAcceleration, float dt)
 {
     Vec2 oldVelocity = velocity;
 
@@ -167,10 +135,6 @@ void Car::integrate(
     else
         acceleration = Vec2(0, 0);
 }
-
-// =====================================================
-// GETTERS
-// =====================================================
 
 Vec2 Car::getPosition() const { return position; }
 Vec2 Car::getVelocityVector() const { return velocity; }

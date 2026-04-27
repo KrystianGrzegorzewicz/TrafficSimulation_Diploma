@@ -42,7 +42,7 @@ float Travel::computeSpeedLimitAhead(int segment, float t, float lookaheadT, flo
     int seg = segment;
     float localT = t;
 
-    const float STEP = 0.02f; // 🔥 było 0.05 (za rzadko)
+    const float STEP = 0.02f;
 
     float traveledT = 0.0f;
 
@@ -64,8 +64,6 @@ float Travel::computeSpeedLimitAhead(int segment, float t, float lookaheadT, flo
             localT = 0.0f;
         }
     }
-
-    // 🔥 zabezpieczenie
     if (minSpeed == std::numeric_limits<float>::max())
         return 50.0f;
 

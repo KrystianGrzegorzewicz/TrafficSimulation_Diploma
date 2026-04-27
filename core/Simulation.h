@@ -14,7 +14,6 @@ private:
 	float period;
     std::vector<Car> cars;
     std::vector<Block> blocks;
-
 	TJunction thisJunction;
 
 public:

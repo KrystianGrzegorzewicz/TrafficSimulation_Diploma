@@ -5,13 +5,10 @@
 struct Perception
 {
     CarState self;
-
-    bool hasCarAhead = false;
     CarState carAhead;
-
+    bool hasCarAhead = false;
     float distanceToCarAhead = 0.0f;
     float relativeSpeed = 0.0f;
-
     float relativeAcceleration = 0.0f;
 };
 

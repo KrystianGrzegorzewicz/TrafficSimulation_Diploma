@@ -18,10 +18,3 @@ Vec2 Block::getTopLeft() const {
 Vec2 Block::getBottomRight() const {
 	return xnyn;
 }
-/*int getColor(int index) {
-	if (index < 0 || index > 2) {
-		std::cerr << "Error: Color index out of range. Valid range is 0-2." << std::endl;
-		return -1;
-	}
-	return color[index];
-}*/

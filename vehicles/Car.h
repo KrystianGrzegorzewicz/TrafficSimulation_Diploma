@@ -3,6 +3,7 @@
 #include "core/Travel.h"
 #include "core/BehaviorModel.h"
 #include "core/Perception.h"
+#include "core/SteeringModel.h"
 
 class Car
 {
@@ -18,25 +19,17 @@ public:
     bool isFinished() const;
 
 private:
-    // =========================
-    // PATH
-    // =========================
     Travel travel;
     int segment = 0;
     float t = 0.0f;
     bool finished = false;
 
-    // =========================
-    // KINEMATICS
-    // =========================
     Vec2 position;
     Vec2 velocity;
     Vec2 acceleration;
     float speed;
 
-    // =========================
-    // TUNING
-    // =========================
+	//tuning parameters
     float maxAccel = 6.0f;
     float maxDecel = 6.0f;
     float maxSpeed = 20.0f;
@@ -48,21 +41,15 @@ private:
     float kp = 8.0f;
     float kd = 4.0f;
 
+    SteeringModel steering{ kp, kd };
     BehaviorModel behavior;
 
 private:
-    // =========================
-    // UPDATE STEPS
-    // =========================
     bool isPathValid() const;
     bool isFinishedInternal();
 
     void updateClosestT();
     bool advanceSegmentIfNeeded();
-
-    Vec2 computeLateralAcceleration(
-        const BehaviorOutput& behaviorOut
-    );
 
     void integrate(
         const Vec2& desiredAcceleration,

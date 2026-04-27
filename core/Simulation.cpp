@@ -21,7 +21,6 @@ void Simulation::step(float dt) {
         timeAccumulator -= period;
     }
 
-    // 1. zbierz stany aut
     std::vector<CarState> states;
     states.reserve(cars.size());
 
@@ -34,7 +33,6 @@ void Simulation::step(float dt) {
             });
     }
 
-    // 2. aktualizuj każde auto z perception
     for (size_t i = 0; i < cars.size(); i++)
     {
         Perception p;
@@ -56,7 +54,6 @@ std::string Simulation::getWorldJson() {
     std::stringstream ss;
     ss << "{";
 
-    // ===== CARS =====
     ss << "\"cars\":[";
     for (size_t i = 0; i < cars.size(); i++) {
         Vec2 pos = cars[i].getPosition();
@@ -73,7 +70,7 @@ std::string Simulation::getWorldJson() {
         if (i != cars.size() - 1) ss << ",";
     }
     ss << "],";
-    // ===== BLOCKS =====
+
 	ss << "\"blocks\":[";
     for (size_t i = 0; i < blocks.size(); i++)
     {
