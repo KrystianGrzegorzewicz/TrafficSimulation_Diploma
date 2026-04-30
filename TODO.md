@@ -1,8 +1,12 @@
 # obserwacja
 [ ] obliczenie czasu reakcji człowieka - ruszanie, hamowanie
 [ ] obliczenie bezpiecznej odległości zachowywanej przez człowieka
+[ ] do rozmytej, obliczyć funkcje sugeno np. max hamuj stała
 
 # symulacja
+[ ] rozbić kod na moduły: modelowanie środowiska, planowanie, generowanie ruchu, percepcja, fizyka, behawioralizm
+[ ] 
+
 ## fizyka
 [ ] priorytety tras
 [ ] rozbić perception na kategorie
@@ -11,9 +15,13 @@
 
 ## behawioralizm
 [ ] rozdzielenie zachowania na av i człowieka
+[ ] ocena ryzyka, dołączanie do ruchu
 [ ] logika rozmyta takagi-sugeno
+[ ] dodanie czasu reakcji do człowieka
+[ ] fov
 
 # zbieranie danych
 [ ] zapis do csv
 [ ] pozycja x
 [ ] czas t
+[ ] density, flow, economy
