@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import RadioButtons, Button
 
 # === DATA ===
-df = pd.read_csv("data/cars.csv")
+df = pd.read_csv("cars.csv")
 
 if "travel_id" not in df.columns:
     raise ValueError("Brakuje kolumny 'travel_id' w CSV!")

@@ -21,7 +21,8 @@
 [ ] fov
 
 # zbieranie danych
-[ ] zapis do csv
-[ ] pozycja x
-[ ] czas t
-[ ] density, flow, economy
+[x] zapis do csv
+[x] pozycja x
+[x] czas t
+[x] density, flow
+[ ] economy
