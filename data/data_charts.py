@@ -1,10 +1,25 @@
 import pandas as pd
 import numpy as np
+import tkinter as tk
+from tkinter import filedialog
 import matplotlib.pyplot as plt
 from matplotlib.widgets import RadioButtons, Button
 
 # === DATA ===
-df = pd.read_csv("cars.csv")
+def choose_file():
+    root = tk.Tk()
+    root.withdraw()  # ukrywa główne okno
+    file_path = filedialog.askopenfilename(
+        title="Wybierz plik CSV z symulacji",
+        filetypes=[("CSV files", "*.csv")]
+    )
+    if not file_path:
+        raise SystemExit("Nie wybrano pliku.")
+    return file_path
+
+csv_path = choose_file()
+df = pd.read_csv(csv_path)
+print("Loaded:", csv_path)
 
 if "travel_id" not in df.columns:
     raise ValueError("Brakuje kolumny 'travel_id' w CSV!")

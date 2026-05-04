@@ -1,9 +1,28 @@
 #include "Simulation.h"
 #include <sstream>
 #include <random>
+#include <chrono>
+#include <iomanip>
 
 std::mt19937 rng(std::random_device{}());
 std::uniform_int_distribution<int> dist(0, 1);
+
+std::string getTimestamp()
+{
+    auto now = std::chrono::system_clock::now();
+    auto t = std::chrono::system_clock::to_time_t(now);
+
+    std::tm tm{};
+#ifdef _WIN32
+    localtime_s(&tm, &t);
+#else
+    localtime_r(&t, &tm);
+#endif
+
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S");
+    return oss.str();
+}
 
 Simulation::Simulation(float d, int junctionIndex) {
     this->thisJunction = TJunction(junctionIndex);
@@ -11,7 +30,8 @@ Simulation::Simulation(float d, int junctionIndex) {
 	period = 1.0f / d;
     cars.emplace_back(14.0f, thisJunction.getRandomTravel());
 	blocks = thisJunction.getBlocks();
-    logFile.open("data/cars.csv");
+    std::string filename = "data/cars_" + getTimestamp() + ".csv";
+    logFile.open(filename);
     logFile << "time,id,travel_id,x,y,vx,vy,ax,ay\n";
 }
 Simulation::~Simulation() {
