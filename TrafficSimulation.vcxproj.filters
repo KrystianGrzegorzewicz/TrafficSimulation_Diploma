@@ -49,6 +49,7 @@
   <ItemGroup>
     <None Include="visualizer.py" />
     <None Include="TODO.md" />
+    <None Include="data_charts.py" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vehicles\Car.h">

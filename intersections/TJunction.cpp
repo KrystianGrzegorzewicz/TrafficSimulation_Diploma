@@ -22,7 +22,7 @@ TJunction::TJunction() {
             Vec2(-100.0f, -1.75f),
             Vec2(-100.0f, -1.75f)
         };
-        travels.push_back(Travel(travelPoints1, 2));
+        travels.push_back(Travel(travelPoints1, 2, 1));
 		//z lewej do prawej
         travelPoints2 = {
             Vec2(-100.0f, 1.75f),
@@ -49,7 +49,7 @@ TJunction::TJunction() {
             Vec2(100.0f, 1.75f),
             Vec2(100.0f, 1.75f)
         };
-        travels.push_back(Travel(travelPoints2, 2));
+        travels.push_back(Travel(travelPoints2, 2, 2));
 		//z lewej w dol
         travelPoints3 = {
             Vec2(-100.0f, 1.75f),
@@ -72,7 +72,7 @@ TJunction::TJunction() {
             Vec2(1.75f, -100.0f),
             Vec2(1.75f, -100.0f),
         };
-        travels.push_back(Travel(travelPoints3, 1));
+        travels.push_back(Travel(travelPoints3, 1, 3));
 
 }
 TJunction::TJunction(int index) {
@@ -105,7 +105,7 @@ TJunction::TJunction(int index) {
                 Vec2(90.0f, 1.75f)
             };
             //z lewej w dol
-            travels.push_back(Travel(travelPoints1, 2));
+            travels.push_back(Travel(travelPoints1, 2, 1));
             travelPoints2 = {
                 Vec2(-90.0f, 1.75f),
                 Vec2(-90.0f, 1.75f),
@@ -122,7 +122,7 @@ TJunction::TJunction(int index) {
                 Vec2(-1.75f, 45.0f)
             };
             //z prawej do lewej
-            travels.push_back(Travel(travelPoints2, 2));
+            travels.push_back(Travel(travelPoints2, 2, 2));
             travelPoints3 = {
                 Vec2(90.0f, -1.75f),
                 Vec2(90.0f, -1.75f),
@@ -138,7 +138,7 @@ TJunction::TJunction(int index) {
                 Vec2(-90.0f, -1.75f),
                 Vec2(-90.0f, -1.75f)
             };
-            travels.push_back(Travel(travelPoints3, 1));
+            travels.push_back(Travel(travelPoints3, 1, 3));
 			break;
         case 2:
 			//gorny z prawej do lewej
@@ -172,7 +172,7 @@ TJunction::TJunction(int index) {
 				Vec2(-100.0f, -1.75f)
             };
             //dolny z lewej do prawej
-            travels.push_back(Travel(travelPoints1, 5));
+            travels.push_back(Travel(travelPoints1, 5, 1));
             travelPoints2 = {
                 Vec2(-100.0f, 1.75f),
                 Vec2(-100.0f, 1.75f),
@@ -199,7 +199,7 @@ TJunction::TJunction(int index) {
                 Vec2(100.0f, 1.75f)
             };
 			//srodkowy z lewej w gore
-            travels.push_back(Travel(travelPoints2, 5));
+            travels.push_back(Travel(travelPoints2, 5, 2));
             travelPoints3 = {
                 Vec2(-90.0f, 1.75f),
                 Vec2(-90.0f, 1.75f),
@@ -216,7 +216,7 @@ TJunction::TJunction(int index) {
                 Vec2(1.75f, -90.0f),   
                 Vec2(1.75f, -90.0f)
             };
-            travels.push_back(Travel(travelPoints3, 1));
+            travels.push_back(Travel(travelPoints3, 1, 3));
 			break;
         case 3:
             travelPoints1 = {
@@ -232,7 +232,7 @@ TJunction::TJunction(int index) {
                 Vec2(0.0f, 0.0f)
             };
             //dolny z lewej do prawej
-            travels.push_back(Travel(travelPoints1, 1));
+            travels.push_back(Travel(travelPoints1, 1, 1));
         default:
             std::cerr << "Unknown TJunction index: " << index << std::endl;
             break;

@@ -11,6 +11,12 @@ Simulation::Simulation(float d, int junctionIndex) {
 	period = 1.0f / d;
     cars.emplace_back(14.0f, thisJunction.getRandomTravel());
 	blocks = thisJunction.getBlocks();
+    logFile.open("data/cars.csv");
+    logFile << "time,id,travel_id,x,y,vx,vy,ax,ay\n";
+}
+Simulation::~Simulation() {
+    if (logFile.is_open())
+        logFile.close();
 }
 
 void Simulation::step(float dt) {
@@ -41,6 +47,21 @@ void Simulation::step(float dt) {
         updatePerception(p, states);
 
         cars[i].update(dt, p);
+    }
+    currentTime += dt;
+
+    for (const auto& car : cars)
+    {
+        Vec2 pos = car.getPosition();
+        Vec2 vel = car.getVelocityVector();
+        Vec2 acc = car.getAccelerationVector();
+
+        logFile << currentTime << ","
+            << car.getId() << ","
+            << car.getTravelId() << ","
+            << pos.x << "," << pos.y << ","
+            << vel.x << "," << vel.y << ","
+            << acc.x << "," << acc.y << "\n";
     }
 
     cars.erase(

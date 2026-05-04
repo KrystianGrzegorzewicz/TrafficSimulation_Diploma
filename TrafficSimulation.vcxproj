@@ -140,6 +140,7 @@
     <ClCompile Include="intersections\TJunction.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="data_charts.py" />
     <None Include="TODO.md" />
     <None Include="visualizer.py" />
   </ItemGroup>

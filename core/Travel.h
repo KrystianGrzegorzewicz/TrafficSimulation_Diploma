@@ -5,8 +5,9 @@
 class Travel {
 private:
 	int weight;
+	int id;
 public:
-	Travel(std::vector<Vec2> points, int w);
+	Travel(std::vector<Vec2> points, int w, int id);
 
 	std::vector<Vec2> TravelPoints;
 
@@ -17,4 +18,5 @@ public:
 	float maxSpeedAt(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t, float aLatMax) const;
 	float computeSpeedLimitAhead(int segment, float t, float lookaheadT, float aLatMax) const;
 	int getWeight() const;
+	int getId() const;
 };

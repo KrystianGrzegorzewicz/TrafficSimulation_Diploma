@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <cmath>
 
+int Car::nextId = 0;
+
 Car::Car(float speed, Travel travel)
     : speed(speed), travel(travel)
 {
@@ -12,6 +14,8 @@ Car::Car(float speed, Travel travel)
 
     velocity = Vec2(0, 0);
     acceleration = Vec2(0, 0);
+    id = nextId++;
+    travelId = travel.getId();
 }
 
 void Car::update(float dt, const Perception& perception)
@@ -136,6 +140,8 @@ void Car::integrate(const Vec2& desiredAcceleration, float dt)
         acceleration = Vec2(0, 0);
 }
 
+int Car::getId() const { return id; }
+int Car::getTravelId() const { return travelId; }
 Vec2 Car::getPosition() const { return position; }
 Vec2 Car::getVelocityVector() const { return velocity; }
 Vec2 Car::getAccelerationVector() const { return acceleration; }

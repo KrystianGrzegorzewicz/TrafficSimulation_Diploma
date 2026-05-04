@@ -1,9 +1,10 @@
 #include "core/Travel.h"
 #include <iostream>
 
-Travel::Travel(std::vector<Vec2> points, int w){
+Travel::Travel(std::vector<Vec2> points, int w, int id){
 	Travel::TravelPoints = points;
 	Travel::weight = w;
+	Travel::id = id;
 }
 Vec2 Travel::bezier(const Vec2& p0, const Vec2& p1, const Vec2& p2, float t) const {
     float u = 1.0f - t;
@@ -71,3 +72,4 @@ float Travel::computeSpeedLimitAhead(int segment, float t, float lookaheadT, flo
     return minSpeed;
 }
 int Travel::getWeight() const { return weight; }
+int Travel::getId() const { return id; }

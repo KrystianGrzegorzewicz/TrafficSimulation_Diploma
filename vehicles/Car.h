@@ -13,13 +13,18 @@ public:
 
     void update(float dt, const Perception& perception);
 
+	int getId() const;
+    int getTravelId() const;
     Vec2 getPosition() const;
     Vec2 getVelocityVector() const;
     Vec2 getAccelerationVector() const;
     bool isFinished() const;
 
 private:
+    static int nextId;
+    int id;
     Travel travel;
+    int travelId;
     int segment = 0;
     float t = 0.0f;
     bool finished = false;
