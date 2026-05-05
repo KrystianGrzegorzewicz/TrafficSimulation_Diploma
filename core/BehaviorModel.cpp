@@ -1,5 +1,6 @@
 #include "core/BehaviorModel.h"
 #include <algorithm>
+#include <cmath>
 
 BehaviorOutput BehaviorModel::compute(
     Travel& travel,
@@ -7,110 +8,102 @@ BehaviorOutput BehaviorModel::compute(
     float t,
     float currentSpeed,
     float maxSpeed,
-    float aLatMax,
+    float maxAccel,
+    float maxDecel,
     float lookaheadBase,
     float lookaheadSpeedFactor,
     const Perception& perception
 )
 {
     BehaviorOutput out;
+    auto& p = travel.TravelPoints;
 
-    if (segment + 2 >= travel.TravelPoints.size())
+    if (segment + 2 >= p.size())
     {
-        out.targetSpeed = 0;
-        out.targetPoint = travel.TravelPoints.back();
+        out.acceleration = Vec2(0, 0);
+        out.targetPoint = p.back();
         return out;
     }
 
-    auto& p = travel.TravelPoints;
-    float dynamicLookahead = lookaheadBase + currentSpeed * lookaheadSpeedFactor;
+    float lookahead =
+        lookaheadBase + currentSpeed * lookaheadSpeedFactor;
 
-    float tLook = std::min(t + dynamicLookahead, 1.0f);
+    out.targetPoint =
+        computeTargetPoint(travel, segment, t, lookahead);
 
-    out.targetPoint = travel.bezier(
-        p[segment], p[segment + 1], p[segment + 2], tLook);
-    float curveSpeed = travel.computeSpeedLimitAhead(
-        segment,
-        t,
-        dynamicLookahead,
-        aLatMax
-    );
-
-    // =========================
-    // OGRANICZENIE PRZEZ AUTO Z PRZODU
-    // =========================
-    // =========================
-// REAKCJA NA AUTO Z PRZODU (rozszerzona)
-// =========================
-    if (perception.hasCarAhead)
-    {
-        float safeDist = computeSafeDistance(
-            currentSpeed,
-            aLatMax   // albo lepiej maxDecel jeśli masz
+    Vec2 tangent =
+        travel.bezierDerivative(
+            p[segment], p[segment + 1], p[segment + 2],
+            std::min(t + lookahead, 1.0f)
         );
-        safeDist *= 1.2f; // safety buffer
 
-        // 1. klasyczne dopasowanie dystansu
-        if (perception.distanceToCarAhead < safeDist)
-        {
-            out.targetSpeed = std::min(
-                out.targetSpeed,
-                perception.carAhead.velocity.length()
-            );
-        }
+    Vec2 forward = tangent.normalized();
 
-        // 2. 🔥 NOWE: reakcja na hamowanie auta z przodu
-        float frontAcc = perception.carAhead.acceleration.length();
+    float curveSpeed =
+        travel.computeSpeedLimitAhead(segment, t, lookahead, 6.0f);
 
-        if (frontAcc < -1.0f) // auto przed nami hamuje
-        {
-            // reaguj wcześniej
-            float brakeFactor = std::clamp(
-                (-frontAcc) / 5.0f,
-                0.0f,
-                1.0f
-            );
+    float v0 = std::min(maxSpeed, curveSpeed);
 
-            out.targetSpeed *= (1.0f - 0.7f * brakeFactor);
-        }
-    }
-
-    float finalSpeed = std::min(maxSpeed, curveSpeed);
-
-    // uwzględnij przeszkody NA KOŃCU (nie nadpisuj)
-    if (perception.hasCarAhead)
-    {
-        float safeDist = computeSafeDistance(
+    float accel =
+        computeIDMAcceleration(
             currentSpeed,
-            aLatMax   // albo lepiej maxDecel jeśli masz
+            v0,
+            maxAccel,
+            maxDecel,
+            perception
         );
-        safeDist *= 1.2f; // safety buffer
 
-        if (perception.distanceToCarAhead < safeDist)
-        {
-            finalSpeed = std::min(finalSpeed,
-                perception.carAhead.velocity.length());
-        }
-
-        float frontAcc = perception.carAhead.acceleration.length();
-
-        if (frontAcc < 0.0f)
-        {
-            finalSpeed *= 0.7f;
-        }
-    }
-
-    out.targetSpeed = finalSpeed;
-
+    out.acceleration = forward * accel;
     return out;
 }
 
-float computeSafeDistance(float speed, float maxDecel)
+Vec2 BehaviorModel::computeTargetPoint(
+    Travel& travel,
+    int segment,
+    float t,
+    float lookahead
+)
 {
-    float reactionTime = 0.5f;
+    auto& p = travel.TravelPoints;
+    float tLook = std::min(t + lookahead, 1.0f);
 
-    float reactionDist = speed * reactionTime;
-    float brakingDist = (speed * speed) / (2.0f * maxDecel);
+    return travel.bezier(
+        p[segment],
+        p[segment + 1],
+        p[segment + 2],
+        tLook
+    );
+}
 
-    return reactionDist + brakingDist;
+float BehaviorModel::computeIDMAcceleration(
+    float v,
+    float v0,
+    float maxAccel,
+    float maxDecel,
+    const Perception& perception
+)
+{
+    constexpr float delta = 4.0f;
+    constexpr float s0 = 3.0f;
+    constexpr float T = 1.2f;
+
+    float freeRoad = std::pow(v / v0, delta);
+    float interaction = 0.0f;
+
+    if (perception.hasCarAhead)
+    {
+        float s = std::max(perception.distanceToCarAhead, 0.1f);
+        float dv = perception.relativeSpeed;
+
+        float desiredGap =
+            s0 + v * T +
+            (v * dv) / (2.0f * std::sqrt(maxAccel * maxDecel + 0.001f));
+
+        interaction = (desiredGap / s) * (desiredGap / s);
+    }
+
+    float accel =
+        maxAccel * (1.0f - freeRoad - interaction);
+
+    return std::clamp(accel, -maxDecel, maxAccel);
 }

@@ -8,8 +8,8 @@ private:
     std::vector<Block> blocks;
 	std::vector<Travel> travels;
 public:
-    TJunction(float centerX, float centerY);
     TJunction();
+    TJunction(int index);
     std::vector<Block> getBlocks();
 	Travel getRandomTravel();
 };

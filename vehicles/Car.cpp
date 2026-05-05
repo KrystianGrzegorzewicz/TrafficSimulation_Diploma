@@ -1,6 +1,8 @@
 #include "vehicles/Car.h"
-#include <cmath>
 #include <algorithm>
+#include <cmath>
+
+int Car::nextId = 0;
 
 Car::Car(float speed, Travel travel)
     : speed(speed), travel(travel)
@@ -12,41 +14,89 @@ Car::Car(float speed, Travel travel)
 
     velocity = Vec2(0, 0);
     acceleration = Vec2(0, 0);
+    id = nextId++;
+    travelId = travel.getId();
 }
 
 void Car::update(float dt, const Perception& perception)
 {
-    if (travel.TravelPoints.size() < 3)
+    if (!isPathValid())
         return;
 
-    Vec2 oldVelocity = velocity;
+    if (isFinishedInternal())
+        return;
 
+    updateClosestT();
+
+    if (advanceSegmentIfNeeded())
+        return;
+
+    BehaviorOutput behaviorOut = behavior.compute(
+        travel,
+        segment,
+        t,
+        velocity.length(),
+        maxSpeed,
+        maxAccel,
+        maxDecel,
+        lookaheadBase,
+        lookaheadSpeedFactor,
+        perception
+    );
+
+    Vec2 lateralAccel =
+        steering.computeLateralAcceleration(
+            travel,
+            segment,
+            t,
+            position,
+            velocity,
+            lookaheadBase,
+            lookaheadSpeedFactor,
+            behaviorOut
+        );
+
+    integrate(
+        behaviorOut.acceleration + lateralAccel,
+        dt
+    );
+}
+
+bool Car::isPathValid() const
+{
+    return travel.TravelPoints.size() >= 3;
+}
+
+bool Car::isFinishedInternal()
+{
     if (segment + 2 >= travel.TravelPoints.size())
     {
         finished = true;
         velocity = Vec2(0, 0);
-        return;
+        return true;
     }
+    return false;
+}
 
+void Car::updateClosestT()
+{
     auto& p = travel.TravelPoints;
 
     Vec2 p0 = p[segment];
     Vec2 p1 = p[segment + 1];
     Vec2 p2 = p[segment + 2];
 
-    // =========================
-    // znajdź t (BEZ ZMIAN)
-    // =========================
     float bestT = t;
-    float bestDist = (travel.bezier(p0, p1, p2, t) - position).length();
+    float bestDist =
+        (travel.bezier(p0, p1, p2, t) - position).length();
 
     for (int i = -2; i <= 2; i++)
     {
-        float testT = t + i * 0.02f;
-        testT = std::clamp(testT, 0.0f, 1.0f);
+        float testT =
+            std::clamp(t + i * 0.02f, 0.0f, 1.0f);
 
-        Vec2 pt = travel.bezier(p0, p1, p2, testT);
-        float d = (pt - position).length();
+        float d =
+            (travel.bezier(p0, p1, p2, testT) - position).length();
 
         if (d < bestDist)
         {
@@ -56,74 +106,24 @@ void Car::update(float dt, const Perception& perception)
     }
 
     t = bestT;
+}
 
+bool Car::advanceSegmentIfNeeded()
+{
     if (t >= 0.999f)
     {
         segment += 2;
         t = 0.0f;
-
-        if (segment + 2 >= travel.TravelPoints.size())
-        {
-            finished = true;
-            velocity = Vec2(0, 0);
-        }
-
-        return;
+        return true;
     }
+    return false;
+}
 
-    // =========================
-    // BEHAVIOR (NOWE)
-    // =========================
-    BehaviorOutput out = behavior.compute(
-        travel,
-        segment,
-        t,
-        velocity.length(),
-        maxSpeed,
-        aLatMax,
-        lookaheadBase,
-        lookaheadSpeedFactor,
-        perception
-    );
+void Car::integrate(const Vec2& desiredAcceleration, float dt)
+{
+    Vec2 oldVelocity = velocity;
 
-    // =========================
-    // kierunek z krzywej (jak było)
-    // =========================
-    float dynamicLookahead = lookaheadBase + velocity.length() * lookaheadSpeedFactor;
-    float tLook = std::min(t + dynamicLookahead, 1.0f);
-    Vec2 tangent = travel.bezierDerivative(p0, p1, p2, tLook);
-    Vec2 forward = tangent.length() > 0.0001f
-        ? tangent / tangent.length()
-        : Vec2(1, 0);
-
-    // =========================
-    // lateral control (jak było)
-    // =========================
-    Vec2 toTarget = out.targetPoint - position;
-
-    float forwardMag = toTarget.dot(forward);
-    Vec2 forwardVec = forward * forwardMag;
-
-    Vec2 lateralError = toTarget - forwardVec;
-
-    float lateralVelMag = velocity.dot(Vec2(-forward.y, forward.x));
-    Vec2 lateralVel = Vec2(-forward.y, forward.x) * lateralVelMag;
-
-    Vec2 a_lateral = lateralError * kp - lateralVel * kd;
-
-    // =========================
-    // forward (z behavior)
-    // =========================
-    float currentSpeed = velocity.length();
-    float dv = out.targetSpeed - currentSpeed;
-
-    float a_forward_scalar = (dv > 0) ? dv * 2.0f : dv * 4.0f;
-    Vec2 a_forward = forward * a_forward_scalar;
-
-    // =========================
-    // suma
-    // =========================
-    acceleration = a_forward + a_lateral;
+    acceleration = desiredAcceleration;
 
     float accLen = acceleration.length();
     if (accLen > maxAccel)
@@ -131,44 +131,18 @@ void Car::update(float dt, const Perception& perception)
 
     velocity += acceleration * dt;
     position += velocity * dt;
+
     speed = velocity.length();
 
     if (dt > 0.00001f)
         acceleration = (velocity - oldVelocity) / dt;
     else
         acceleration = Vec2(0, 0);
-    if (perception.hasCarAhead)
-    {
-        Vec2 forward = velocity.length() > 0.001f
-            ? velocity.normalized()
-            : Vec2(1, 0);
-
-        float dist = perception.distanceToCarAhead;
-
-        float safeDist = computeSafeDistance(speed, maxAccel) + 1.0f;
-
-        if (dist < safeDist)
-        {
-            float safeSpeed = std::sqrt(
-                2.0f * maxAccel * std::max(0.0f, dist - 0.5f)
-            );
-
-            float currentSpeed = velocity.length();
-
-            float clampedSpeed = std::min(currentSpeed, safeSpeed);
-
-            velocity = forward * clampedSpeed;
-        }
-    }
 }
 
-Vec2 Car::getPosition() const {
-    return position;
-}
-Vec2 Car::getVelocityVector() const {
-    return velocity;
-}
-Vec2 Car::getAccelerationVector() const {
-    return acceleration;
-}
+int Car::getId() const { return id; }
+int Car::getTravelId() const { return travelId; }
+Vec2 Car::getPosition() const { return position; }
+Vec2 Car::getVelocityVector() const { return velocity; }
+Vec2 Car::getAccelerationVector() const { return acceleration; }
 bool Car::isFinished() const { return finished; }
