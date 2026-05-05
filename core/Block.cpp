@@ -5,7 +5,7 @@
 
 Block::Block(float x0, float y0, float xn, float yn, float onDur, float offDur) 
     : x0y0(x0, y0), xnyn(xn, yn), onDuration(onDur), offDuration(offDur), 
-      elapsedTime(0.0f), isCurrentlyOn(true) 
+      elapsedTime(0.0f), isCurrentlyOn(false) 
 {
     Block::color[0] = 255;
     Block::color[1] = 255;

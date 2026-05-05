@@ -13,7 +13,7 @@ private:
     bool isCurrentlyOn;    // Current state
     
 public:
-    Block(float x0, float y0, float xn, float yn, float onDur = 5.0f, float offDur = 5.0f);
+    Block(float x0, float y0, float xn, float yn, float onDur = 0.0f, float offDur = 1.0f);
     
     void update(float dt);
     void getVisualization();

@@ -125,10 +125,14 @@ def draw_blocks():
     for block in blocks:
         x1, y1 = to_screen(block["x1"], block["y1"])
         x2, y2 = to_screen(block["x2"], block["y2"])
+        if block["active"] == 1:
+            color = (200, 0, 0)
+        else:
+            color = (50, 50, 50)
 
         pygame.draw.rect(
             screen,
-            (100, 50, 50),
+            color,
             (x1, y1, x2 - x1, y2 - y1)
         )
 

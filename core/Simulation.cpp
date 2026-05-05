@@ -71,6 +71,9 @@ void Simulation::step(float dt) {
 
         cars[i].update(dt, p);
     }
+    for (auto& block : blocks) {
+		block.update(dt);
+    }
     currentTime += dt;
 
     if (saveCsv)
@@ -125,11 +128,13 @@ std::string Simulation::getWorldJson() {
     {
 		Vec2 topleft = blocks[i].getTopLeft();
 		Vec2 bottomright = blocks[i].getBottomRight();
+		bool active = blocks[i].isActive();
 
         ss << "{\"x1\":" << topleft.x
             << ",\"y1\":" << topleft.y
             << ",\"x2\":" << bottomright.x
-            << ",\"y2\":" << bottomright.y << "}";
+            << ",\"y2\":" << bottomright.y
+            << ",\"active\":" << active << "}";
         if (i != blocks.size() - 1) ss << ",";
     }
     ss << "]}\n";

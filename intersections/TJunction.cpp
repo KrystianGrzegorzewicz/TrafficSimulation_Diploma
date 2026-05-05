@@ -219,19 +219,20 @@ TJunction::TJunction(int index) {
             travels.push_back(Travel(travelPoints3, 1, 3));
 			break;
         case 3:
+            blocks.push_back(Block(-100.0f, -2.0f, 100.0f, -1.75f));
+            blocks.push_back(Block(-100.0f, 1.75f, 100.0f, 2.0f, 4.0f, 2.0f));
+            //z lewej do prawej
             travelPoints1 = {
+                Vec2(-100.0f, 0.0f),
+                Vec2(-100.0f, 0.0f),
+                Vec2(-60.0f, 0.0f),
+                Vec2(-30.0f, 0.0f),
                 Vec2(0.0f, 0.0f),
-                Vec2(0.0f, 0.0f),
-                Vec2(-10.0f, 0.0f),
-                Vec2(-10.0f, -10.0f),
-                Vec2(-10.0f,-20.0f),
-                Vec2(0.0f, -20.0f),
-                Vec2(10.0f, -20.0f),
-                Vec2(10.0f, -10.0f),
-                Vec2(10.0f, 0.0f),
-                Vec2(0.0f, 0.0f)
+                Vec2(30.0f, 0.0f),
+                Vec2(60.0f, 0.0f),
+                Vec2(100.0f, 0.0f),
+                Vec2(100.0f, 0.0f)
             };
-            //dolny z lewej do prawej
             travels.push_back(Travel(travelPoints1, 1, 1));
         default:
             std::cerr << "Unknown TJunction index: " << index << std::endl;

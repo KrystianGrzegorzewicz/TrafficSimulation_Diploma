@@ -29,7 +29,7 @@ int main() {
             conf.saveCsv = true;
         std::print("Set simulation speed (e.g., 1.0 for normal speed): ");
         std::cin >> conf.simSpeed;
-        std::print("Set simulation junction sample (1, 2): ");
+        std::print("Set simulation junction sample (1, 2, 3): ");
         std::cin >> conf.junction;
     }
 
