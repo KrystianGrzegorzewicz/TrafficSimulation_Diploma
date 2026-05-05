@@ -220,7 +220,8 @@ TJunction::TJunction(int index) {
 			break;
         case 3:
             blocks.push_back(Block(-100.0f, -2.0f, 100.0f, -1.75f));
-            blocks.push_back(Block(-100.0f, 1.75f, 100.0f, 2.0f, 4.0f, 2.0f));
+            blocks.push_back(Block(-100.0f, 1.75f, 100.0f, 2.0f));
+            blocks.push_back(Block(0.0f, -1.75f, 5.0f, 1.75f, 5.0f, 5.0f));
             //z lewej do prawej
             travelPoints1 = {
                 Vec2(-100.0f, 0.0f),

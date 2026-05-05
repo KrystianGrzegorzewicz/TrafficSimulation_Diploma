@@ -11,7 +11,8 @@
 [ ] priorytety tras
 [ ] rozbić perception na kategorie
 [ ] wzory ruchu - doczytać jakie są istniejące modele
-[ ] bloki stop, światła, przejścia dla pieszych
+[x] bloki stop, światła, przejścia dla pieszych
+[ ] podpiąć zachowanie do bloków
 
 ## behawioralizm
 [ ] rozdzielenie zachowania na av i człowieka
