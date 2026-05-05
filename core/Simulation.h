@@ -12,10 +12,10 @@
 class Simulation {
 private:
     float timeAccumulator;
-	float period;
+    float period;
     std::vector<Car> cars;
     std::vector<Block> blocks;
-	TJunction thisJunction;
+    TJunction thisJunction;
     std::ofstream logFile;
     float currentTime = 0.0f;
     bool saveCsv;
@@ -24,6 +24,9 @@ public:
     Simulation(float d, int junctionIndex, bool saveCsv);
     ~Simulation();
     void step(float dt);
-	void sendCsv();
+    void sendCsv();
     std::string getWorldJson();
+    
+private:
+    void updateBlocks(float dt);
 };

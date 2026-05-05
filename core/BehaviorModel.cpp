@@ -53,6 +53,17 @@ BehaviorOutput BehaviorModel::compute(
             perception
         );
 
+    // Block avoidance takes priority over normal behavior
+    if (perception.hasBlockHazard && perception.blockHazard.isActive)
+    {
+        float blockDecel = computeBlockAvoidanceDeceleration(
+            currentSpeed,
+            maxDecel,
+            perception
+        );
+        accel = std::min(accel, blockDecel);
+    }
+
     out.acceleration = forward * accel;
     return out;
 }
@@ -106,4 +117,34 @@ float BehaviorModel::computeIDMAcceleration(
         maxAccel * (1.0f - freeRoad - interaction);
 
     return std::clamp(accel, -maxDecel, maxAccel);
+}
+
+float BehaviorModel::computeBlockAvoidanceDeceleration(
+    float currentSpeed,
+    float maxDecel,
+    const Perception& perception
+)
+{
+    if (!perception.hasBlockHazard || !perception.blockHazard.isActive)
+        return 0.0f;
+
+    float distance = perception.blockHazard.distance;
+
+    // Three-zone braking strategy
+    if (distance < 5.0f)
+    {
+        // Emergency zone: full deceleration
+        return -maxDecel;
+    }
+    else if (distance < 20.0f)
+    {
+        // Reaction zone: gradual deceleration
+        float ratio = (distance - 5.0f) / 15.0f;  // 0.0 to 1.0
+        return -maxDecel * (1.0f - ratio);
+    }
+    else
+    {
+        // Safe zone: no additional braking
+        return 0.0f;
+    }
 }

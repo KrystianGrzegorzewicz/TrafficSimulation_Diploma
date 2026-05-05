@@ -40,4 +40,10 @@ private:
         float maxDecel,
         const Perception& perception
     );
+    
+    float computeBlockAvoidanceDeceleration(
+        float currentSpeed,
+        float maxDecel,
+        const Perception& perception
+    );
 };

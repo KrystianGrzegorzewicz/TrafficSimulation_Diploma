@@ -6,16 +6,20 @@ private:
     Vec2 x0y0, xnyn;
     int color[3];
     
-    // Timing properties
+    // Timing properties for on/off cycling
     float onDuration;      // Duration block is active (seconds)
     float offDuration;     // Duration block is inactive (seconds)
     float elapsedTime;     // Current elapsed time in current cycle
     bool isCurrentlyOn;    // Current state
     
 public:
-    Block(float x0, float y0, float xn, float yn, float onDur = 0.0f, float offDur = 1.0f);
+    Block(float x0, float y0, float xn, float yn, float onDur = 5.0f, float offDur = 5.0f);
+    ~Block() = default;
     
+    // Update state based on dt
     void update(float dt);
+    
+    // Original methods
     void getVisualization();
     int getColor(int index);
     Vec2 getTopLeft() const;

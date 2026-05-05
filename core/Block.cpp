@@ -3,13 +3,13 @@
 #include <algorithm>
 #include <cmath>
 
-Block::Block(float x0, float y0, float xn, float yn, float onDur, float offDur) 
-    : x0y0(x0, y0), xnyn(xn, yn), onDuration(onDur), offDuration(offDur), 
-      elapsedTime(0.0f), isCurrentlyOn(false) 
+Block::Block(float x0, float y0, float xn, float yn, float onDur, float offDur)
+    : x0y0(x0, y0), xnyn(xn, yn), onDuration(onDur), offDuration(offDur),
+      elapsedTime(0.0f), isCurrentlyOn(true)
 {
-    Block::color[0] = 255;
-    Block::color[1] = 255;
-    Block::color[2] = 255;
+    color[0] = 255;
+    color[1] = 0;
+    color[2] = 0;
 }
 
 void Block::update(float dt)
@@ -17,28 +17,53 @@ void Block::update(float dt)
     elapsedTime += dt;
     float cycleDuration = onDuration + offDuration;
     
-    // Wrap elapsed time to current cycle
+    // Wrap around cycle
     if (elapsedTime >= cycleDuration)
     {
         elapsedTime = std::fmod(elapsedTime, cycleDuration);
     }
     
-    // Determine if currently on or off
+    // Determine current state
     isCurrentlyOn = (elapsedTime < onDuration);
+    
+    // Update color based on state
+    if (isCurrentlyOn)
+    {
+        color[0] = 200;  // Bright red when active
+        color[1] = 0;
+        color[2] = 0;
+    }
+    else
+    {
+        color[0] = 80;   // Dark red when inactive
+        color[1] = 20;
+        color[2] = 20;
+    }
 }
 
-void Block::getVisualization() {
-    std::cout << "Block: (" << x0y0.x << ", " << x0y0.y << ") to (" << xnyn.x << ", " << xnyn.y << ") with color ("
-        << color[0] << ", " << color[1] << ", " << color[2] << ")"
-        << " - State: " << (isCurrentlyOn ? "ON" : "OFF")
-        << " (" << elapsedTime << "s)" << std::endl;
+void Block::getVisualization()
+{
+    std::string state = isCurrentlyOn ? "ON" : "OFF";
+    std::cout << "Block: (" << x0y0.x << ", " << x0y0.y << ") to ("
+              << xnyn.x << ", " << xnyn.y << ") [" << state << "] with color ("
+              << color[0] << ", " << color[1] << ", " << color[2] << ")"
+              << std::endl;
 }
 
-Vec2 Block::getTopLeft() const {
+int Block::getColor(int index)
+{
+    if (index >= 0 && index < 3)
+        return color[index];
+    return 0;
+}
+
+Vec2 Block::getTopLeft() const
+{
     return x0y0;
 }
 
-Vec2 Block::getBottomRight() const {
+Vec2 Block::getBottomRight() const
+{
     return xnyn;
 }
 
@@ -50,7 +75,9 @@ bool Block::isActive() const
 float Block::getProgress() const
 {
     float cycleDuration = onDuration + offDuration;
-    return elapsedTime / cycleDuration;
+    if (cycleDuration < 0.001f)
+        return 0.0f;
+    return std::fmod(elapsedTime, cycleDuration) / cycleDuration;
 }
 
 Vec2 Block::getCenter() const
@@ -79,18 +106,13 @@ float Block::getDistanceToPoint(const Vec2& point) const
     float minY = std::min(x0y0.y, xnyn.y);
     float maxY = std::max(x0y0.y, xnyn.y);
     
-    float dx = 0.0f;
-    float dy = 0.0f;
+    // Clamp point to block bounds
+    float closestX = std::clamp(point.x, minX, maxX);
+    float closestY = std::clamp(point.y, minY, maxY);
     
-    if (point.x < minX)
-        dx = minX - point.x;
-    else if (point.x > maxX)
-        dx = point.x - maxX;
-    
-    if (point.y < minY)
-        dy = minY - point.y;
-    else if (point.y > maxY)
-        dy = point.y - maxY;
+    // Calculate distance to closest point on block
+    float dx = point.x - closestX;
+    float dy = point.y - closestY;
     
     return std::sqrt(dx * dx + dy * dy);
 }
