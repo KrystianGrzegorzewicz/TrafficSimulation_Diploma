@@ -24,15 +24,18 @@ std::string getTimestamp()
     return oss.str();
 }
 
-Simulation::Simulation(float d, int junctionIndex) {
+Simulation::Simulation(float d, int junctionIndex, bool saveCsv) {
     this->thisJunction = TJunction(junctionIndex);
 	timeAccumulator = 0.0f;
 	period = 1.0f / d;
     cars.emplace_back(14.0f, thisJunction.getRandomTravel());
 	blocks = thisJunction.getBlocks();
-    std::string filename = "data/cars_" + getTimestamp() + ".csv";
-    logFile.open(filename);
-    logFile << "time,id,travel_id,x,y,vx,vy,ax,ay\n";
+    if (saveCsv)
+    {
+        std::string filename = "data/cars_" + getTimestamp() + ".csv";
+        logFile.open(filename);
+        logFile << "time,id,travel_id,x,y,vx,vy,ax,ay\n";
+    }    
 }
 Simulation::~Simulation() {
     if (logFile.is_open())
@@ -70,6 +73,17 @@ void Simulation::step(float dt) {
     }
     currentTime += dt;
 
+    if (saveCsv)
+		sendCsv();
+    
+    cars.erase(
+        std::remove_if(cars.begin(), cars.end(),
+            [](const Car& c) { return c.isFinished(); }),
+        cars.end()
+    );
+}
+
+void Simulation::sendCsv() {
     for (const auto& car : cars)
     {
         Vec2 pos = car.getPosition();
@@ -83,12 +97,6 @@ void Simulation::step(float dt) {
             << vel.x << "," << vel.y << ","
             << acc.x << "," << acc.y << "\n";
     }
-
-    cars.erase(
-        std::remove_if(cars.begin(), cars.end(),
-            [](const Car& c) { return c.isFinished(); }),
-        cars.end()
-    );
 }
 
 std::string Simulation::getWorldJson() {

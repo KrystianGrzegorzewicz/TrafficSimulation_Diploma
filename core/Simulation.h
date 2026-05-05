@@ -18,10 +18,12 @@ private:
 	TJunction thisJunction;
     std::ofstream logFile;
     float currentTime = 0.0f;
+    bool saveCsv;
 
 public:
-    Simulation(float d, int junctionIndex);
+    Simulation(float d, int junctionIndex, bool saveCsv);
     ~Simulation();
     void step(float dt);
+	void sendCsv();
     std::string getWorldJson();
 };

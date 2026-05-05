@@ -23,6 +23,10 @@ int main() {
         std::cin >> input;
         if (input == 0)
 			conf.gui = false;
+        std::print("Save data to csv? 1 - Yes, 0 - No: ");
+        std::cin >> input;
+        if (input == 1)
+            conf.saveCsv = true;
         std::print("Set simulation speed (e.g., 1.0 for normal speed): ");
         std::cin >> conf.simSpeed;
         std::print("Set simulation junction sample (1, 2): ");
@@ -30,7 +34,7 @@ int main() {
     }
 
     const float fixedDt = 0.01f;
-    Simulation sim = Simulation(conf.spawnRate, conf.junction);
+    Simulation sim = Simulation(conf.spawnRate, conf.junction, conf.saveCsv);
 
     if (conf.gui)
     {

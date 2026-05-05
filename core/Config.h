@@ -3,6 +3,7 @@
 
 struct Config {
 	bool gui;
+	bool saveCsv;
 	float simSpeed;
 	float spawnRate;
 	int junction;
