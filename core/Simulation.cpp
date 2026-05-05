@@ -145,15 +145,13 @@ std::string Simulation::getWorldJson() {
     for (size_t i = 0; i < blocks.size(); i++) {
         Vec2 topLeft = blocks[i].getTopLeft();
         Vec2 bottomRight = blocks[i].getBottomRight();
-        
+		bool active = blocks[i].isActive();
+        //test
         ss << "{\"x1\":" << topLeft.x
             << ",\"y1\":" << topLeft.y
             << ",\"x2\":" << bottomRight.x
             << ",\"y2\":" << bottomRight.y
-            << ",\"active\":" << (blocks[i].isActive() ? "true" : "false")
-            << ",\"r\":" << blocks[i].getColor(0)
-            << ",\"g\":" << blocks[i].getColor(1)
-            << ",\"b\":" << blocks[i].getColor(2) << "}";
+            << ",\"active\":" << active  << "}";
         
         if (i < blocks.size() - 1)
             ss << ",";
