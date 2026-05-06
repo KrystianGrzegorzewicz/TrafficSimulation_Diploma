@@ -272,12 +272,73 @@ TJunction::TJunction(int index) {
             };
             travels.push_back(Travel(travelPoints1, 1, 1));
         case 4: //proste rondo
+            circles.push_back(Circle(0.0f, 0.0f, 11.0f, true));
+            circles.push_back(Circle(0.0f, 0.0f, 17.0f, false));
+
+            lines.push_back(Line(-150.0f, -3.5f, -35.0f, -3.5f, 0.2f));
+            lines.push_back(Line(-150.0f, 0.0f, -25.0f, 0.0f, 0.2f));
+            lines.push_back(Line(-150.0f, 3.5f, -35.0f, 3.5f, 0.2f));
+
+            lines.push_back(Line(35.0f, -3.5f, 150.0f, -3.5f, 0.2f));
+            lines.push_back(Line(25.0f, 0.0f, 150.0f, 0.0f, 0.2f));
+            lines.push_back(Line(35.0f, 3.5f, 150.0f, 3.5f, 0.2f));
+
+            lines.push_back(Line(-3.5f, -150.0f, -3.5f, -35.0f, 0.2f));
+            lines.push_back(Line(0.0f, -150.0f, 0.0f, -25.0f, 0.2f));
+            lines.push_back(Line(3.5f, -150.0f, 3.5f, -35.0f, 0.2f));
+
+            lines.push_back(Line(-35.0f, -3.5f, -14.5f, -8.8f, 0.2f));
+            lines.push_back(Line(-35.0f, 3.5f, -14.5f, 8.8f, 0.2f));
+            lines.push_back(Line(-25.0f, 0.0f, -16.9f, -1.8f, 0.2f));
+            lines.push_back(Line(-25.0f, 0.0f, -16.9f, 1.8f, 0.2f));
+
+            lines.push_back(Line(35.0f, -3.5f, 14.5f, -8.8f, 0.2f));
+            lines.push_back(Line(35.0f, 3.5f, 14.5f, 8.8f, 0.2f));
+            lines.push_back(Line(25.0f, 0.0f, 16.9f, -1.8f, 0.2f));
+            lines.push_back(Line(25.0f, 0.0f, 16.9f, 1.8f, 0.2f));
+
+            lines.push_back(Line(-3.5f, -35.0f, -8.8f, -14.5f, 0.2f));
+            lines.push_back(Line(3.5f, -35.0f, 8.8f, -14.5f, 0.2f));
+            lines.push_back(Line(0.0f, -25.0f, -1.8f, -16.9f, 0.2f));
+            lines.push_back(Line(0.0f, -25.0f, 1.8f, -16.9f, 0.2f));
 
             //z gory w dol
             travelPoints1 = {
-                Vec2(-100.0f, 0.0f),
+                Vec2(-150.0f, 1.75f),
+                Vec2(-150.0f, 1.75f),
+                Vec2(-100.0f, 1.75f),
+                Vec2(-60.0f, 1.75f),
+                Vec2(-40.0f, 1.75f),
+
+                /*Vec2(-35.0f, 1.75f),
+                Vec2(-13.0f, 1.75f),
+                Vec2(-9.0f, 5.0f),
+                Vec2(-13.25f, 14.0f),
+                Vec2(0.0f, 14.0f),
+                Vec2(13.25f, 14.0f),
+                Vec2(9.0f, 5.0f),
+                Vec2(13.0f, 1.75f),
+                Vec2(35.0f, 1.75f),*/
+
+                Vec2(-35.0f, 1.75f),
+                Vec2(-20.0f, 2.75f),
+                Vec2(-14.5f, 5.0f),
+                Vec2(-9.25f, 11.0f),
+                Vec2(0.0f, 14.0f),
+                Vec2(9.25f, 11.0f),
+                Vec2(14.5f, 5.0f),
+                Vec2(20.0f, 2.75f),
+                Vec2(35.0f, 1.75f),
+
+
+                Vec2(40.0f, 1.75f),
+                Vec2(60.0f, 1.75f),
+                Vec2(80.0f, 1.75f),
+                Vec2(100.0f, 1.75f),
+                Vec2(150.0f, 1.75f),
+                Vec2(150.0f, 1.75f),
             };
-            //z gory w prawo
+/*            //z gory w prawo
             travelPoints2 = {
                 Vec2(-100.0f, 0.0f),
             };
@@ -296,7 +357,7 @@ TJunction::TJunction(int index) {
 			//z dolu w gore
             travelPoints6 = {
                 Vec2(-100.0f, 0.0f),
-            };
+            };*/
 			travels.push_back(Travel(travelPoints1, 1, 1));
         default:
             std::cerr << "Unknown TJunction index: " << index << std::endl;

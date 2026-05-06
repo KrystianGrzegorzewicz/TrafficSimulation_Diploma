@@ -8,5 +8,5 @@ struct Config {
 	float spawnRate;
 	int junction;
 
-	Config() : gui(true), simSpeed(1.0f), spawnRate(1.0f), junction(3), saveCsv(false) {}
+	Config() : gui(true), simSpeed(1.0f), spawnRate(1.0f), junction(4), saveCsv(false) {}
 };

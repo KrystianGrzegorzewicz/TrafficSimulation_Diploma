@@ -131,6 +131,8 @@
     <ClCompile Include="core\BehaviorModel.cpp" />
     <ClCompile Include="core\Block.cpp" />
     <ClCompile Include="core\BlockPerception.cpp" />
+    <ClCompile Include="core\Circle.cpp" />
+    <ClCompile Include="core\Line.cpp" />
     <ClCompile Include="core\Perception.cpp" />
     <ClCompile Include="core\PerceptionUpdater.cpp" />
     <ClCompile Include="core\SteeringModel.cpp" />
@@ -150,7 +152,9 @@
     <ClInclude Include="core\Block.h" />
     <ClInclude Include="core\BlockPerception.h" />
     <ClInclude Include="core\CarState.h" />
+    <ClInclude Include="core\Circle.h" />
     <ClInclude Include="core\Config.h" />
+    <ClInclude Include="core\Line.h" />
     <ClInclude Include="core\Perception.h" />
     <ClInclude Include="core\PerceptionUpdater.h" />
     <ClInclude Include="core\SteeringModel.h" />
