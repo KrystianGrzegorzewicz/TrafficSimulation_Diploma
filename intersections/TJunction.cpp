@@ -95,6 +95,16 @@ TJunction::TJunction(int index) {
             blocks.push_back(Block(3.5f, 3.5f, 100.0f, 4.0f));
             blocks.push_back(Block(-4.0f, 3.5f, -3.5f, 50.0f));
             blocks.push_back(Block(3.5f, 3.5f, 4.0f, 50.0f));
+            
+            // Add lines for junction markings
+            lines.push_back(Line(-100.0f, -3.75f, 100.0f, -3.75f, 0.3f));
+            lines.push_back(Line(-100.0f, 3.75f, 100.0f, 3.75f, 0.3f));
+            
+            // Add circles for lane markers
+            circles.push_back(Circle(-50.0f, -3.75f, 1.0f, false));
+            circles.push_back(Circle(0.0f, -3.75f, 1.0f, false));
+            circles.push_back(Circle(50.0f, -3.75f, 1.0f, false));
+            
 			//z lewej do prawej
             travelPoints1 = {
                 Vec2(-90.0f, 1.75f),
@@ -162,6 +172,16 @@ TJunction::TJunction(int index) {
             blocks.push_back(Block(3.5f, -100.0f, 4.0f, -3.5f));
             blocks.push_back(Block(-0.5f, -100.0f, 0.0f, -3.5f));
             blocks.push_back(Block(-20.0f, 3.5f, 3.5f, 3.7f));
+            
+            // Add lines for junction markings
+            lines.push_back(Line(-100.0f, -3.75f, 100.0f, -3.75f, 0.3f));
+            lines.push_back(Line(-100.0f, 3.75f, 0.0f, 3.75f, 0.3f));
+            lines.push_back(Line(0.0f, 3.75f, 23.5f, 7.25f, 0.3f));
+            
+            // Add circles for conflict zone markers
+            circles.push_back(Circle(0.0f, 0.0f, 2.0f, false));
+            circles.push_back(Circle(-20.0f, 3.6f, 1.5f, false));
+            
             travelPoints1 = {
                 Vec2(100.0f, -1.75f),
                 Vec2(100.0f, -1.75f),
@@ -228,6 +248,16 @@ TJunction::TJunction(int index) {
             blocks.push_back(Block(-100.0f, -2.0f, 100.0f, -1.75f));
             blocks.push_back(Block(-100.0f, 1.75f, 100.0f, 2.0f));
             blocks.push_back(Block(0.0f, -1.75f, 5.0f, 1.75f, 10.0f, 5.0f));
+            
+            // Add lines for single lane
+            lines.push_back(Line(-100.0f, 0.0f, 100.0f, 0.0f, 0.2f));
+            
+            // Add circles for pedestrian crossing markers
+            for (float x = -90.0f; x <= 90.0f; x += 20.0f) {
+                circles.push_back(Circle(x, -1.75f, 0.5f, false));
+                circles.push_back(Circle(x, 1.75f, 0.5f, false));
+            }
+            
             //z lewej do prawej
             travelPoints1 = {
                 Vec2(-100.0f, 0.0f),
@@ -273,8 +303,17 @@ TJunction::TJunction(int index) {
             break;
 	}
 }
+
 std::vector<Block> TJunction::getBlocks() {
     return blocks;
+}
+
+std::vector<Line> TJunction::getLines() {
+    return lines;
+}
+
+std::vector<Circle> TJunction::getCircles() {
+    return circles;
 }
 
 Travel TJunction::getRandomTravel() {

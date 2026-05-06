@@ -34,7 +34,7 @@ last_mouse = (0, 0)
 
 # ===== AUTO FIT =====
 
-def compute_bounds(cars, blocks):
+def compute_bounds(cars, blocks, lines, circles):
     xs, ys = [], []
 
     for car in cars:
@@ -44,16 +44,24 @@ def compute_bounds(cars, blocks):
     for block in blocks:
         xs += [block["x1"], block["x2"]]
         ys += [block["y1"], block["y2"]]
+    
+    for line in lines:
+        xs += [line["x1"], line["x2"]]
+        ys += [line["y1"], line["y2"]]
+    
+    for circle in circles:
+        xs += [circle["cx"] - circle["radius"], circle["cx"] + circle["radius"]]
+        ys += [circle["cy"] - circle["radius"], circle["cy"] + circle["radius"]]
 
     if not xs:
         return 0, 0, 100, 100
 
     return min(xs), min(ys), max(xs), max(ys)
 
-def fit_view(cars, blocks):
+def fit_view(cars, blocks, lines, circles):
     global cam_x, cam_y, scale
 
-    min_x, min_y, max_x, max_y = compute_bounds(cars, blocks)
+    min_x, min_y, max_x, max_y = compute_bounds(cars, blocks, lines, circles)
 
     world_w = max_x - min_x
     world_h = max_y - min_y
@@ -136,6 +144,32 @@ def draw_blocks():
             (x1, y1, x2 - x1, y2 - y1)
         )
 
+def draw_lines():
+    """Draw line markings on the junction"""
+    for line in lines:
+        x1, y1 = to_screen(line["x1"], line["y1"])
+        x2, y2 = to_screen(line["x2"], line["y2"])
+        
+        # Light grayish color (RGB: 200, 200, 200)
+        color = (line.get("r", 200), line.get("g", 200), line.get("b", 200))
+        thickness = max(1, int(line.get("thickness", 1.0) * scale))
+        
+        pygame.draw.line(screen, color, (x1, y1), (x2, y2), thickness)
+
+def draw_circles():
+    """Draw circle markers on the junction"""
+    for circle in circles:
+        cx, cy = to_screen(circle["cx"], circle["cy"])
+        radius = max(1, int(circle["radius"] * scale))
+        
+        # Light grayish color (RGB: 200, 200, 200)
+        color = (circle.get("r", 200), circle.get("g", 200), circle.get("b", 200))
+        
+        if circle.get("filled", False):
+            pygame.draw.circle(screen, color, (int(cx), int(cy)), radius)
+        else:
+            pygame.draw.circle(screen, color, (int(cx), int(cy)), radius, 2)
+
 # ===== MAIN =====
 
 sock = connect()
@@ -143,6 +177,8 @@ buffer = ""
 
 cars = []
 blocks = []
+lines = []
+circles = []
 
 running = True
 while running:
@@ -187,11 +223,13 @@ while running:
                 print("JSON ERROR:", e)
                 continue
 
-            cars = world["cars"]
-            blocks = world["blocks"]
+            cars = world.get("cars", [])
+            blocks = world.get("blocks", [])
+            lines = world.get("lines", [])
+            circles = world.get("circles", [])
 
             if not initialized:
-                fit_view(cars, blocks)
+                fit_view(cars, blocks, lines, circles)
                 initialized = True
 
     except BlockingIOError:
@@ -206,6 +244,8 @@ while running:
     screen.fill((30,30,30))
 
     draw_blocks()
+    draw_lines()
+    draw_circles()
 
     for car in cars:
         x, y = to_screen(car["x"], car["y"])
