@@ -152,12 +152,8 @@ std::string Simulation::getWorldJson() {
             << ",\"x2\":" << bottomRight.x
             << ",\"y2\":" << bottomRight.y
             << ",\"active\":" << active  << "}";
-        
-        if (i < blocks.size() - 1)
-            ss << ",";
+        if (i != blocks.size() - 1) ss << ",";
     }
-    ss << "]";
-    
-    ss << "}";
+    ss << "]}\n";
     return ss.str();
 }

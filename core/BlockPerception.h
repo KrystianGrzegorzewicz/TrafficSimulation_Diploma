@@ -22,6 +22,6 @@ public:
     );
 
 private:
-    static constexpr float MAX_VIEW_DISTANCE = 50.0f;
-    static constexpr float THREAT_DISTANCE = 20.0f;  // Distance at which threat = 1.0f
+    static constexpr float MAX_VIEW_DISTANCE = 70.0f;
+    static constexpr float THREAT_DISTANCE = 50.0f;  // Distance at which threat = 1.0f
 };
