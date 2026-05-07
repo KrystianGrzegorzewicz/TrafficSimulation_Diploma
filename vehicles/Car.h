@@ -40,7 +40,7 @@ private:
     float maxSpeed = 20.0f;
 
     float lookaheadBase = 0.1f;
-    float lookaheadSpeedFactor = 0.03f;
+    float lookaheadSpeedFactor = 0.04f;
 
     // PD controller
     float kp = 8.0f;

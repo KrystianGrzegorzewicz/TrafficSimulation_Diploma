@@ -6,7 +6,7 @@ TJunction::TJunction() {
     std::vector<Vec2> travelPoints1;
     std::vector<Vec2> travelPoints2;
     std::vector<Vec2> travelPoints3;
-
+    Travel tempTravel(travelPoints1, 1, 0);
 
     //z prawej do lewej
         travelPoints1 = {
@@ -84,6 +84,8 @@ TJunction::TJunction(int index) {
     std::vector<Vec2> travelPoints4;
     std::vector<Vec2> travelPoints5;
     std::vector<Vec2> travelPoints6;
+    Travel tempTravel(travelPoints1, 1, 0);
+    const float STEP = 0.05f; // gęstość punktów
 
     switch (index) {
         case 0:
@@ -302,32 +304,21 @@ TJunction::TJunction(int index) {
             lines.push_back(Line(0.0f, -25.0f, -1.8f, -16.9f, 0.2f));
             lines.push_back(Line(0.0f, -25.0f, 1.8f, -16.9f, 0.2f));
 
-            //z gory w dol
+            //z lewej do prawej
             travelPoints1 = {
                 Vec2(-150.0f, 1.75f),
                 Vec2(-150.0f, 1.75f),
                 Vec2(-100.0f, 1.75f),
                 Vec2(-60.0f, 1.75f),
-                Vec2(-40.0f, 1.75f),
-
-                /*Vec2(-35.0f, 1.75f),
-                Vec2(-13.0f, 1.75f),
-                Vec2(-9.0f, 5.0f),
-                Vec2(-13.25f, 14.0f),
-                Vec2(0.0f, 14.0f),
-                Vec2(13.25f, 14.0f),
-                Vec2(9.0f, 5.0f),
-                Vec2(13.0f, 1.75f),
-                Vec2(35.0f, 1.75f),*/
 
                 Vec2(-35.0f, 1.75f),
-                Vec2(-20.0f, 2.75f),
-                Vec2(-14.5f, 5.0f),
-                Vec2(-9.25f, 11.0f),
+                Vec2(-19.0f, 2.0f),
+                Vec2(-16.2f, 4.0f),
+                Vec2(-7.0f, 14.0f),
                 Vec2(0.0f, 14.0f),
-                Vec2(9.25f, 11.0f),
-                Vec2(14.5f, 5.0f),
-                Vec2(20.0f, 2.75f),
+                Vec2(8.0f, 14.0f),
+                Vec2(13.0f, 7.5f),
+                Vec2(19.00f, 2.0f),
                 Vec2(35.0f, 1.75f),
 
 
@@ -338,15 +329,59 @@ TJunction::TJunction(int index) {
                 Vec2(150.0f, 1.75f),
                 Vec2(150.0f, 1.75f),
             };
-/*            //z gory w prawo
+			
+
+            //z lewej w gore
             travelPoints2 = {
-                Vec2(-100.0f, 0.0f),
+                Vec2(-150.0f, 1.75f),
+                Vec2(-150.0f, 1.75f),
+                Vec2(-100.0f, 1.75f),
+                Vec2(-60.0f, 1.75f),
+
+                Vec2(-35.0f, 1.75f),
+                Vec2(-19.0f, 2.0f),
+                Vec2(-16.2f, 4.0f),
+                Vec2(-7.0f, 14.0f),
+                Vec2(0.0f, 14.0f),
+                Vec2(8.0f, 14.0f),
+                Vec2(12.8f, 7.25f),
+                Vec2(16.0f, 0.f),
+                Vec2(12.8f, -5.5f),
+                //Vec2(12.8f, -7.25f),
+                Vec2(10.5f, -9.0f),
+                Vec2(7.0f, -12.0f),
+                Vec2(1.5f, -17.0f),
+                Vec2(1.75f, -35.0f),
+
+                Vec2(1.75f, -60.0f),
+                Vec2(1.75f, -90.0f),
+                Vec2(1.75f, -120.0f),
+                Vec2(1.75f, -150.0f),
+                Vec2(1.75f, -150.0f),
+
             };
             //z prawej w gore
             travelPoints3 = {
-                Vec2(-100.0f, 0.0f),
+                Vec2(150.0f, -1.75f),
+                Vec2(150.0f, -1.75f),
+                Vec2(120.0f, -1.75f),
+                Vec2(100.0f, -1.75f),
+                Vec2(90.0f, -1.75f),
+                Vec2(60.0f, -1.75f),
+
+                Vec2(35.0f, -1.75f),
+                Vec2(19.0f, -2.0f),
+                Vec2(16.2f, -4.0f),
+                Vec2(1.75f, -16.0f),
+                Vec2(1.75f, -35.0f),
+
+                Vec2(1.75f, -60.0f),
+                Vec2(1.75f, -90.0f),
+                Vec2(1.75f, -120.0f),
+                Vec2(1.75f, -150.0f),
+                Vec2(1.75f, -150.0f),
             };
-			//z prawej w dol
+			/*//z prawej w lewo
             travelPoints4 = {
                 Vec2(-100.0f, 0.0f),
             };
@@ -359,10 +394,37 @@ TJunction::TJunction(int index) {
                 Vec2(-100.0f, 0.0f),
             };*/
 			travels.push_back(Travel(travelPoints1, 1, 1));
+            travels.push_back(Travel(travelPoints2, 1, 1));
+            travels.push_back(Travel(travelPoints3, 1, 1));
         default:
             std::cerr << "Unknown TJunction index: " << index << std::endl;
             break;
 	}
+    //for all travelPoints3 add small circle markers to indicate the path
+    for (const Vec2& point : travelPoints3) {
+        circles.push_back(Circle(point.x, point.y, 0.5f, false));
+    }
+
+    //for all travelPoints3 add small circle along bezier curve to indicate the path
+
+
+
+
+    for (size_t i = 0; i + 2 < travelPoints3.size(); i += 2)
+    {
+        Vec2 p0 = travelPoints3[i];
+        Vec2 p1 = travelPoints3[i + 1];
+        Vec2 p2 = travelPoints3[i + 2];
+
+        for (float t = 0.0f; t <= 1.0f; t += STEP)
+        {
+            Vec2 point = tempTravel.bezier(p0, p1, p2, t);
+
+            circles.push_back(
+                Circle(point.x, point.y, 0.3f, false)
+            );
+        }
+    }
 }
 
 std::vector<Block> TJunction::getBlocks() {
