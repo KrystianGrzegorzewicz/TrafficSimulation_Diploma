@@ -370,8 +370,8 @@ TJunction::TJunction(int index) {
                 Vec2(60.0f, -1.75f),
 
                 Vec2(35.0f, -1.75f),
-                Vec2(19.0f, -2.0f),
-                Vec2(16.2f, -4.0f),
+                Vec2(22.0f, -2.5f),
+                Vec2(16.2f, -6.0f),
                 Vec2(1.75f, -16.0f),
                 Vec2(1.75f, -35.0f),
 
@@ -381,40 +381,87 @@ TJunction::TJunction(int index) {
                 Vec2(1.75f, -150.0f),
                 Vec2(1.75f, -150.0f),
             };
-			/*//z prawej w lewo
+			//z prawej w lewo
             travelPoints4 = {
-                Vec2(-100.0f, 0.0f),
+                Vec2(150.0f, -1.75f),
+                Vec2(150.0f, -1.75f),
+                Vec2(120.0f, -1.75f),
+                Vec2(100.0f, -1.75f),
+                Vec2(90.0f, -1.75f),
+                Vec2(60.0f, -1.75f),
+
+                Vec2(35.0f, -1.75f),
+                Vec2(19.0f, -2.0f),
+                Vec2(16.2f, -4.0f),
+                Vec2(10.5f, -7.0f),
+                Vec2(6.7f, -11.0f),
+                Vec2(0.0f, -16.0f),
+                Vec2(-8.8f, -9.2f),
+                Vec2(-13.5f, -4.0f),
+                Vec2(-35.0f, -1.75f),
+
+                Vec2(-60.0f, -1.75f),
+                Vec2(-90.0f, -1.75f),
+                Vec2(-120.0f, -1.75f),
+                Vec2(-150.0f, -1.75f),
+                Vec2(-150.0f, -1.75f)
             };
-			//z dolu w prawo
+			//z gory w lewo
             travelPoints5 = {
-                Vec2(-100.0f, 0.0f),
+                Vec2(-1.75f, -150.0f),
+                Vec2(-1.75f, -150.0f),
+                Vec2(-1.75f, -120.0f),
+                Vec2(-1.75f, -90.0f),
+                Vec2(-1.75f, -60.0f),
+
+
+
+                Vec2(-60.0f, -1.75f),
+                Vec2(-90.0f, -1.75f),
+                Vec2(-120.0f, -1.75f),
+                Vec2(-150.0f, -1.75f),
+                Vec2(-150.0f, -1.75f)
             };
-			//z dolu w gore
+			//z gory w prawo
             travelPoints6 = {
-                Vec2(-100.0f, 0.0f),
-            };*/
+                Vec2(-1.75f, -150.0f),
+                Vec2(-1.75f, -150.0f),
+                Vec2(-1.75f, -120.0f),
+                Vec2(-1.75f, -90.0f),
+                Vec2(-1.75f, -60.0f),
+
+                
+
+                Vec2(40.0f, 1.75f),
+                Vec2(60.0f, 1.75f),
+                Vec2(80.0f, 1.75f),
+                Vec2(100.0f, 1.75f),
+                Vec2(150.0f, 1.75f),
+                Vec2(150.0f, 1.75f),
+            };
 			travels.push_back(Travel(travelPoints1, 1, 1));
-            travels.push_back(Travel(travelPoints2, 1, 1));
-            travels.push_back(Travel(travelPoints3, 1, 1));
+            travels.push_back(Travel(travelPoints2, 1, 2));
+            travels.push_back(Travel(travelPoints3, 1, 3));
+			travels.push_back(Travel(travelPoints4, 1, 4));
         default:
             std::cerr << "Unknown TJunction index: " << index << std::endl;
             break;
 	}
-    //for all travelPoints3 add small circle markers to indicate the path
-    for (const Vec2& point : travelPoints3) {
+/*    //for all travelPoints4 add small circle markers to indicate the path
+    for (const Vec2& point : travelPoints4) {
         circles.push_back(Circle(point.x, point.y, 0.5f, false));
     }
 
-    //for all travelPoints3 add small circle along bezier curve to indicate the path
+    //for all travelPoints4 add small circle along bezier curve to indicate the path
 
 
 
 
-    for (size_t i = 0; i + 2 < travelPoints3.size(); i += 2)
+    for (size_t i = 0; i + 2 < travelPoints4.size(); i += 2)
     {
-        Vec2 p0 = travelPoints3[i];
-        Vec2 p1 = travelPoints3[i + 1];
-        Vec2 p2 = travelPoints3[i + 2];
+        Vec2 p0 = travelPoints4[i];
+        Vec2 p1 = travelPoints4[i + 1];
+        Vec2 p2 = travelPoints4[i + 2];
 
         for (float t = 0.0f; t <= 1.0f; t += STEP)
         {
@@ -424,7 +471,7 @@ TJunction::TJunction(int index) {
                 Circle(point.x, point.y, 0.3f, false)
             );
         }
-    }
+    }*/
 }
 
 std::vector<Block> TJunction::getBlocks() {
