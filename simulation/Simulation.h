@@ -12,30 +12,30 @@
 class Simulation
 {
 public:
-    Simulation(float spawnRate, int junctionIndex, bool saveCsv);
-    ~Simulation();
+	Simulation(float spawnRate, int junctionIndex, bool saveCsv);
+	~Simulation();
 
-    // Advance by dt seconds (called from main at fixed step).
-    void step(float dt);
+	// Advance by dt seconds (called from main at fixed step).
+	void step(float dt);
 
-    std::string getWorldJson();
-    void        sendCsv();
+	std::string getWorldJson();
+	void        sendCsv();
 
 private:
-    void spawnVehicle();
-    void rebuildVehicleStates();   // fills worldState.vehicleStates before updates
-    void pruneFinished();
+	void spawnVehicle();
+	void rebuildVehicleStates();   // fills worldState.vehicleStates before updates
+	void pruneFinished();
 
-    Junction  junction;
-    WorldState worldState;
+	Junction  junction;
+	WorldState worldState;
 
-    std::vector<std::unique_ptr<Car>> vehicles;
+	std::vector<std::unique_ptr<Car>> vehicles;
 
-    // Time book-keeping (moved out of main)
-    float spawnAccumulator = 0.0f;
-    float spawnPeriod = 1.0f;
-    float currentTime = 0.0f;
+	// Time book-keeping (moved out of main)
+	float spawnAccumulator = 0.0f;
+	float spawnPeriod = 1.0f;
+	float currentTime = 0.0f;
 
-    bool       saveCsv = false;
-    std::ofstream logFile;
+	bool       saveCsv = false;
+	std::ofstream logFile;
 };

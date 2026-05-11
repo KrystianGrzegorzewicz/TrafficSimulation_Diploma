@@ -10,19 +10,19 @@
 class Junction
 {
 public:
-    Junction();
-    explicit Junction(int index);
+	Junction();
+	explicit Junction(int index);
 
-    // Mutable so Block::update() can be called each tick
-    std::vector<Block>& getBlocks();
-    const std::vector<Block>& getBlocks() const;
-    std::vector<Line>          getLines()   const;
-    std::vector<Circle>        getCircles() const;
-    Travel                     getRandomTravel();
+	// Mutable so Block::update() can be called each tick
+	std::vector<Block>& getBlocks();
+	const std::vector<Block>& getBlocks() const;
+	std::vector<Line>          getLines()   const;
+	std::vector<Circle>        getCircles() const;
+	Travel                     getRandomTravel();
 
 private:
-    std::vector<Block>  blocks;
-    std::vector<Travel> travels;
-    std::vector<Line>   lines;
-    std::vector<Circle> circles;
+	std::vector<Block>  blocks;
+	std::vector<Travel> travels;
+	std::vector<Line>   lines;
+	std::vector<Circle> circles;
 };

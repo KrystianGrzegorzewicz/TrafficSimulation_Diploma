@@ -4,9 +4,9 @@
 
 struct CarState
 {
-    Vec2 position;
-    Vec2 velocity;
-    Vec2 acceleration;
-    int travelId = -1;
-    int id = -1;
+	Vec2 position;
+	Vec2 velocity;
+	Vec2 acceleration;
+	int travelId = -1;
+	int id = -1;
 };

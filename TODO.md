@@ -4,22 +4,22 @@
 [ ] do rozmytej, obliczyć funkcje sugeno np. max hamuj stała
 
 # symulacja
-[ ] rozbić kod na moduły: modelowanie środowiska, planowanie, generowanie ruchu, percepcja, fizyka, behawioralizm
+[x] rozbić kod na moduły: modelowanie środowiska, planowanie, generowanie ruchu, percepcja, fizyka, behawioralizm
 [ ] 
 
 ## fizyka
 [ ] priorytety tras
 [ ] rozbić perception na kategorie
-[ ] wzory ruchu - doczytać jakie są istniejące modele
+[ ] wzory ruchu - doczytać jakie są istniejące modele - zapoznanie się z refactorem
 [x] bloki stop, światła, przejścia dla pieszych
-[ ] podpiąć zachowanie do bloków
+[x] podpiąć zachowanie do bloków
 
 ## behawioralizm
-[ ] rozdzielenie zachowania na av i człowieka
+[x] rozdzielenie zachowania na av i człowieka
 [ ] ocena ryzyka, dołączanie do ruchu
 [ ] logika rozmyta takagi-sugeno
 [ ] dodanie czasu reakcji do człowieka
-[ ] fov
+[ ] fov, wyłączone linie (bloki)
 
 # zbieranie danych
 [x] zapis do csv

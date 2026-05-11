@@ -4,7 +4,7 @@ import json
 import time
 import math
 
-WIDTH, HEIGHT = 1200, 900
+WIDTH, HEIGHT = 1600, 1200
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -85,7 +85,7 @@ def to_screen(x, y):
 
 # ===== RYSOWANIE =====
 
-def draw_car(x, y, vx, vy, ax, ay):
+def draw_car(x, y, vx, vy, ax, ay, color_r, color_g, color_b):
     car_length_m = 3.5
     car_width_m = 1.8
 
@@ -93,9 +93,8 @@ def draw_car(x, y, vx, vy, ax, ay):
     height = max(2, car_width_m * scale)
 
     angle = math.degrees(math.atan2(-vy, vx))
-
     car_surf = pygame.Surface((width, height), pygame.SRCALPHA)
-    pygame.draw.rect(car_surf, (50, 100, 220), (0, 0, width, height))
+    pygame.draw.rect(car_surf, (color_r, color_g, color_b), (0, 0, width, height))
 
     # ---- braking detection ----
     is_braking = (ax * vx + ay * vy) < 0
@@ -253,7 +252,11 @@ while running:
         vy = car["vy"] * scale
         ax = car["ax"] * scale
         ay = car["ay"] * scale
-        draw_car(x, y, vx, vy, ax, ay)
+        color_r = car["color_r"]
+        color_g = car["color_g"]
+        color_b = car["color_b"]
+
+        draw_car(x, y, vx, vy, ax, ay, color_r, color_g, color_b)
 
     pygame.display.flip()
     clock.tick(60)

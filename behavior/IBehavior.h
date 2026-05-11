@@ -7,18 +7,18 @@
 class IBehavior
 {
 public:
-    virtual ~IBehavior() = default;
+	virtual ~IBehavior() = default;
 
-    virtual BehaviorOutput compute(
-        Travel& travel,
-        int                     segment,
-        float                   t,
-        float                   currentSpeed,
-        float                   maxSpeed,
-        float                   maxAccel,
-        float                   maxDecel,
-        float                   lookaheadBase,
-        float                   lookaheadSpeedFactor,
-        const PerceptionState& perception
-    ) = 0;
+	virtual BehaviorOutput compute(
+		Travel& travel,
+		int segment,
+		float t,
+		float currentSpeed,
+		float maxSpeed,
+		float maxAccel,
+		float maxDecel,
+		float lookaheadBase,
+		float lookaheadSpeedFactor,
+		const PerceptionState& perception
+	) = 0;
 };

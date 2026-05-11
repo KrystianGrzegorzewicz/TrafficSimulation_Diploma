@@ -24,15 +24,6 @@
     <ClCompile Include="behavior\BehaviorHuman.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="behavior\BehaviorOutput.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="behavior\IBehavior.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="perception\IPerception.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
     <ClCompile Include="perception\PerceptionAV.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>

@@ -9,20 +9,20 @@
 
 std::unique_ptr<Car> VehicleFactory::createHuman(float speed, Travel travel)
 {
-    return std::make_unique<CarHuman>(
-        speed,
-        std::move(travel),
-        std::make_unique<BehaviorHuman>(),
-        std::make_unique<PerceptionHuman>()
-    );
+	return std::make_unique<CarHuman>(
+		speed,
+		std::move(travel),
+		std::make_unique<BehaviorHuman>(),
+		std::make_unique<PerceptionHuman>()
+	);
 }
 
 std::unique_ptr<Car> VehicleFactory::createAV(float speed, Travel travel)
 {
-    return std::make_unique<CarAV>(
-        speed,
-        std::move(travel),
-        std::make_unique<BehaviorAV>(),
-        std::make_unique<PerceptionAV>()
-    );
+	return std::make_unique<CarAV>(
+		speed,
+		std::move(travel),
+		std::make_unique<BehaviorAV>(),
+		std::make_unique<PerceptionAV>()
+	);
 }

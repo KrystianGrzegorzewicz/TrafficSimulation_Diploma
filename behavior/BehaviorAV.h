@@ -5,12 +5,12 @@
 class BehaviorAV : public IBehavior
 {
 public:
-    BehaviorOutput compute(
-        Travel&, int, float, float, float, float, float, float, float,
-        const PerceptionState&
-    ) override
-    {
-        // TODO: AV planning logic
-        return {};
-    }
+	BehaviorOutput compute(
+		Travel&, int, float, float, float, float, float, float, float,
+		const PerceptionState&
+	) override
+	{
+		// TODO: AV planning logic
+		return {};
+	}
 };

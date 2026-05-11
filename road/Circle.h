@@ -3,19 +3,19 @@
 
 class Circle {
 private:
-    Vec2 center;
-    float radius;
-    int color[3];
-    bool filled;
-    
+	Vec2 center;
+	float radius;
+	int color[3];
+	bool filled;
+
 public:
-    Circle(float cx, float cy, float radius, bool filled = false);
-    ~Circle() = default;
-    
-    Vec2 getCenter() const;
-    float getRadius() const;
-    bool isFilled() const;
-    int getColor(int index) const;
-    
-    void setColor(int r, int g, int b);
+	Circle(float cx, float cy, float radius, bool filled = false);
+	~Circle() = default;
+
+	Vec2 getCenter() const;
+	float getRadius() const;
+	bool isFilled() const;
+	int getColor(int index) const;
+
+	void setColor(int r, int g, int b);
 };

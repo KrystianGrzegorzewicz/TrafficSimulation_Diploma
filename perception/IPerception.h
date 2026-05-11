@@ -7,15 +7,15 @@
 class IPerception
 {
 public:
-    virtual ~IPerception() = default;
+	virtual ~IPerception() = default;
 
-    // Update perceptual state for one vehicle.
-    // self    — the owning vehicle's current state
-    // world   — full simulation context (other vehicles, road blocks, etc.)
-    // outState — filled in by the implementation
-    virtual void update(
-        const CarState& self,
-        const WorldState& world,
-        PerceptionState& outState
-    ) = 0;
+	// Update perceptual state for one vehicle.
+	// self    — the owning vehicle's current state
+	// world   — full simulation context (other vehicles, road blocks, etc.)
+	// outState — filled in by the implementation
+	virtual void update(
+		const CarState& self,
+		const WorldState& world,
+		PerceptionState& outState
+	) = 0;
 };

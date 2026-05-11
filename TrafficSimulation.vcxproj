@@ -130,10 +130,7 @@
   <ItemGroup>
     <ClCompile Include="behavior\BehaviorAV.cpp" />
     <ClCompile Include="behavior\BehaviorHuman.cpp" />
-    <ClCompile Include="behavior\BehaviorOutput.cpp" />
-    <ClCompile Include="behavior\IBehavior.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="perception\IPerception.cpp" />
     <ClCompile Include="perception\PerceptionAV.cpp" />
     <ClCompile Include="perception\PerceptionHuman.cpp" />
     <ClCompile Include="perception\PerceptionState.cpp" />

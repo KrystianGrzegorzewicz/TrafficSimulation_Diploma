@@ -3,53 +3,53 @@
 #include <cmath>
 
 Vec2 SteeringModel::computeLateralAcceleration(
-    const Travel& travel,
-    int                   segment,
-    float                 t,
-    const Vec2& position,
-    const Vec2& velocity,
-    float                 lookaheadBase,
-    float                 lookaheadSpeedFactor,
-    const BehaviorOutput& behaviorOut
+	const Travel& travel,
+	int   segment,
+	float t,
+	const Vec2& position,
+	const Vec2& velocity,
+	float lookaheadBase,
+	float lookaheadSpeedFactor,
+	const BehaviorOutput& behaviorOut
 ) const
 {
-    const auto& p = travel.TravelPoints;
+	const auto& p = travel.TravelPoints;
 
-    const Vec2& p0 = p[segment];
-    const Vec2& p1 = p[segment + 1];
-    const Vec2& p2 = p[segment + 2];
+	const Vec2& p0 = p[segment];
+	const Vec2& p1 = p[segment + 1];
+	const Vec2& p2 = p[segment + 2];
 
-    float speed = velocity.length();
-    float lookahead = lookaheadBase + speed * lookaheadSpeedFactor;
+	float speed = velocity.length();
+	float lookahead = lookaheadBase + speed * lookaheadSpeedFactor;
 
-    float tLook = std::min(t + lookahead, 1.0f);
+	float tLook = std::min(t + lookahead, 1.0f);
 
-    Vec2 tangent = travel.bezierDerivative(p0, p1, p2, tLook);
+	Vec2 tangent = travel.bezierDerivative(p0, p1, p2, tLook);
 
-    Vec2 forward = tangent.normalized();
-    Vec2 right(-forward.y, forward.x);
+	Vec2 forward = tangent.normalized();
+	Vec2 right(-forward.y, forward.x);
 
-    Vec2 toTarget = behaviorOut.targetPoint - position;
+	Vec2 toTarget = behaviorOut.targetPoint - position;
 
-    float forwardMag = toTarget.dot(forward);
-    Vec2  lateralError = toTarget - forward * forwardMag;
+	float forwardMag = toTarget.dot(forward);
+	Vec2  lateralError = toTarget - forward * forwardMag;
 
-    float lateralVel = velocity.dot(right);
+	float lateralVel = velocity.dot(right);
 
-    Vec2 a_lateral = lateralError * kp - right * lateralVel * kd;
+	Vec2 a_lateral = lateralError * kp - right * lateralVel * kd;
 
-    // Clamp to physics-feasible lateral acceleration
-    float safeSpeed = std::max(speed * 0.9f, 0.1f);
-    float maxFromRadius = (safeSpeed * safeSpeed) / minTurnRadius;
-    float maxLatAcc = std::min(aLatMax, maxFromRadius);
+	// Clamp to physics-feasible lateral acceleration
+	float safeSpeed = std::max(speed * 0.9f, 0.1f);
+	float maxFromRadius = (safeSpeed * safeSpeed) / minTurnRadius;
+	float maxLatAcc = std::min(aLatMax, maxFromRadius);
 
-    float latLen = a_lateral.length();
-    if (latLen > maxLatAcc)
-        a_lateral = a_lateral / latLen * maxLatAcc;
+	float latLen = a_lateral.length();
+	if (latLen > maxLatAcc)
+		a_lateral = a_lateral / latLen * maxLatAcc;
 
-    // Suppress lateral authority at very low speeds to avoid spin-in-place
-    float lowSpeedDamping = std::clamp(speed / 5.0f, 0.0f, 1.0f);
-    a_lateral *= lowSpeedDamping;
+	// Suppress lateral authority at very low speeds to avoid spin-in-place
+	float lowSpeedDamping = std::clamp(speed / 5.0f, 0.0f, 1.0f);
+	a_lateral *= lowSpeedDamping;
 
-    return a_lateral;
+	return a_lateral;
 }

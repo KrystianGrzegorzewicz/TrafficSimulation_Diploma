@@ -8,17 +8,18 @@
 class CarAV : public Car
 {
 public:
-    CarAV(
-        float initialSpeed,
-        Travel travel,
-        std::unique_ptr<IBehavior>   behavior,
-        std::unique_ptr<IPerception> perception
-    );
+	CarAV(
+		float initialSpeed,
+		Travel travel,
+		std::unique_ptr<IBehavior>   behavior,
+		std::unique_ptr<IPerception> perception//,
+		//int color[3]
+	);
 
-    void update(float dt, const WorldState& world) override;
+	void update(float dt, const WorldState& world) override;
 
 private:
-    std::unique_ptr<IBehavior>   behavior;
-    std::unique_ptr<IPerception> perception;
-    PerceptionState perceptionState;
+	std::unique_ptr<IBehavior>   behavior;
+	std::unique_ptr<IPerception> perception;
+	PerceptionState perceptionState;
 };
