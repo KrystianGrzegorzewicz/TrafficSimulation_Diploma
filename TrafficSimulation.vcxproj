@@ -128,19 +128,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="core\BehaviorModel.cpp" />
-    <ClCompile Include="core\Block.cpp" />
-    <ClCompile Include="core\BlockPerception.cpp" />
-    <ClCompile Include="core\Circle.cpp" />
-    <ClCompile Include="core\Line.cpp" />
-    <ClCompile Include="core\Perception.cpp" />
-    <ClCompile Include="core\PerceptionUpdater.cpp" />
-    <ClCompile Include="core\SteeringModel.cpp" />
-    <ClCompile Include="core\Travel.cpp" />
-    <ClCompile Include="vehicles\Car.cpp" />
+    <ClCompile Include="behavior\BehaviorAV.cpp" />
+    <ClCompile Include="behavior\BehaviorHuman.cpp" />
+    <ClCompile Include="behavior\BehaviorOutput.cpp" />
+    <ClCompile Include="behavior\IBehavior.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="core\Simulation.cpp" />
-    <ClCompile Include="intersections\TJunction.cpp" />
+    <ClCompile Include="perception\IPerception.cpp" />
+    <ClCompile Include="perception\PerceptionAV.cpp" />
+    <ClCompile Include="perception\PerceptionHuman.cpp" />
+    <ClCompile Include="perception\PerceptionState.cpp" />
+    <ClCompile Include="physics\SteeringModel.cpp" />
+    <ClCompile Include="road\Block.cpp" />
+    <ClCompile Include="road\Circle.cpp" />
+    <ClCompile Include="road\Junction.cpp" />
+    <ClCompile Include="road\Line.cpp" />
+    <ClCompile Include="road\Travel.cpp" />
+    <ClCompile Include="simulation\Simulation.cpp" />
+    <ClCompile Include="vehicles\Car.cpp" />
+    <ClCompile Include="vehicles\CarAv.cpp" />
+    <ClCompile Include="vehicles\CarHuman.cpp" />
+    <ClCompile Include="vehicles\VehicleFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="data\data_charts.py" />
@@ -148,21 +155,29 @@
     <None Include="visualizer.py" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="core\BehaviorModel.h" />
-    <ClInclude Include="core\Block.h" />
-    <ClInclude Include="core\BlockPerception.h" />
-    <ClInclude Include="core\CarState.h" />
-    <ClInclude Include="core\Circle.h" />
+    <ClInclude Include="behavior\BehaviorAV.h" />
+    <ClInclude Include="behavior\BehaviorHuman.h" />
+    <ClInclude Include="behavior\BehaviorOutput.h" />
+    <ClInclude Include="behavior\IBehavior.h" />
     <ClInclude Include="core\Config.h" />
-    <ClInclude Include="core\Line.h" />
-    <ClInclude Include="core\Perception.h" />
-    <ClInclude Include="core\PerceptionUpdater.h" />
-    <ClInclude Include="core\SteeringModel.h" />
-    <ClInclude Include="core\Travel.h" />
-    <ClInclude Include="vehicles\Car.h" />
-    <ClInclude Include="core\Simulation.h" />
-    <ClInclude Include="intersections\TJunction.h" />
     <ClInclude Include="core\Vec2.h" />
+    <ClInclude Include="perception\IPerception.h" />
+    <ClInclude Include="perception\PerceptionAV.h" />
+    <ClInclude Include="perception\PerceptionHuman.h" />
+    <ClInclude Include="perception\PerceptionState.h" />
+    <ClInclude Include="physics\SteeringModel.h" />
+    <ClInclude Include="road\Block.h" />
+    <ClInclude Include="road\Circle.h" />
+    <ClInclude Include="road\Junction.h" />
+    <ClInclude Include="road\Line.h" />
+    <ClInclude Include="road\Travel.h" />
+    <ClInclude Include="simulation\Simulation.h" />
+    <ClInclude Include="simulation\WorldState.h" />
+    <ClInclude Include="vehicles\Car.h" />
+    <ClInclude Include="vehicles\CarAv.h" />
+    <ClInclude Include="vehicles\CarHuman.h" />
+    <ClInclude Include="vehicles\CarState.h" />
+    <ClInclude Include="vehicles\VehicleFactory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

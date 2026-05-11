@@ -5,89 +5,126 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
-#include "core/Simulation.h"
+#include "simulation/Simulation.h"
 #include "core/Config.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 
-int main() {
-    WSADATA wsa;
-    WSAStartup(MAKEWORD(2, 2), &wsa);
+// ---------------------------------------------------------------------------
+// Config parsing (identical to original)
+// ---------------------------------------------------------------------------
+
+static Config parseConfig()
+{
     Config conf;
-	int input;
+    int input = 1;
+
     std::print("Load default config? 1 - Yes, 0 - No: ");
-	std::cin >> input;
+    std::cin >> input;
+
     if (input != 1)
     {
         std::print("Connect to graphic interface? 1 - Yes, 0 - No: ");
         std::cin >> input;
-        if (input == 0)
-			conf.gui = false;
+        if (input == 0) conf.gui = false;
+
         std::print("Save data to csv? 1 - Yes, 0 - No: ");
         std::cin >> input;
-        if (input == 1)
-            conf.saveCsv = true;
-        std::print("Set simulation speed (e.g., 1.0 for normal speed): ");
+        if (input == 1) conf.saveCsv = true;
+
+        std::print("Set simulation speed (e.g. 1.0 for normal): ");
         std::cin >> conf.simSpeed;
-        std::print("Set simulation junction sample (1, 2, 3): ");
+
+        std::print("Set junction sample (1, 2, 3, 4): ");
         std::cin >> conf.junction;
     }
 
+    return conf;
+}
+
+// ---------------------------------------------------------------------------
+// main
+// ---------------------------------------------------------------------------
+
+int main()
+{
+    WSADATA wsa;
+    WSAStartup(MAKEWORD(2, 2), &wsa);
+
+    const Config conf = parseConfig();
+
+    // All time logic now lives inside Simulation::step()
+    Simulation sim(conf.spawnRate, conf.junction, conf.saveCsv);
+
     const float fixedDt = 0.01f;
-    Simulation sim = Simulation(conf.spawnRate, conf.junction, conf.saveCsv);
+    const float maxRealDt = 0.05f;
+    const float sendInterval = 1.f / 60.f;
 
     if (conf.gui)
     {
         std::print("Started gui\n");
+
+        // ---- TCP server setup (unchanged from original) ----
         SOCKET server_fd = socket(AF_INET, SOCK_STREAM, 0);
 
-        sockaddr_in address;
+        sockaddr_in address{};
         address.sin_family = AF_INET;
         address.sin_addr.s_addr = INADDR_ANY;
         address.sin_port = htons(5555);
 
-        bind(server_fd, (sockaddr*)&address, sizeof(address));
+        bind(server_fd, reinterpret_cast<sockaddr*>(&address), sizeof(address));
         listen(server_fd, 1);
 
-        std::println("Waiting for Python client...\n");
-        SOCKET client_socket = accept(server_fd, NULL, NULL);
-        std::println("Client connected!\n");
+        std::println("Waiting for Python client...");
+        SOCKET client_socket = accept(server_fd, nullptr, nullptr);
+        std::println("Client connected!");
 
-        auto last = std::chrono::high_resolution_clock::now();
-        float accumulator = 0.0f;
-        const float maxDt = 0.05f;
-        const float sendInterval = 1.0f / 60.0f;
+        // ---- Render loop ----
+        float accumulator = 0.f;
+        float sendTimer = 0.f;
+        auto  last = std::chrono::high_resolution_clock::now();
 
-        float sendTimer = 0.0f;
-
-        while (true) {
-            auto now = std::chrono::high_resolution_clock::now();
+        while (true)
+        {
+            auto  now = std::chrono::high_resolution_clock::now();
             float realDt = std::chrono::duration<float>(now - last).count();
             last = now;
 
-            if (realDt > maxDt)
-                realDt = maxDt;
-            float simDt = realDt * conf.simSpeed;
+            if (realDt > maxRealDt) realDt = maxRealDt;
 
-            accumulator += simDt;
-            while (accumulator >= fixedDt) {
+            // Scale by simSpeed so fast/slow-motion works
+            accumulator += realDt * conf.simSpeed;
+
+            while (accumulator >= fixedDt)
+            {
                 sim.step(fixedDt);
                 accumulator -= fixedDt;
             }
-            sendTimer += realDt;
 
-            if (sendTimer >= sendInterval) {
+            sendTimer += realDt;
+            if (sendTimer >= sendInterval)
+            {
                 std::string msg = sim.getWorldJson();
-                send(client_socket, msg.c_str(), msg.size(), 0);
-                sendTimer = 0.0f;
+                send(client_socket,
+                    msg.c_str(),
+                    static_cast<int>(msg.size()),
+                    0);
+                sendTimer = 0.f;
             }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
-    } else {
-        std::print("Started no gui\n");
-        while (true) {
-            sim.step(fixedDt);
-        }
+
+        closesocket(client_socket);
+        closesocket(server_fd);
     }
+    else
+    {
+        std::print("Started headless\n");
+        while (true)
+            sim.step(fixedDt);
+    }
+
+    WSACleanup();
+    return 0;
 }
