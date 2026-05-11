@@ -31,8 +31,7 @@ TJunction::TJunction(int index) {
     std::vector<Vec2> travelPoints4;
     std::vector<Vec2> travelPoints5;
     std::vector<Vec2> travelPoints6;
-    Travel tempTravel(travelPoints1, 1, 0);
-    const float STEP = 0.05f; // gęstość punktów
+    
 
     switch (index) {
         case 0:
@@ -395,24 +394,7 @@ TJunction::TJunction(int index) {
             std::cerr << "Unknown TJunction index: " << index << std::endl;
             break;
 	}
-
-    /*for (const Vec2& point : travelPoints6) {
-        circles.push_back(Circle(point.x, point.y, 0.5f, false));
-    }
-    for (size_t i = 0; i + 2 < travelPoints6.size(); i += 2)
-    {
-        Vec2 p0 = travelPoints6[i];
-        Vec2 p1 = travelPoints6[i + 1];
-        Vec2 p2 = travelPoints6[i + 2];
-        for (float t = 0.0f; t <= 1.0f; t += STEP)
-        {
-            Vec2 point = tempTravel.bezier(p0, p1, p2, t);
-
-            circles.push_back(
-                Circle(point.x, point.y, 0.3f, false)
-            );
-        }
-    }*/
+	//circles.emplace_back(drawTravel(travelPoints1));
 }
 
 std::vector<Block> TJunction::getBlocks() {
@@ -425,6 +407,29 @@ std::vector<Line> TJunction::getLines() {
 
 std::vector<Circle> TJunction::getCircles() {
     return circles;
+}
+std::vector<Circle> drawTravel(std::vector<Vec2> travelPoints) {
+    Travel tempTravel(travelPoints, 1, 0);
+    const float STEP = 0.05f; // gęstość punktów
+    std::vector<Circle> circles;
+    for (const Vec2& point : travelPoints) {
+        circles.push_back(Circle(point.x, point.y, 0.5f, false));
+    }
+    for (size_t i = 0; i + 2 < travelPoints.size(); i += 2)
+    {
+        Vec2 p0 = travelPoints[i];
+        Vec2 p1 = travelPoints[i + 1];
+        Vec2 p2 = travelPoints[i + 2];
+        for (float t = 0.0f; t <= 1.0f; t += STEP)
+        {
+            Vec2 point = tempTravel.bezier(p0, p1, p2, t);
+
+            circles.push_back(
+                Circle(point.x, point.y, 0.3f, false)
+            );
+        }
+    }
+	return circles;
 }
 
 Travel TJunction::getRandomTravel() {
