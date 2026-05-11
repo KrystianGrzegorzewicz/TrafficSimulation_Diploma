@@ -154,6 +154,47 @@ std::string Simulation::getWorldJson() {
             << ",\"active\":" << active  << "}";
         if (i != blocks.size() - 1) ss << ",";
     }
-    ss << "]}\n";
+    ss << "]";
+    
+    // Serialize lines
+    ss << ",\"lines\":[";
+    std::vector<Line> lines = thisJunction.getLines();
+    for (size_t i = 0; i < lines.size(); i++) {
+        Vec2 start = lines[i].getStart();
+        Vec2 end = lines[i].getEnd();
+        float thickness = lines[i].getThickness();
+        
+        ss << "{\"x1\":" << start.x
+            << ",\"y1\":" << start.y
+            << ",\"x2\":" << end.x
+            << ",\"y2\":" << end.y
+            << ",\"thickness\":" << thickness
+            << ",\"r\":" << lines[i].getColor(0)
+            << ",\"g\":" << lines[i].getColor(1)
+            << ",\"b\":" << lines[i].getColor(2) << "}";
+        if (i != lines.size() - 1) ss << ",";
+    }
+    ss << "]";
+    
+    // Serialize circles
+    ss << ",\"circles\":[";
+    std::vector<Circle> circles = thisJunction.getCircles();
+    for (size_t i = 0; i < circles.size(); i++) {
+        Vec2 center = circles[i].getCenter();
+        float radius = circles[i].getRadius();
+        bool filled = circles[i].isFilled();
+        
+        ss << "{\"cx\":" << center.x
+            << ",\"cy\":" << center.y
+            << ",\"radius\":" << radius
+            << ",\"filled\":" << (filled ? "true" : "false")
+            << ",\"r\":" << circles[i].getColor(0)
+            << ",\"g\":" << circles[i].getColor(1)
+            << ",\"b\":" << circles[i].getColor(2) << "}";
+        if (i != circles.size() - 1) ss << ",";
+    }
+    ss << "]";
+    
+    ss << "}\n";
     return ss.str();
 }

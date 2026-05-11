@@ -41,7 +41,7 @@ Vec2 SteeringModel::computeLateralAcceleration(
     Vec2 a_lateral =
         lateralError * kp - right * lateralVel * kd;
 
-    float safeSpeed = std::max(speed, 0.1f);
+    float safeSpeed = std::max(speed * 0.9f, 0.1f);
 
     float maxFromRadius =
         (safeSpeed * safeSpeed) / minTurnRadius;

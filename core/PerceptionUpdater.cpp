@@ -17,7 +17,7 @@ void PerceptionUpdater::update(
 
     Vec2 right(-forward.y, forward.x);
 
-    constexpr float maxViewDistance = 50.0f;
+    constexpr float maxViewDistance = 100.0f;
     constexpr float laneWidth = 3.0f;
     constexpr float fovDot = 0.3f;
 
