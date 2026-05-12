@@ -130,10 +130,11 @@
   <ItemGroup>
     <ClCompile Include="behavior\BehaviorAV.cpp" />
     <ClCompile Include="behavior\BehaviorHuman.cpp" />
+    <ClCompile Include="behavior\longitudinal\FuzzyLongitudinalModel.cpp" />
+    <ClCompile Include="behavior\longitudinal\IDMLongitudinalModel.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="perception\PerceptionAV.cpp" />
     <ClCompile Include="perception\PerceptionHuman.cpp" />
-    <ClCompile Include="perception\PerceptionState.cpp" />
     <ClCompile Include="physics\SteeringModel.cpp" />
     <ClCompile Include="road\Block.cpp" />
     <ClCompile Include="road\Circle.cpp" />
@@ -156,6 +157,10 @@
     <ClInclude Include="behavior\BehaviorHuman.h" />
     <ClInclude Include="behavior\BehaviorOutput.h" />
     <ClInclude Include="behavior\IBehavior.h" />
+    <ClInclude Include="behavior\longitudinal\FuzzyLongitudinalModel.h" />
+    <ClInclude Include="behavior\longitudinal\IDMLongitudinalModel.h" />
+    <ClInclude Include="behavior\longitudinal\ILongitudinalModel.h" />
+    <ClInclude Include="behavior\MotionCommand.h" />
     <ClInclude Include="core\Config.h" />
     <ClInclude Include="core\Vec2.h" />
     <ClInclude Include="perception\IPerception.h" />

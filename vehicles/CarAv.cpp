@@ -1,6 +1,6 @@
 #include "vehicles/CarAV.h"
 
-CarAV::CarAV(
+/*CarAV::CarAV(
 	float                        initialSpeed,
 	Travel                       travel,
 	std::unique_ptr<IBehavior>   behavior,
@@ -44,4 +44,4 @@ void CarAV::update(float dt, const WorldState& world)
 
 	// 4. Integrate
 	integrate(behOut.acceleration + latAccel, dt);
-}
+}*/

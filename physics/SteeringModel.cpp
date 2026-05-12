@@ -1,55 +1,60 @@
 #include "physics/SteeringModel.h"
 #include <algorithm>
-#include <cmath>
 
 Vec2 SteeringModel::computeLateralAcceleration(
-	const Travel& travel,
-	int   segment,
-	float t,
-	const Vec2& position,
-	const Vec2& velocity,
-	float lookaheadBase,
-	float lookaheadSpeedFactor,
-	const BehaviorOutput& behaviorOut
+    const Vec2& position,
+    const Vec2& velocity,
+    const Vec2& targetPoint
 ) const
 {
-	const auto& p = travel.TravelPoints;
+    float speed = velocity.length();
 
-	const Vec2& p0 = p[segment];
-	const Vec2& p1 = p[segment + 1];
-	const Vec2& p2 = p[segment + 2];
+    Vec2 forward =
+        (speed > 0.1f)
+        ? velocity.normalized()
+        : Vec2(1.f, 0.f);
 
-	float speed = velocity.length();
-	float lookahead = lookaheadBase + speed * lookaheadSpeedFactor;
+    Vec2 right(-forward.y, forward.x);
 
-	float tLook = std::min(t + lookahead, 1.0f);
+    Vec2 toTarget = targetPoint - position;
 
-	Vec2 tangent = travel.bezierDerivative(p0, p1, p2, tLook);
+    float forwardMag = toTarget.dot(forward);
 
-	Vec2 forward = tangent.normalized();
-	Vec2 right(-forward.y, forward.x);
+    Vec2 lateralError =
+        toTarget - forward * forwardMag;
 
-	Vec2 toTarget = behaviorOut.targetPoint - position;
+    float lateralVelocity =
+        velocity.dot(right);
 
-	float forwardMag = toTarget.dot(forward);
-	Vec2  lateralError = toTarget - forward * forwardMag;
+    // PD controller
+    // a = kp * error - kd * velocity
+    Vec2 aLateral =
+        lateralError * kp -
+        right * lateralVelocity * kd;
 
-	float lateralVel = velocity.dot(right);
+    // Physics cornering limit
+    // v² / R
+    float safeSpeed =
+        std::max(speed * 0.9f, 0.1f);
 
-	Vec2 a_lateral = lateralError * kp - right * lateralVel * kd;
+    float maxFromRadius =
+        (safeSpeed * safeSpeed) /
+        minTurnRadius;
 
-	// Clamp to physics-feasible lateral acceleration
-	float safeSpeed = std::max(speed * 0.9f, 0.1f);
-	float maxFromRadius = (safeSpeed * safeSpeed) / minTurnRadius;
-	float maxLatAcc = std::min(aLatMax, maxFromRadius);
+    float maxLatAcc =
+        std::min(aLatMax, maxFromRadius);
 
-	float latLen = a_lateral.length();
-	if (latLen > maxLatAcc)
-		a_lateral = a_lateral / latLen * maxLatAcc;
+    float len = aLateral.length();
 
-	// Suppress lateral authority at very low speeds to avoid spin-in-place
-	float lowSpeedDamping = std::clamp(speed / 5.0f, 0.0f, 1.0f);
-	a_lateral *= lowSpeedDamping;
+    if (len > maxLatAcc)
+    {
+        aLateral =
+            aLateral / len * maxLatAcc;
+    }
 
-	return a_lateral;
+    // Reduce oscillations at low speed
+    float damping =
+        std::clamp(speed / 5.0f, 0.0f, 1.0f);
+
+    return aLateral * damping;
 }

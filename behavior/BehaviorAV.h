@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include "behavior/IBehavior.h"
 
 // Skeleton — no logic yet.
@@ -13,4 +13,4 @@ public:
 		// TODO: AV planning logic
 		return {};
 	}
-};
+};*/
