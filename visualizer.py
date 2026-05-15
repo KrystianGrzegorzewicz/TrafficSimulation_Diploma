@@ -4,10 +4,13 @@ import json
 import time
 import math
 
-WIDTH, HEIGHT = 1200, 900
-
 pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+# STARTOWY ROZMIAR (można zmienić, potem i tak jest dynamiczny)
+WIDTH, HEIGHT = 1600, 1200
+
+screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
+pygame.display.set_caption("Simulation Viewer")
 clock = pygame.time.Clock()
 
 def connect():
@@ -59,7 +62,7 @@ def compute_bounds(cars, blocks, lines, circles):
     return min(xs), min(ys), max(xs), max(ys)
 
 def fit_view(cars, blocks, lines, circles):
-    global cam_x, cam_y, scale
+    global cam_x, cam_y, scale, WIDTH, HEIGHT
 
     min_x, min_y, max_x, max_y = compute_bounds(cars, blocks, lines, circles)
 
@@ -72,7 +75,6 @@ def fit_view(cars, blocks, lines, circles):
     padding = 100
     scale = min((WIDTH - padding) / world_w, (HEIGHT - padding) / world_h)
 
-    # ustaw kamerę na środek świata
     cam_x = min_x + world_w / 2
     cam_y = min_y + world_h / 2
 
@@ -85,7 +87,7 @@ def to_screen(x, y):
 
 # ===== RYSOWANIE =====
 
-def draw_car(x, y, vx, vy, ax, ay):
+def draw_car(x, y, vx, vy, ax, ay, color_r, color_g, color_b):
     car_length_m = 3.5
     car_width_m = 1.8
 
@@ -93,39 +95,23 @@ def draw_car(x, y, vx, vy, ax, ay):
     height = max(2, car_width_m * scale)
 
     angle = math.degrees(math.atan2(-vy, vx))
-
     car_surf = pygame.Surface((width, height), pygame.SRCALPHA)
-    pygame.draw.rect(car_surf, (50, 100, 220), (0, 0, width, height))
+    pygame.draw.rect(car_surf, (color_r, color_g, color_b), (0, 0, width, height))
 
-    # ---- braking detection ----
     is_braking = (ax * vx + ay * vy) < 0
     light_color = (255, 40, 40) if is_braking else (90, 0, 0)
 
-    # ---- rear lights (local space) ----
     light_w = width * 0.08
     light_h = height * 0.25
     margin = height * 0.1
 
-    # left rear light
-    pygame.draw.rect(
-        car_surf,
-        light_color,
-        (0, margin, light_w, light_h)
-    )
+    pygame.draw.rect(car_surf, light_color, (0, margin, light_w, light_h))
+    pygame.draw.rect(car_surf, light_color, (0, height - margin - light_h, light_w, light_h))
 
-    # right rear light
-    pygame.draw.rect(
-        car_surf,
-        light_color,
-        (0, height - margin - light_h, light_w, light_h)
-    )
-
-    # ---- rotate & draw ----
     rotated = pygame.transform.rotate(car_surf, angle)
     rect = rotated.get_rect(center=(x, y))
     screen.blit(rotated, rect.topleft)
 
-    # ---- debug vectors ----
     pygame.draw.line(screen, (150, 50, 50), (x, y), (x + ax, y + ay), 4)
     pygame.draw.line(screen, (50, 200, 50), (x, y), (x + vx, y + vy), 2)
 
@@ -133,38 +119,22 @@ def draw_blocks():
     for block in blocks:
         x1, y1 = to_screen(block["x1"], block["y1"])
         x2, y2 = to_screen(block["x2"], block["y2"])
-        if block["active"] == 1:
-            color = (200, 0, 0)
-        else:
-            color = (50, 50, 50)
-
-        pygame.draw.rect(
-            screen,
-            color,
-            (x1, y1, x2 - x1, y2 - y1)
-        )
+        color = (200, 0, 0) if block["active"] == 1 else (50, 50, 50)
+        pygame.draw.rect(screen, color, (x1, y1, x2 - x1, y2 - y1))
 
 def draw_lines():
-    """Draw line markings on the junction"""
     for line in lines:
         x1, y1 = to_screen(line["x1"], line["y1"])
         x2, y2 = to_screen(line["x2"], line["y2"])
-        
-        # Light grayish color (RGB: 200, 200, 200)
         color = (line.get("r", 200), line.get("g", 200), line.get("b", 200))
         thickness = max(1, int(line.get("thickness", 1.0) * scale))
-        
         pygame.draw.line(screen, color, (x1, y1), (x2, y2), thickness)
 
 def draw_circles():
-    """Draw circle markers on the junction"""
     for circle in circles:
         cx, cy = to_screen(circle["cx"], circle["cy"])
         radius = max(1, int(circle["radius"] * scale))
-        
-        # Light grayish color (RGB: 200, 200, 200)
         color = (circle.get("r", 200), circle.get("g", 200), circle.get("b", 200))
-        
         if circle.get("filled", False):
             pygame.draw.circle(screen, color, (int(cx), int(cy)), radius)
         else:
@@ -186,6 +156,12 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+        # ⭐ NAJWAŻNIEJSZE — OBSŁUGA RESIZE OKNA
+        elif event.type == pygame.VIDEORESIZE:
+            WIDTH, HEIGHT = event.w, event.h
+            screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
+            fit_view(cars, blocks, lines, circles)
+
         elif event.type == pygame.MOUSEWHEEL:
             zoom_factor = 1.1 if event.y > 0 else 0.9
             scale *= zoom_factor
@@ -203,26 +179,16 @@ while running:
             mx, my = pygame.mouse.get_pos()
             dx = mx - last_mouse[0]
             dy = my - last_mouse[1]
-
             cam_x -= dx / scale
             cam_y -= dy / scale
-
             last_mouse = (mx, my)
 
-    # ===== SOCKET =====
     try:
         data = sock.recv(4096).decode()
         buffer += data
-
         while "\n" in buffer:
             line, buffer = buffer.split("\n", 1)
-
-            try:
-                world = json.loads(line)
-            except Exception as e:
-                print("JSON ERROR:", e)
-                continue
-
+            world = json.loads(line)
             cars = world.get("cars", [])
             blocks = world.get("blocks", [])
             lines = world.get("lines", [])
@@ -240,7 +206,6 @@ while running:
         buffer = ""
         initialized = False
 
-    # ===== RENDER =====
     screen.fill((30,30,30))
 
     draw_blocks()
@@ -253,7 +218,7 @@ while running:
         vy = car["vy"] * scale
         ax = car["ax"] * scale
         ay = car["ay"] * scale
-        draw_car(x, y, vx, vy, ax, ay)
+        draw_car(x, y, vx, vy, ax, ay, car["color_r"], car["color_g"], car["color_b"])
 
     pygame.display.flip()
     clock.tick(60)
