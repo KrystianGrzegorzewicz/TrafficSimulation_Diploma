@@ -49,7 +49,7 @@ void PerceptionHuman::updateCarAhead(
 		float dist = relPos.length();
 
 		// Skip self (same position) and out-of-range
-		if (dist < 0.001f || dist > fov.maxViewDistance)
+		if ((dist < 0.001f || dist > fov.maxViewDistance) && o.id != self.id)
 			continue;
 
 		Vec2  dir = relPos / dist;

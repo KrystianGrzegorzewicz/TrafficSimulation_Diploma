@@ -4,20 +4,56 @@
 
 int Car::nextId = 0;
 
-Car::Car(float initialSpeed, Travel travel)
-	: speed(initialSpeed)
-	, travel(std::move(travel))
+Car::Car(float initialSpeed, Travel travelIn)
+	: travel(std::move(travelIn))
 	, steering(kp, kd)
 {
-	if (!this->travel.TravelPoints.empty())
-		position = this->travel.TravelPoints[0];
-	else
-		position = Vec2(0.f, 0.f);
-
-	velocity = Vec2(0.f, 0.f);
-	acceleration = Vec2(0.f, 0.f);
 	id = nextId++;
-	travelId = this->travel.getId();
+	travelId = travel.getId();
+
+	segment = 0;
+	t = 0.0f;
+	finished = false;
+
+	const auto& pts = travel.TravelPoints;
+
+	if (!pts.empty()) {
+		position = pts[0];
+	}
+	else {
+		position = Vec2(0.f, 0.f);
+	}
+
+	Vec2 tangent(1.f, 0.f);
+
+	if (pts.size() >= 3) {
+		tangent = travel.bezierDerivative(
+			pts[0],
+			pts[1],
+			pts[2],
+			0.0f
+		);
+
+		if (tangent.length() < 0.0001f) {
+			tangent = pts[1] - pts[0];
+		}
+
+		if (tangent.length() < 0.0001f) {
+			tangent = pts[2] - pts[0];
+		}
+
+		tangent.normalize();
+	}
+
+	// Important:
+	// zero speed means zero velocity, and zero velocity has no direction.
+	// So give every newly spawned car a tiny minimum launch speed.
+	const float minLaunchSpeed = 2.0f;
+
+	speed = std::max(initialSpeed, minLaunchSpeed);
+	velocity = tangent * speed;
+
+	acceleration = Vec2(0.f, 0.f);
 }
 
 // ---------------------------------------------------------------------------
@@ -34,7 +70,7 @@ int* Car::getColor()          const { return const_cast<int*>(color); }
 
 CarState Car::getState() const
 {
-	return { position, velocity, acceleration, id };
+	return { position, velocity, acceleration, travelId, id };
 }
 
 // ---------------------------------------------------------------------------
@@ -104,11 +140,13 @@ void Car::integrate(const Vec2& desiredAcceleration, float dt)
 
 	acceleration = desiredAcceleration;
 
+	acceleration = desiredAcceleration;
 	float accLen = acceleration.length();
-	if (accLen > maxAccel)
-		acceleration = acceleration / accLen * maxAccel;
-
+	float aMax = std::max(maxAccel, maxDecel);
+	if (accLen > aMax)
+		acceleration = acceleration / accLen * aMax;
 	velocity += acceleration * dt;
+
 	position += velocity * dt;
 
 	speed = velocity.length();
