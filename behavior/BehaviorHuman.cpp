@@ -45,8 +45,8 @@ MotionCommand BehaviorHuman::compute(
 	float curveSpeed = travel.computeSpeedLimitAhead(
 		segment, t, lookahead, aLatMax
 	);
-	constexpr float kMinCurveSpeed = 8.0f;   // never crawl below ~28 km/h
-	curveSpeed = std::max(curveSpeed, kMinCurveSpeed);
+	/*	constexpr float kMinCurveSpeed = 8.0f;   // never crawl below ~28 km/h
+		curveSpeed = std::max(curveSpeed, kMinCurveSpeed);*/
 	float desiredSpeed = std::min(maxSpeed, curveSpeed);
 
 	// Block hazard override

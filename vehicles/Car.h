@@ -66,7 +66,7 @@ protected:
 	float maxSpeed = 20.0f;
 	float lookaheadBase = 0.1f;
 	float lookaheadSpeedFactor = 0.04f;
-	float kp = 4.0f;
+	float kp = 8.0f;
 	float kd = 5.0f;
 
 	SteeringModel steering{ kp, kd };
