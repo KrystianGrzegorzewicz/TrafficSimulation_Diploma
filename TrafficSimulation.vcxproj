@@ -136,6 +136,7 @@
     <ClCompile Include="perception\PerceptionAV.cpp" />
     <ClCompile Include="perception\PerceptionHuman.cpp" />
     <ClCompile Include="physics\SteeringModel.cpp" />
+    <ClCompile Include="planning\PathPlanner.cpp" />
     <ClCompile Include="road\Block.cpp" />
     <ClCompile Include="road\Circle.cpp" />
     <ClCompile Include="road\Junction.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="perception\PerceptionHuman.h" />
     <ClInclude Include="perception\PerceptionState.h" />
     <ClInclude Include="physics\SteeringModel.h" />
+    <ClInclude Include="planning\PathPlanner.h" />
     <ClInclude Include="road\Block.h" />
     <ClInclude Include="road\Circle.h" />
     <ClInclude Include="road\Junction.h" />

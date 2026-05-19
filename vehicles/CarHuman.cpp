@@ -4,15 +4,12 @@ CarHuman::CarHuman(
 	float initialSpeed,
 	Travel travel,
 	std::unique_ptr<IBehavior> beh,
-	std::unique_ptr<IPerception> perc
-)
+	std::unique_ptr<IPerception> perc)
 	: Car(initialSpeed, std::move(travel)),
 	behavior(std::move(beh)),
 	perception(std::move(perc))
 {
-	color[0] = 20;
-	color[1] = 200;
-	color[2] = 50;
+	color[0] = 20; color[1] = 200; color[2] = 50;
 }
 
 void CarHuman::update(float dt, const WorldState& world)
@@ -25,42 +22,20 @@ void CarHuman::update(float dt, const WorldState& world)
 	perception->update(getState(), world, perceptionState);
 
 	MotionCommand cmd = behavior->compute(
-		travel,
-		segment,
-		t,
-		getState(),
-		maxSpeed,
-		maxAccel,
-		maxDecel,
-		lookaheadBase,
-		lookaheadSpeedFactor,
-		perceptionState
-	);
+		travel, segment, t, getState(),
+		maxSpeed, maxAccel, maxDecel,
+		lookaheadBase, lookaheadSpeedFactor,
+		perceptionState);
 
 	Vec2 latAccel = steering.computeLateralAcceleration(
-		position,
-		velocity,
-		cmd.targetPoint
-	);
+		position, velocity, cmd.targetPoint);
 
-	Vec2 forwardDir;
-	if (velocity.length() > 0.1f) {
-		forwardDir = velocity.normalized();
-	}
-	else {
-		const auto& pts = travel.TravelPoints;
-		forwardDir = travel.bezierDerivative(
-			pts[segment], pts[segment + 1], pts[segment + 2], t
-		).normalized();
-		if (forwardDir.length() < 0.001f) forwardDir = Vec2(1.f, 0.f);
-	}
+	Vec2 forwardDir = velocity.length() > 0.1f
+		? velocity.normalized()
+		: Vec2(1, 0);
 
-	Vec2 desiredAccel = forwardDir * cmd.longitudinalAcceleration;
+	Vec2 longAccel = forwardDir * cmd.longitudinalAcceleration;
+	if (cmd.emergencyBrake) longAccel = forwardDir * (-maxDecel);
 
-	if (cmd.emergencyBrake)
-	{
-		desiredAccel = forwardDir * (-maxDecel);
-	}
-
-	integrate(desiredAccel + latAccel, dt);
+	integrate(longAccel + latAccel, dt);
 }

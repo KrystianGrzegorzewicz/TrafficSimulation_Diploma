@@ -12,7 +12,7 @@
 class Simulation
 {
 public:
-	Simulation(float spawnRate, int junctionIndex, bool saveCsv);
+	Simulation(float spawnRate, int junctionIndex, bool saveCsv, const float AVrate);
 	~Simulation();
 
 	// Advance by dt seconds (called from main at fixed step).
@@ -35,6 +35,7 @@ private:
 	float spawnAccumulator = 0.0f;
 	float spawnPeriod = 1.0f;
 	float currentTime = 0.0f;
+	float AVrate = 0.0f;
 
 	bool       saveCsv = false;
 	std::ofstream logFile;

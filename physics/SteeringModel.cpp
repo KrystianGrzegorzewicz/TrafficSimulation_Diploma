@@ -55,9 +55,9 @@ Vec2 SteeringModel::computeLateralAcceleration(
 			aLateral / len * maxLatAcc;
 	}
 
-	/*    // Reduce oscillations at low speed
-		float damping =
-			std::clamp(speed / 5.0f, 0.0f, 1.0f);*/
+	// Reduce oscillations at low speed
+	float damping =
+		std::clamp(speed / 5.0f, 0.0f, 1.0f);
 
 	return aLateral;
 }

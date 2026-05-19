@@ -20,12 +20,14 @@ std::unique_ptr<Car> VehicleFactory::createHuman(float speed, Travel travel)
 	);
 }
 
-/*std::unique_ptr<Car> VehicleFactory::createAV(float speed, Travel travel)
+std::unique_ptr<Car> VehicleFactory::createAV(float speed, Travel travel)
 {
 	return std::make_unique<CarAV>(
 		speed,
 		std::move(travel),
-		//std::make_unique<BehaviorAV>(),
+		std::make_unique<BehaviorAV>(
+			std::make_unique<IDMLongitudinalModel>()
+		),
 		std::make_unique<PerceptionAV>()
 	);
-}*/
+}

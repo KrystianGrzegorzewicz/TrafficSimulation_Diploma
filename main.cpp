@@ -57,7 +57,7 @@ int main()
 	const Config conf = parseConfig();
 
 	// All time logic now lives inside Simulation::step()
-	Simulation sim(conf.spawnRate, conf.junction, conf.saveCsv);
+	Simulation sim(conf.spawnRate, conf.junction, conf.saveCsv, conf.AVRate);
 
 	const float fixedDt = 0.01f;
 	const float maxRealDt = 0.05f;

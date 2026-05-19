@@ -1,14 +1,13 @@
 #include "vehicles/CarAV.h"
 
-/*CarAV::CarAV(
-	float                        initialSpeed,
-	Travel                       travel,
-	std::unique_ptr<IBehavior>   behavior,
-	std::unique_ptr<IPerception> perception
-)
+CarAV::CarAV(
+	float initialSpeed,
+	Travel travel,
+	std::unique_ptr<IBehavior> beh,
+	std::unique_ptr<IPerception> perc)
 	: Car(initialSpeed, std::move(travel)),
-	behavior(std::move(behavior)),
-	perception(std::move(perception))
+	behavior(std::move(beh)),
+	perception(std::move(perc))
 {
 	this->color[0] = 180;
 	this->color[1] = 180;
@@ -22,26 +21,23 @@ void CarAV::update(float dt, const WorldState& world)
 	updateClosestT();
 	if (advanceSegmentIfNeeded()) return;
 
-	// 1. Perception — AV stub fills nothing yet
 	perception->update(getState(), world, perceptionState);
 
-	// 2. Behavior — AV stub returns zero acceleration
-	BehaviorOutput behOut = behavior->compute(
-		travel, segment, t,
-		velocity.length(), maxSpeed,
-		maxAccel, maxDecel,
+	MotionCommand cmd = behavior->compute(
+		travel, segment, t, getState(),
+		maxSpeed, maxAccel, maxDecel,
 		lookaheadBase, lookaheadSpeedFactor,
-		perceptionState
-	);
+		perceptionState);
 
-	// 3. Steering — shared physics, same as CarHuman
 	Vec2 latAccel = steering.computeLateralAcceleration(
-		travel, segment, t,
-		position, velocity,
-		lookaheadBase, lookaheadSpeedFactor,
-		behOut
-	);
+		position, velocity, cmd.targetPoint);
 
-	// 4. Integrate
-	integrate(behOut.acceleration + latAccel, dt);
-}*/
+	Vec2 forwardDir = velocity.length() > 0.1f
+		? velocity.normalized()
+		: Vec2(1, 0);
+
+	Vec2 longAccel = forwardDir * cmd.longitudinalAcceleration;
+	if (cmd.emergencyBrake) longAccel = forwardDir * (-maxDecel);
+
+	integrate(longAccel + latAccel, dt);
+}

@@ -1,16 +1,27 @@
-/*#pragma once
+#pragma once
 #include "behavior/IBehavior.h"
+#include "behavior/longitudinal/ILongitudinalModel.h"
+#include "planning/PathPlanner.h"
+#include <memory>
 
-// Skeleton — no logic yet.
 class BehaviorAV : public IBehavior
 {
 public:
-	BehaviorOutput compute(
-		Travel&, int, float, float, float, float, float, float, float,
-		const PerceptionState&
-	) override
-	{
-		// TODO: AV planning logic
-		return {};
-	}
-};*/
+	explicit BehaviorAV(std::unique_ptr<ILongitudinalModel> longitudinalModel);
+
+	MotionCommand compute(
+		Travel& travel,
+		int segment,
+		float t,
+		const CarState& self,
+		float maxSpeed,
+		float maxAccel,
+		float maxDecel,
+		float lookaheadBase,
+		float lookaheadSpeedFactor,
+		const PerceptionState& perception) override;
+
+private:
+	std::unique_ptr<ILongitudinalModel> longitudinalModel;
+	PathPlanner planner;
+};

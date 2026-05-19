@@ -30,9 +30,10 @@ static std::string getTimestamp()
 // Constructor
 // ---------------------------------------------------------------------------
 
-Simulation::Simulation(float spawnRate, int junctionIndex, bool saveCsv)
+Simulation::Simulation(float spawnRate, int junctionIndex, bool saveCsv, const float AVrate)
 	: junction(junctionIndex)
 	, saveCsv(saveCsv)
+	, AVrate(AVrate)
 {
 	spawnPeriod = (spawnRate > 0.f) ? (1.f / spawnRate) : 1e9f;
 
@@ -102,9 +103,10 @@ void Simulation::step(float dt)
 void Simulation::spawnVehicle()
 {
 	vehicles.push_back(
-		//randomly choose between human and AV for now — can be tuned or made dynamic in future
-
-		VehicleFactory::createHuman(14.f, junction.getRandomTravel())
+		//randomly choose between human and AV based on AVrate
+		(AVrate > 0.f && (rand() / (float)RAND_MAX) < AVrate)
+		? VehicleFactory::createAV(14.f, junction.getRandomTravel())
+		: VehicleFactory::createHuman(14.f, junction.getRandomTravel())
 	);
 }
 

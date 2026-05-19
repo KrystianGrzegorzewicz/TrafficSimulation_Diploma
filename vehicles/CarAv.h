@@ -12,8 +12,7 @@ public:
 		float initialSpeed,
 		Travel travel,
 		std::unique_ptr<IBehavior>   behavior,
-		std::unique_ptr<IPerception> perception//,
-		//int color[3]
+		std::unique_ptr<IPerception> perception
 	);
 
 	void update(float dt, const WorldState& world) override;
