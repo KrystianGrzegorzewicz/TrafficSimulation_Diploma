@@ -11,19 +11,59 @@ PathPlan PathPlanner::compute(
 {
 	PathPlan out;
 
-	float lookaheadDist = std::max(6.0f, speed * 1.2f);
-	out.lookaheadDistance = lookaheadDist;
+	const auto& pts = travel.TravelPoints;
 
-	// Convert meters -> parametric t step using derivative magnitude
-	const auto& p = travel.TravelPoints;
-	Vec2 d = travel.bezierDerivative(p[segment], p[segment + 1], p[segment + 2], t);
-	float metersPerT = std::max(d.length(), 0.001f);
-	float lookaheadT = lookaheadDist / metersPerT;
+	float curvature =
+		travel.bezierCurvature(
+			pts[segment],
+			pts[segment + 1],
+			pts[segment + 2],
+			t);
 
-	out.targetPoint = computeTargetArcLength(travel, segment, t, lookaheadDist);
+	// dynamic lookahead:
+	// szybciej = dalej
+	// większa krzywizna = bliżej
+	float curveFactor =
+		1.0f / (1.0f + curvature * 20.0f);
 
-	out.maxCurveSpeed = travel.computeSpeedLimitAhead(
-		segment, t, lookaheadT, aLatMax);
+	float lookaheadDist =
+		5.0f +
+		speed * 0.9f;
+
+	lookaheadDist *=
+		std::clamp(curveFactor,
+			0.35f,
+			1.0f);
+
+	out.lookaheadDistance =
+		lookaheadDist;
+
+	out.targetPoint =
+		computeTargetArcLength(
+			travel,
+			segment,
+			t,
+			lookaheadDist);
+
+	// przewidywanie zakrętu z wyprzedzeniem
+	float reactionTime = 4.0f;
+
+	float brakingDistance =
+		(speed * speed)
+		/ (2.f * 4.5f);
+
+	float previewDistance =
+		std::max(
+			40.f,
+			speed * reactionTime
+			+ brakingDistance);
+
+	out.maxCurveSpeed =
+		travel.computeSpeedLimitAhead(
+			segment,
+			t,
+			previewDistance,
+			aLatMax);
 
 	return out;
 }

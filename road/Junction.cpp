@@ -222,13 +222,16 @@ Junction::Junction(int index)
 			Vec2(60.f, 1.75f), Vec2(80.f, 1.75f), Vec2(100.f, 1.75f),
 			Vec2(150.f, 1.75f), Vec2(150.f, 1.75f)
 		};
-
+		//circles.emplace_back(drawTravel(tp6));
+		circles.append_range(drawTravel(tp1));
 		travels.emplace_back(tp1, 1, 1);
 		travels.emplace_back(tp2, 1, 2);
 		travels.emplace_back(tp3, 1, 3);
 		travels.emplace_back(tp4, 1, 4);
 		travels.emplace_back(tp5, 1, 5);
 		travels.emplace_back(tp6, 1, 6);
+
+		
 		break;
 
 		// ------------------------------------------------------------------
@@ -287,4 +290,27 @@ Travel Junction::getRandomTravel()
 	}
 
 	return travels.back();   // unreachable, but satisfies the compiler
+}
+std::vector<Circle> Junction::drawTravel(std::vector<Vec2> travelPoints) {
+	Travel tempTravel(travelPoints, 1, 0);
+	const float STEP = 0.05f; // gęstość punktów
+	std::vector<Circle> circles;
+	for (const Vec2& point : travelPoints) {
+		circles.push_back(Circle(point.x, point.y, 0.5f, false));
+	}
+	for (size_t i = 0; i + 2 < travelPoints.size(); i += 2)
+	{
+		Vec2 p0 = travelPoints[i];
+		Vec2 p1 = travelPoints[i + 1];
+		Vec2 p2 = travelPoints[i + 2];
+		for (float t = 0.0f; t <= 1.0f; t += STEP)
+		{
+			Vec2 point = tempTravel.bezier(p0, p1, p2, t);
+
+			circles.push_back(
+				Circle(point.x, point.y, 0.3f, false)
+			);
+		}
+	}
+	return circles;
 }

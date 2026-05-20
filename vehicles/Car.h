@@ -61,13 +61,13 @@ protected:
 	float speed = 0.0f;
 
 	// --- Tuning (subclasses may override in constructor) ---
-	float maxAccel = 6.0f;
+	float maxAccel = 4.0f;
 	float maxDecel = 6.0f;
 	float maxSpeed = 20.0f;
 	float lookaheadBase = 0.1f;
-	float lookaheadSpeedFactor = 0.04f;
-	float kp = 8.0f;
-	float kd = 5.0f;
+	float lookaheadSpeedFactor = 0.03f;
+	float kp = 5.0f;
+	float kd = 3.0f;
 
 	SteeringModel steering{ kp, kd };
 };

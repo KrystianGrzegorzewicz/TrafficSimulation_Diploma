@@ -19,6 +19,7 @@ public:
 	std::vector<Line>          getLines()   const;
 	std::vector<Circle>        getCircles() const;
 	Travel                     getRandomTravel();
+	std::vector<Circle> drawTravel(std::vector<Vec2> travelPoints);
 
 private:
 	std::vector<Block>  blocks;

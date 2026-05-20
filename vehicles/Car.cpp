@@ -97,23 +97,90 @@ void Car::updateClosestT()
 {
 	const auto& p = travel.TravelPoints;
 
+	if (segment + 2 >= (int)p.size())
+		return;
+
 	const Vec2& p0 = p[segment];
 	const Vec2& p1 = p[segment + 1];
 	const Vec2& p2 = p[segment + 2];
 
+	// --- adaptive search window ---
+	float speed = velocity.length();
+
+	// większe okno przy dużej prędkości
+	float searchRadiusT =
+		std::clamp(0.08f + speed * 0.008f,
+			0.08f,
+			0.35f);
+
+	float startT =
+		std::max(0.0f, t - searchRadiusT);
+
+	float endT =
+		std::min(1.0f, t + searchRadiusT);
+
 	float bestT = t;
-	float bestDist = (travel.bezier(p0, p1, p2, t) - position).length();
+	float bestDist2 = FLT_MAX;
 
-	for (int i = -2; i <= 2; ++i)
+	// coarse search
+	const int coarseSteps = 30;
+
+	for (int i = 0; i <= coarseSteps; ++i)
 	{
-		float testT = std::clamp(t + i * 0.02f, 0.0f, 1.0f);
-		float d = (travel.bezier(p0, p1, p2, testT) - position).length();
+		float testT =
+			startT +
+			(endT - startT) *
+			(i / (float)coarseSteps);
 
-		if (d < bestDist)
+		Vec2 curvePoint =
+			travel.bezier(p0, p1, p2, testT);
+
+		float d2 =
+			(curvePoint - position)
+			.lengthSquared();
+
+		if (d2 < bestDist2)
 		{
-			bestDist = d;
+			bestDist2 = d2;
 			bestT = testT;
 		}
+	}
+
+	// fine refinement
+	float refineRange = 0.03f;
+
+	for (int iter = 0; iter < 3; ++iter)
+	{
+		float localBestT = bestT;
+		float localBestD2 = bestDist2;
+
+		for (int i = -8; i <= 8; ++i)
+		{
+			float testT =
+				std::clamp(
+					bestT + i * refineRange / 8.f,
+					0.f,
+					1.f
+				);
+
+			Vec2 pt =
+				travel.bezier(
+					p0, p1, p2, testT);
+
+			float d2 =
+				(pt - position)
+				.lengthSquared();
+
+			if (d2 < localBestD2)
+			{
+				localBestD2 = d2;
+				localBestT = testT;
+			}
+		}
+
+		bestT = localBestT;
+		bestDist2 = localBestD2;
+		refineRange *= 0.5f;
 	}
 
 	t = bestT;
@@ -134,27 +201,70 @@ bool Car::advanceSegmentIfNeeded()
 // Protected physics — identical for every vehicle type
 // ---------------------------------------------------------------------------
 
-void Car::integrate(const Vec2& desiredAcceleration, float dt)
+void Car::integrate(
+	const Vec2& desiredAcceleration,
+	float dt)
 {
 	const Vec2 oldVelocity = velocity;
 
-	acceleration = desiredAcceleration;
+	Vec2 forward =
+		velocity.length() > 0.1f
+		? velocity.normalized()
+		: Vec2(1, 0);
 
-	acceleration = desiredAcceleration;
-	float accLen = acceleration.length();
-	float aMax = std::max(maxAccel, maxDecel);
-	if (accLen > aMax)
-		acceleration = acceleration / accLen * aMax;
+	Vec2 right(-forward.y, forward.x);
+
+	float aLong =
+		desiredAcceleration.dot(forward);
+
+	float aLat =
+		desiredAcceleration.dot(right);
+
+	// separate limits
+	aLong = std::clamp(
+		aLong,
+		-maxDecel,
+		maxAccel);
+
+	// friction circle
+	const float tireGrip = 9.0f;
+
+	float maxLatAvailable =
+		std::sqrt(std::max(
+			0.f,
+			tireGrip * tireGrip
+			- aLong * aLong));
+
+	aLat = std::clamp(
+		aLat,
+		-maxLatAvailable,
+		maxLatAvailable);
+
+	acceleration =
+		forward * aLong +
+		right * aLat;
+
+	// semi-implicit Euler
 	velocity += acceleration * dt;
+
+	float speed = velocity.length();
+
+	if (speed > maxSpeed)
+	{
+		velocity =
+			velocity.normalized()
+			* maxSpeed;
+	}
 
 	position += velocity * dt;
 
-	speed = velocity.length();
+	this->speed =
+		velocity.length();
 
-	// Recompute acceleration from velocity delta so getAccelerationVector()
-	// always reflects what actually happened this tick.
-	if (dt > 0.00001f)
-		acceleration = (velocity - oldVelocity) / dt;
-	else
-		acceleration = Vec2(0.f, 0.f);
+	if (dt > 1e-5f)
+	{
+		acceleration =
+			(velocity - oldVelocity)
+			/ dt;
+	}
 }

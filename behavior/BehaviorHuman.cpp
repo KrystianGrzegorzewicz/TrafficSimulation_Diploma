@@ -24,7 +24,24 @@ MotionCommand BehaviorHuman::compute(
 
 	newCmd.targetPoint = plan.targetPoint;
 
-	float desiredSpeed = std::min(maxSpeed, plan.maxCurveSpeed);
+	float currentSpeed =
+		self.velocity.length();
+
+	float desiredSpeed =
+		std::min(
+			maxSpeed,
+			plan.maxCurveSpeed);
+
+	// anticipatory braking
+	float overspeed =
+		currentSpeed -
+		desiredSpeed;
+
+	if (overspeed > 0.f)
+	{
+		desiredSpeed -=
+			overspeed * 0.35f;
+	}
 
 	if (perception.hasBlockHazard && perception.hazardIsActive)
 	{

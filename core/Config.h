@@ -14,7 +14,7 @@ struct Config {
 		simSpeed(1.0f),
 		spawnRate(1.0f),
 		AVRate(0.2f),
-		junction(4),
+		junction(2),
 		saveCsv(false)
 	{
 	}

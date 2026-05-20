@@ -66,27 +66,79 @@ float Travel::maxSpeedAt(
 // ---------------------------------------------------------------------------
 
 float Travel::computeSpeedLimitAhead(
-	int segment, float t, float lookaheadT, float aLatMax) const
+	int segment,
+	float t,
+	float lookaheadDistance,
+	float aLatMax) const
 {
-	float minSpeed = std::numeric_limits<float>::max();
-	int   seg = segment;
+	struct SpeedSample
+	{
+		float distance;
+		float curveSpeed;
+	};
+
+	std::vector<SpeedSample> samples;
+
+	int seg = segment;
 	float localT = t;
 
-	const float STEP = 0.02f;
-	float       traveled = 0.f;
+	float traveled = 0.f;
+	const float step = 0.01f;
 
-	while (traveled < lookaheadT &&
-		seg + 2 < static_cast<int>(TravelPoints.size()))
+	// ------------------------------------------------
+	// SAMPLE CURVATURE AHEAD
+	// ------------------------------------------------
+
+	while (traveled < lookaheadDistance
+		&& seg + 2 < (int)TravelPoints.size())
 	{
-		const Vec2& p0 = TravelPoints[seg];
-		const Vec2& p1 = TravelPoints[seg + 1];
-		const Vec2& p2 = TravelPoints[seg + 2];
+		const Vec2& p0 =
+			TravelPoints[seg];
 
-		float v = maxSpeedAt(p0, p1, p2, localT, aLatMax);
-		minSpeed = std::min(minSpeed, v);
+		const Vec2& p1 =
+			TravelPoints[seg + 1];
 
-		localT += STEP;
-		traveled += STEP;
+		const Vec2& p2 =
+			TravelPoints[seg + 2];
+
+		float curvature =
+			bezierCurvature(
+				p0, p1, p2, localT);
+
+		float curveSpeed;
+
+		if (curvature < 1e-5f)
+		{
+			curveSpeed = 999.f;
+		}
+		else
+		{
+			float radius =
+				1.f / curvature;
+
+			// conservative
+			curveSpeed =
+				std::sqrt(
+					aLatMax * radius)
+				* 0.72f;
+		}
+
+		samples.push_back({
+			traveled,
+			curveSpeed
+			});
+
+		Vec2 deriv =
+			bezierDerivative(
+				p0, p1, p2,
+				localT);
+
+		float ds =
+			deriv.length()
+			* step;
+
+		traveled += ds;
+		localT += step;
 
 		if (localT >= 1.f)
 		{
@@ -95,10 +147,45 @@ float Travel::computeSpeedLimitAhead(
 		}
 	}
 
-	if (minSpeed == std::numeric_limits<float>::max())
-		return 50.f;   // no curvature constraint found — open road
+	if (samples.empty())
+		return 999.f;
 
-	return minSpeed;
+	// ------------------------------------------------
+	// BACKWARD BRAKING PROPAGATION
+	// ------------------------------------------------
+
+	// comfort braking
+	const float planningDecel = 4.5f;
+
+	float allowedSpeed =
+		samples.back().curveSpeed;
+
+	for (int i =
+		(int)samples.size() - 2;
+		i >= 0;
+		--i)
+	{
+		float ds =
+			samples[i + 1].distance
+			- samples[i].distance;
+
+		// v² = u² + 2as
+		float maxEnterSpeed =
+			std::sqrt(
+				allowedSpeed *
+				allowedSpeed
+				+
+				2.f *
+				planningDecel *
+				ds);
+
+		allowedSpeed =
+			std::min(
+				samples[i].curveSpeed,
+				maxEnterSpeed);
+	}
+
+	return allowedSpeed;
 }
 
 int Travel::getWeight() const { return weight; }

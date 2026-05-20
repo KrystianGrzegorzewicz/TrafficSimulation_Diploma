@@ -9,55 +9,45 @@ Vec2 SteeringModel::computeLateralAcceleration(
 {
 	float speed = velocity.length();
 
-	Vec2 toTargetRaw = targetPoint - position;
+	Vec2 toTarget =
+		targetPoint - position;
+
+	if (toTarget.lengthSquared() < 1e-6f)
+		return Vec2(0, 0);
+
 	Vec2 forward =
 		(speed > 0.1f)
 		? velocity.normalized()
-		: (toTargetRaw.length() > 0.001f
-			? toTargetRaw.normalized()
-			: Vec2(1.f, 0.f));
+		: toTarget.normalized();
 
 	Vec2 right(-forward.y, forward.x);
 
-	Vec2 toTarget = targetPoint - position;
-
-	float forwardMag = toTarget.dot(forward);
-
-	Vec2 lateralError =
-		toTarget - forward * forwardMag;
+	float lateralError =
+		toTarget.dot(right);
 
 	float lateralVelocity =
 		velocity.dot(right);
 
-	// PD controller
-	// a = kp * error - kd * velocity
-	Vec2 aLateral =
-		lateralError * kp -
-		right * lateralVelocity * kd;
+	// critically damped PD
+	float omega = kp;
 
-	// Physics cornering limit
-	// v² / R
-	float safeSpeed =
-		std::max(speed * 0.9f, 0.1f);
+	float commandedLatAcc =
+		omega * omega * lateralError
+		- 2.f * kd * lateralVelocity;
 
-	float maxFromRadius =
-		(safeSpeed * safeSpeed) /
-		minTurnRadius;
-
-	float maxLatAcc =
-		std::min(aLatMax, maxFromRadius);
-
-	float len = aLateral.length();
-
-	if (len > maxLatAcc)
+	// ograniczenie wyłącznie geometrią skrętu
+	if (speed > 0.5f)
 	{
-		aLateral =
-			aLateral / len * maxLatAcc;
+		float maxCurvatureAcc =
+			(speed * speed)
+			/ minTurnRadius;
+
+		commandedLatAcc =
+			std::clamp(
+				commandedLatAcc,
+				-maxCurvatureAcc,
+				maxCurvatureAcc);
 	}
 
-	// Reduce oscillations at low speed
-	float damping =
-		std::clamp(speed / 5.0f, 0.0f, 1.0f);
-
-	return aLateral;
+	return right * commandedLatAcc;
 }
