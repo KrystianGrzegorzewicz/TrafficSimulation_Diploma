@@ -7,7 +7,7 @@ import math
 pygame.init()
 
 # STARTOWY ROZMIAR (można zmienić, potem i tak jest dynamiczny)
-WIDTH, HEIGHT = 1600, 1200
+WIDTH, HEIGHT = 1200, 800
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption("Simulation Viewer")

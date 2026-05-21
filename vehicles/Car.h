@@ -1,63 +1,86 @@
 #pragma once
+#include "road/Travel.h"
+#include "vehicles/CarState.h"
+#include "physics/SteeringModel.h"
+#include "core/Vec2.h"
+#include "perception/IPerception.h"
+#include "behavior/IBehavior.h"
 
-#include "core/Travel.h"
-#include "core/BehaviorModel.h"
-#include "core/Perception.h"
-#include "core/SteeringModel.h"
+// Base vehicle.  Owns:
+//   - physical state (position, velocity, acceleration)
+//   - path tracking (segment, t)
+//   - SteeringModel (shared physics, not a strategy)
+//   - integrate() — Euler integration, same for all vehicle types
+//
+// Does NOT own IBehavior or IPerception — subclasses inject these.
+// Simulation holds std::unique_ptr<Car>, calling the virtual update().
+struct WorldState;
+//class IPerception;
 
 class Car
 {
 public:
-    Car(float speed, Travel travel);
-    ~Car() = default;
+	Car(float initialSpeed, Travel travel);
+	virtual ~Car();
 
-    void update(float dt, const Perception& perception);
+	// Called each tick.  Subclasses implement their own decision cycle
+	// but MUST call integrate() with the desired acceleration.
+	virtual void update(float dt, const WorldState& world) = 0;
 
-	int getId() const;
-    int getTravelId() const;
-    Vec2 getPosition() const;
-    Vec2 getVelocityVector() const;
-    Vec2 getAccelerationVector() const;
-    bool isFinished() const;
+	// --- Accessors (unchanged API) ---
+	int	getId()               const;
+	int	getTravelId()         const;
+	Vec2 getPosition()         const;
+	Vec2 getVelocityVector()   const;
+	Vec2 getAccelerationVector() const;
+	bool isFinished()	const;
+	int* getColor()	const;
+	Vec2 filteredTargetPoint;
+	bool hasFilteredTarget = false;
 
-private:
-    static int nextId;
-    int id;
-    Travel travel;
-    int travelId;
-    int segment = 0;
-    float t = 0.0f;
-    bool finished = false;
+	CarState getState()	const;  // convenience for WorldState assembly
 
-    Vec2 position;
-    Vec2 velocity;
-    Vec2 acceleration;
-    float speed;
+protected:
+	// Shared path helpers
+	bool isPathValid()          const;
+	bool isFinishedInternal();
+	void updateClosestT();
+	bool advanceSegmentIfNeeded();
 
-	//tuning parameters
-    float maxAccel = 6.0f;
-    float maxDecel = 6.0f;
-    float maxSpeed = 20.0f;
+	// Shared physics — called by every subclass
+	void integrate(const Vec2& desiredAcceleration, float dt);
+	void executeUpdate(
+		float dt,
+		const WorldState& world,
+		IBehavior& behavior,
+		IPerception& perception,
+		PerceptionState& perceptionState
+	);
 
-    float lookaheadBase = 0.1f;
-    float lookaheadSpeedFactor = 0.04f;
+	// --- State ---
+	static int nextId;
+	int   id;
+	int   travelId;
+	Travel travel;
+	int   segment = 0;
+	float t = 0.0f;
+	bool  finished = false;
+	int color[3];
 
-    // PD controller
-    float kp = 8.0f;
-    float kd = 4.0f;
+	Vec2  position;
+	Vec2  velocity;
+	Vec2  acceleration;
 
-    SteeringModel steering{ kp, kd };
-    BehaviorModel behavior;
+	float speed = 0.0f;
 
-private:
-    bool isPathValid() const;
-    bool isFinishedInternal();
+	// --- Tuning (subclasses may override in constructor) ---
+	float maxAccel = 4.0f;
+	float maxDecel = 6.0f;
+	float maxSpeed = 20.0f;
+	float lookaheadBase = 0.1f;
+	float lookaheadSpeedFactor = 0.04f;
+	float kp = 8.0f;
+	float kd = 6.0f;
 
-    void updateClosestT();
-    bool advanceSegmentIfNeeded();
-
-    void integrate(
-        const Vec2& desiredAcceleration,
-        float dt
-    );
+	SteeringModel steering{ kp, kd };
 };
