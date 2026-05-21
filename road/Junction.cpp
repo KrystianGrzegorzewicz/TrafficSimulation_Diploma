@@ -106,13 +106,14 @@ Junction::Junction(int index)
 			Vec2(40.f,1.75f), Vec2(60.f,1.75f), Vec2(90.f,1.75f),
 			Vec2(100.f,1.75f), Vec2(100.f,1.75f)
 		};
-		// Left → down (left turn)
+		// Left → up (left turn)
 		tp3 = {
 			Vec2(-90.f,1.75f),  Vec2(-90.f,1.75f),  Vec2(-60.f,1.75f),
 			Vec2(-30.f,1.75f),  Vec2(-1.5f,1.75f), Vec2(1.75f,1.75f),
 			Vec2(1.75f,-1.5f),Vec2(1.75f,-30.f), Vec2(1.75f,-60.f),
 			Vec2(1.75f,-90.f),Vec2(1.75f,-90.f)
 		};
+		//circles.append_range(drawTravel(tp2));
 		travels.emplace_back(tp1, 5, 1);
 		travels.emplace_back(tp2, 5, 2);
 		travels.emplace_back(tp3, 1, 3);
@@ -223,7 +224,7 @@ Junction::Junction(int index)
 			Vec2(150.f, 1.75f), Vec2(150.f, 1.75f)
 		};
 
-		circles.append_range(drawTravel(tp6));
+		//circles.append_range(drawTravel(tp6));
 		travels.emplace_back(tp1, 1, 1);
 		travels.emplace_back(tp2, 1, 2);
 		travels.emplace_back(tp3, 1, 3);

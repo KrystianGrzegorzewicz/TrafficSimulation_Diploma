@@ -33,9 +33,6 @@ MotionCommand BehaviorAV::compute(
 	cmd.targetPoint =
 		plan.targetPoint;
 
-	cmd.targetTangent =
-		plan.targetTangent;
-
 	float desiredSpeed =
 		std::min(
 			maxSpeed,

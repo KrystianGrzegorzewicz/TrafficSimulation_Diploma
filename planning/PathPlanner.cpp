@@ -44,17 +44,6 @@ PathPlan PathPlanner::compute(
 			segment,
 			t,
 			lookaheadDist);
-	Vec2 deriv =
-		travel.bezierDerivative(
-			pts[segment],
-			pts[segment + 1],
-			pts[segment + 2],
-			t);
-
-	if (deriv.length() > 0.001f)
-	{
-		deriv.normalize();
-	}
 
 	float reactionTime = 3.0f;
 
@@ -107,36 +96,6 @@ Vec2 PathPlanner::computeTargetArcLength(
 		localT = 0;
 	}
 
-	if (seg + 2 >= (int)p.size())
-	{
-		return p.back();
-	}
-
-	Vec2 currentPoint =
-		travel.bezier(
-			p[seg],
-			p[seg + 1],
-			p[seg + 2],
-			localT);
-
-	// --- segment blending ---
-	if (localT > 0.85f &&
-		seg + 4 < (int)p.size())
-	{
-		float blend =
-			(localT - 0.85f) / 0.15f;
-
-		Vec2 nextPoint =
-			travel.bezier(
-				p[seg + 2],
-				p[seg + 3],
-				p[seg + 4],
-				blend);
-
-		currentPoint =
-			currentPoint * (1.0f - blend)
-			+ nextPoint * blend;
-	}
-
-	return currentPoint;
+	if (seg + 2 >= (int)p.size()) return p.back();
+	return travel.bezier(p[seg], p[seg + 1], p[seg + 2], localT);
 }

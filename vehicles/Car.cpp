@@ -192,7 +192,7 @@ bool Car::advanceSegmentIfNeeded()
 	if (t >= 0.999f)
 	{
 		segment += 2;
-		t = -1.0f;
+		t = 0.0f;
 
 		if (segment + 2 >= static_cast<int>(travel.TravelPoints.size()))
 		{
@@ -321,26 +321,11 @@ void Car::executeUpdate(
 			lookaheadSpeedFactor,
 			perceptionState);
 
-	if (!hasFilteredTarget)
-	{
-		filteredTargetPoint = cmd.targetPoint;
-		hasFilteredTarget = true;
-	}
-
-	// smoothing
-	float targetBlend =
-		std::clamp(dt * 4.0f, 0.0f, 1.0f);
-
-	filteredTargetPoint =
-		filteredTargetPoint * (1.0f - targetBlend)
-		+ cmd.targetPoint * targetBlend;
-
 	Vec2 lateralAcc =
 		steering.computeLateralAcceleration(
 			position,
 			velocity,
-			filteredTargetPoint,
-			cmd.targetTangent);
+			cmd.targetPoint);
 
 	Vec2 forward =
 		velocity.length() > 0.1f

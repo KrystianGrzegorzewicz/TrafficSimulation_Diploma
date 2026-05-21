@@ -21,14 +21,12 @@ public:
 	Vec2 computeLateralAcceleration(
 		const Vec2& position,
 		const Vec2& velocity,
-		const Vec2& targetPoint,
-		const Vec2& targetTangent
+		const Vec2& targetPoint
 	) const;
 
 private:
 	float kp;
 	float kd;
-	float headingKp = 2.0f;
 
 	float aLatMax = 6.0f;
 	float minTurnRadius = 2.0f;
