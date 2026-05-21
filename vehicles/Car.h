@@ -44,6 +44,13 @@ protected:
 
 	// Shared physics — called by every subclass
 	void integrate(const Vec2& desiredAcceleration, float dt);
+	void executeUpdate(
+		float dt,
+		const WorldState& world,
+		IBehavior& behavior,
+		IPerception& perception,
+		PerceptionState& perceptionState
+	);
 
 	// --- State ---
 	static int nextId;

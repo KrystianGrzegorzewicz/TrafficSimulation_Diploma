@@ -11,7 +11,8 @@ PathPlan PathPlanner::compute(
 {
 	PathPlan out;
 
-	const auto& pts = travel.TravelPoints;
+	const auto& pts =
+		travel.TravelPoints;
 
 	float curvature =
 		travel.bezierCurvature(
@@ -20,19 +21,18 @@ PathPlan PathPlanner::compute(
 			pts[segment + 2],
 			t);
 
-	// dynamic lookahead:
-	// szybciej = dalej
-	// większa krzywizna = bliżej
 	float curveFactor =
-		1.0f / (1.0f + curvature * 20.0f);
+		1.0f /
+		(1.0f + curvature * 35.0f);
 
 	float lookaheadDist =
-		5.0f +
-		speed * 0.9f;
+		2.5f +
+		speed * 0.45f;
 
 	lookaheadDist *=
-		std::clamp(curveFactor,
-			0.35f,
+		std::clamp(
+			curveFactor,
+			0.30f,
 			1.0f);
 
 	out.lookaheadDistance =
@@ -45,18 +45,17 @@ PathPlan PathPlanner::compute(
 			t,
 			lookaheadDist);
 
-	// przewidywanie zakrętu z wyprzedzeniem
-	float reactionTime = 4.0f;
+	float reactionTime = 3.0f;
 
 	float brakingDistance =
 		(speed * speed)
-		/ (2.f * 4.5f);
+		/ (2.f * 5.0f);
 
 	float previewDistance =
 		std::max(
-			40.f,
-			speed * reactionTime
-			+ brakingDistance);
+			25.f,
+			speed * reactionTime +
+			brakingDistance);
 
 	out.maxCurveSpeed =
 		travel.computeSpeedLimitAhead(
@@ -67,7 +66,6 @@ PathPlan PathPlanner::compute(
 
 	return out;
 }
-
 Vec2 PathPlanner::computeTargetArcLength(
 	Travel& travel,
 	int segment,

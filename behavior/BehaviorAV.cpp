@@ -19,24 +19,52 @@ MotionCommand BehaviorAV::compute(
 {
 	MotionCommand cmd;
 
-	float speed = self.velocity.length();
-	PathPlan plan = planner.compute(travel, segment, t, speed, 6.0f);
+	float speed =
+		self.velocity.length();
 
-	cmd.targetPoint = plan.targetPoint;
+	PathPlan plan =
+		planner.compute(
+			travel,
+			segment,
+			t,
+			speed,
+			7.5f);
 
-	float desiredSpeed = std::min(maxSpeed, plan.maxCurveSpeed);
+	cmd.targetPoint =
+		plan.targetPoint;
 
-	if (perception.hasBlockHazard && perception.hazardIsActive)
+	float desiredSpeed =
+		std::min(
+			maxSpeed,
+			plan.maxCurveSpeed);
+
+	// Predictive hazard braking
+	if (perception.hasBlockHazard &&
+		perception.hazardIsActive)
 	{
-		if (perception.hazardDistance < 10) desiredSpeed = 0;
-		else desiredSpeed *= 0.5f;
+		float hazardFactor =
+			std::clamp(
+				perception.hazardDistance / 45.f,
+				0.f,
+				1.f);
+
+		desiredSpeed *= hazardFactor;
 	}
 
-	cmd.longitudinalAcceleration = longitudinalModel->computeAcceleration(
-		self, perception, desiredSpeed, maxAccel, maxDecel);
+	cmd.longitudinalAcceleration =
+		longitudinalModel
+		->computeAcceleration(
+			self,
+			perception,
+			desiredSpeed,
+			maxAccel,
+			maxDecel);
 
-	if (perception.hasBlockHazard && perception.hazardDistance < 5)
+	if (perception.hasBlockHazard &&
+		perception.hazardDistance < 3.0f)
+	{
 		cmd.emergencyBrake = true;
+	}
 
 	return cmd;
 }

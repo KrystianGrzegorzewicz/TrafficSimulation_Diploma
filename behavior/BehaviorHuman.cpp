@@ -19,66 +19,83 @@ MotionCommand BehaviorHuman::compute(
 {
 	MotionCommand newCmd;
 
-	float speed = self.velocity.length();
-	PathPlan plan = planner.compute(travel, segment, t, speed, 6.0f);
-
-	newCmd.targetPoint = plan.targetPoint;
-
-	float currentSpeed =
+	float speed =
 		self.velocity.length();
+
+	PathPlan plan =
+		planner.compute(
+			travel,
+			segment,
+			t,
+			speed,
+			6.0f);
+
+	newCmd.targetPoint =
+		plan.targetPoint;
 
 	float desiredSpeed =
 		std::min(
 			maxSpeed,
 			plan.maxCurveSpeed);
 
-	// anticipatory braking
+	// Human anticipatory braking
 	float overspeed =
-		currentSpeed -
+		speed -
 		desiredSpeed;
 
 	if (overspeed > 0.f)
 	{
 		desiredSpeed -=
-			overspeed * 0.35f;
+			overspeed * 0.55f;
 	}
 
-	if (perception.hasBlockHazard && perception.hazardIsActive)
+	// Hazard anticipation
+	if (perception.hasBlockHazard &&
+		perception.hazardIsActive)
 	{
-		if (perception.hazardDistance < 10) desiredSpeed = 0;
-		else desiredSpeed *= 0.5f;
+		float hazardFactor =
+			std::clamp(
+				perception.hazardDistance / 35.f,
+				0.f,
+				1.f);
+
+		desiredSpeed *= hazardFactor;
 	}
 
 	newCmd.longitudinalAcceleration =
-		longitudinalModel->computeAcceleration(
-			self, perception, desiredSpeed, maxAccel, maxDecel);
+		longitudinalModel
+		->computeAcceleration(
+			self,
+			perception,
+			desiredSpeed,
+			maxAccel,
+			maxDecel);
 
-	if (perception.hasBlockHazard && perception.hazardDistance < 5)
+	if (perception.hasBlockHazard &&
+		perception.hazardDistance < 4.0f)
+	{
 		newCmd.emergencyBrake = true;
+	}
 
-	// -------------------------------------------------
-	// HUMAN REACTION DELAY
-	// -------------------------------------------------
-
-	// Dodajemy nową decyzję do bufora
+	// Natural human delay
 	reactionBuffer.push_back(newCmd);
 
-	// Ile kroków opóźnienia potrzebujemy?
-	float dtEstimate = 0.016f; // sym step ~60Hz (możesz potem podać z zewnątrz)
-	int stepsDelay = std::max(1, (int)(reactionTime / dtEstimate));
+	const int stepsDelay = 12;
 
-	// Jeśli bufor jeszcze nie pełny → człowiek "nie zdążył zareagować"
-	if ((int)reactionBuffer.size() <= stepsDelay)
+	if ((int)reactionBuffer.size()
+		<= stepsDelay)
 	{
 		MotionCommand idle;
-		idle.targetPoint = plan.targetPoint; // patrzy na drogę
-		idle.longitudinalAcceleration = 0.0f; // ale jeszcze nic nie robi
+		idle.targetPoint =
+			plan.targetPoint;
+
 		return idle;
 	}
 
-	// Zwracamy starą decyzję
-	MotionCommand delayedCmd = reactionBuffer.front();
+	MotionCommand delayed =
+		reactionBuffer.front();
+
 	reactionBuffer.pop_front();
 
-	return delayedCmd;
+	return delayed;
 }

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 
+
 int Car::nextId = 0;
 
 Car::Car(float initialSpeed, Travel travelIn)
@@ -267,4 +268,63 @@ void Car::integrate(
 			(velocity - oldVelocity)
 			/ dt;
 	}
+}
+void Car::executeUpdate(
+	float dt,
+	const WorldState& world,
+	IBehavior& behavior,
+	IPerception& perception,
+	PerceptionState& perceptionState)
+{
+	if (!isPathValid() || isFinishedInternal())
+		return;
+
+	updateClosestT();
+
+	if (advanceSegmentIfNeeded())
+		return;
+
+	perception.update(
+		getState(),
+		world,
+		perceptionState);
+
+	MotionCommand cmd =
+		behavior.compute(
+			travel,
+			segment,
+			t,
+			getState(),
+			maxSpeed,
+			maxAccel,
+			maxDecel,
+			lookaheadBase,
+			lookaheadSpeedFactor,
+			perceptionState);
+
+	Vec2 lateralAcceleration =
+		steering.computeLateralAcceleration(
+			position,
+			velocity,
+			cmd.targetPoint);
+
+	Vec2 forwardDir =
+		velocity.length() > 0.1f
+		? velocity.normalized()
+		: Vec2(1.f, 0.f);
+
+	Vec2 longitudinalAcceleration =
+		forwardDir *
+		cmd.longitudinalAcceleration;
+
+	if (cmd.emergencyBrake)
+	{
+		longitudinalAcceleration =
+			forwardDir * (-maxDecel);
+	}
+
+	integrate(
+		longitudinalAcceleration +
+		lateralAcceleration,
+		dt);
 }

@@ -9,33 +9,29 @@ CarHuman::CarHuman(
 	behavior(std::move(beh)),
 	perception(std::move(perc))
 {
-	color[0] = 20; color[1] = 200; color[2] = 50;
+	color[0] = 20;
+	color[1] = 200;
+	color[2] = 50;
+
+	// Human tuning
+	maxSpeed = 18.0f;
+	maxAccel = 3.5f;
+	maxDecel = 5.5f;
+
+	kp = 6.5f;
+	kd = 2.5f;
+
+	steering = SteeringModel(kp, kd);
 }
 
-void CarHuman::update(float dt, const WorldState& world)
+void CarHuman::update(
+	float dt,
+	const WorldState& world)
 {
-	if (!isPathValid() || isFinishedInternal()) return;
-
-	updateClosestT();
-	if (advanceSegmentIfNeeded()) return;
-
-	perception->update(getState(), world, perceptionState);
-
-	MotionCommand cmd = behavior->compute(
-		travel, segment, t, getState(),
-		maxSpeed, maxAccel, maxDecel,
-		lookaheadBase, lookaheadSpeedFactor,
+	executeUpdate(
+		dt,
+		world,
+		*behavior,
+		*perception,
 		perceptionState);
-
-	Vec2 latAccel = steering.computeLateralAcceleration(
-		position, velocity, cmd.targetPoint);
-
-	Vec2 forwardDir = velocity.length() > 0.1f
-		? velocity.normalized()
-		: Vec2(1, 0);
-
-	Vec2 longAccel = forwardDir * cmd.longitudinalAcceleration;
-	if (cmd.emergencyBrake) longAccel = forwardDir * (-maxDecel);
-
-	integrate(longAccel + latAccel, dt);
 }
