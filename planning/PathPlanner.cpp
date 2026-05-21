@@ -44,6 +44,19 @@ PathPlan PathPlanner::compute(
 			segment,
 			t,
 			lookaheadDist);
+	Vec2 deriv =
+		travel.bezierDerivative(
+			pts[segment],
+			pts[segment + 1],
+			pts[segment + 2],
+			t);
+
+	if (deriv.length() > 0.001f)
+	{
+		deriv.normalize();
+	}
+
+	out.targetTangent = deriv;
 
 	float reactionTime = 3.0f;
 

@@ -1,8 +1,8 @@
 #pragma once
 #include "road/Junction.h"
-#include "vehicles/Car.h"   // forward-declared for CarState
+//#include "vehicles/Car.h"   // forward-declared for CarState
 #include <vector>
-
+#include "vehicles/CarState.h"
 // Shared, simulation-wide read-only context.
 // Passed by const reference into Perception and Behavior each tick.
 struct WorldState

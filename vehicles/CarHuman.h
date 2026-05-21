@@ -1,7 +1,6 @@
 #pragma once
 #include "vehicles/Car.h"
-#include "behavior/IBehavior.h"
-#include "perception/IPerception.h"
+
 #include <memory>
 
 class CarHuman : public Car
@@ -14,6 +13,7 @@ public:
 		std::unique_ptr<IPerception> perception//,
 		//int color[3]
 	);
+	~CarHuman() override;
 
 	void update(float dt, const WorldState& world) override;
 

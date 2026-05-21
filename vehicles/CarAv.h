@@ -1,7 +1,5 @@
 #pragma once
 #include "vehicles/Car.h"
-#include "behavior/IBehavior.h"
-#include "perception/IPerception.h"
 #include <memory>
 
 // Skeleton — structure mirrors CarHuman, logic left for future sprint.
@@ -14,6 +12,7 @@ public:
 		std::unique_ptr<IBehavior>   behavior,
 		std::unique_ptr<IPerception> perception
 	);
+	~CarAV() override;
 
 	void update(float dt, const WorldState& world) override;
 

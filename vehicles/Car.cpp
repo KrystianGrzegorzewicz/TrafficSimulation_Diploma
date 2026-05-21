@@ -1,10 +1,10 @@
 #include "vehicles/Car.h"
+#include "perception/IPerception.h"
 #include <algorithm>
 #include <cmath>
 
-
 int Car::nextId = 0;
-
+Car::~Car() = default;
 Car::Car(float initialSpeed, Travel travelIn)
 	: travel(std::move(travelIn))
 	, steering(kp, kd)
@@ -192,9 +192,18 @@ bool Car::advanceSegmentIfNeeded()
 	if (t >= 0.999f)
 	{
 		segment += 2;
-		t = 0.0f;
+		t = -1.0f;
+
+		if (segment + 2 >= static_cast<int>(travel.TravelPoints.size()))
+		{
+			finished = true;
+			velocity = Vec2(0.f, 0.f);
+			return false;
+		}
+
 		return true;
 	}
+
 	return false;
 }
 
@@ -276,16 +285,26 @@ void Car::executeUpdate(
 	IPerception& perception,
 	PerceptionState& perceptionState)
 {
-	if (!isPathValid() || isFinishedInternal())
+	if (finished)
 		return;
+
+	if (!isPathValid())
+	{
+		finished = true;
+		return;
+	}
 
 	updateClosestT();
 
-	if (advanceSegmentIfNeeded())
+	advanceSegmentIfNeeded();
+
+	if (isFinishedInternal())
 		return;
 
+	CarState self = getState();
+
 	perception.update(
-		getState(),
+		self,
 		world,
 		perceptionState);
 
@@ -294,7 +313,7 @@ void Car::executeUpdate(
 			travel,
 			segment,
 			t,
-			getState(),
+			self,
 			maxSpeed,
 			maxAccel,
 			maxDecel,
@@ -302,29 +321,42 @@ void Car::executeUpdate(
 			lookaheadSpeedFactor,
 			perceptionState);
 
-	Vec2 lateralAcceleration =
+	if (!hasFilteredTarget)
+	{
+		filteredTargetPoint = cmd.targetPoint;
+		hasFilteredTarget = true;
+	}
+
+	// smoothing
+	float targetBlend =
+		std::clamp(dt * 4.0f, 0.0f, 1.0f);
+
+	filteredTargetPoint =
+		filteredTargetPoint * (1.0f - targetBlend)
+		+ cmd.targetPoint * targetBlend;
+
+	Vec2 lateralAcc =
 		steering.computeLateralAcceleration(
 			position,
 			velocity,
-			cmd.targetPoint);
+			filteredTargetPoint);
 
-	Vec2 forwardDir =
+	Vec2 forward =
 		velocity.length() > 0.1f
 		? velocity.normalized()
 		: Vec2(1.f, 0.f);
 
-	Vec2 longitudinalAcceleration =
-		forwardDir *
-		cmd.longitudinalAcceleration;
+	Vec2 longitudinalAcc =
+		forward * cmd.longitudinalAcceleration;
+
+	Vec2 totalAcc =
+		lateralAcc + longitudinalAcc;
 
 	if (cmd.emergencyBrake)
 	{
-		longitudinalAcceleration =
-			forwardDir * (-maxDecel);
+		totalAcc =
+			forward * (-maxDecel);
 	}
 
-	integrate(
-		longitudinalAcceleration +
-		lateralAcceleration,
-		dt);
+	integrate(totalAcc, dt);
 }

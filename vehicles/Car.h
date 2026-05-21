@@ -3,6 +3,8 @@
 #include "vehicles/CarState.h"
 #include "physics/SteeringModel.h"
 #include "core/Vec2.h"
+#include "perception/IPerception.h"
+#include "behavior/IBehavior.h"
 
 // Base vehicle.  Owns:
 //   - physical state (position, velocity, acceleration)
@@ -12,13 +14,14 @@
 //
 // Does NOT own IBehavior or IPerception — subclasses inject these.
 // Simulation holds std::unique_ptr<Car>, calling the virtual update().
-class WorldState;
+struct WorldState;
+//class IPerception;
 
 class Car
 {
 public:
 	Car(float initialSpeed, Travel travel);
-	virtual ~Car() = default;
+	virtual ~Car();
 
 	// Called each tick.  Subclasses implement their own decision cycle
 	// but MUST call integrate() with the desired acceleration.
@@ -32,6 +35,8 @@ public:
 	Vec2 getAccelerationVector() const;
 	bool isFinished()	const;
 	int* getColor()	const;
+	Vec2 filteredTargetPoint;
+	bool hasFilteredTarget = false;
 
 	CarState getState()	const;  // convenience for WorldState assembly
 

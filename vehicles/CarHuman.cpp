@@ -1,4 +1,5 @@
 #include "vehicles/CarHuman.h"
+#include "perception/IPerception.h"
 
 CarHuman::CarHuman(
 	float initialSpeed,
@@ -18,11 +19,12 @@ CarHuman::CarHuman(
 	maxAccel = 3.5f;
 	maxDecel = 5.5f;
 
-	kp = 6.5f;
-	kd = 2.5f;
+	/*kp = 6.5f;
+	kd = 2.5f;*/
 
 	steering = SteeringModel(kp, kd);
 }
+CarHuman::~CarHuman() = default;
 
 void CarHuman::update(
 	float dt,

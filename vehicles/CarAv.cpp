@@ -1,4 +1,5 @@
-#include "vehicles/CarAV.h"
+#include "vehicles/CarAv.h"
+#include "perception/IPerception.h"
 
 CarAV::CarAV(
 	float initialSpeed,
@@ -18,11 +19,12 @@ CarAV::CarAV(
 	maxAccel = 5.0f;
 	maxDecel = 7.0f;
 
-	kp = 8.0f;
-	kd = 2.0f;
+	/*kp = 8.0f;
+	kd = 2.0f;*/
 
 	steering = SteeringModel(kp, kd);
 }
+CarAV::~CarAV() = default;
 
 void CarAV::update(
 	float dt,

@@ -223,7 +223,7 @@ Junction::Junction(int index)
 			Vec2(150.f, 1.75f), Vec2(150.f, 1.75f)
 		};
 		//circles.emplace_back(drawTravel(tp6));
-		circles.append_range(drawTravel(tp1));
+		//circles.append_range(drawTravel(tp1));
 		travels.emplace_back(tp1, 1, 1);
 		travels.emplace_back(tp2, 1, 2);
 		travels.emplace_back(tp3, 1, 3);
@@ -231,7 +231,6 @@ Junction::Junction(int index)
 		travels.emplace_back(tp5, 1, 5);
 		travels.emplace_back(tp6, 1, 6);
 
-		
 		break;
 
 		// ------------------------------------------------------------------
