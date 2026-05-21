@@ -339,7 +339,8 @@ void Car::executeUpdate(
 		steering.computeLateralAcceleration(
 			position,
 			velocity,
-			filteredTargetPoint);
+			filteredTargetPoint,
+			cmd.targetTangent);
 
 	Vec2 forward =
 		velocity.length() > 0.1f

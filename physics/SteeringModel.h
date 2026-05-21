@@ -14,20 +14,22 @@
 class SteeringModel
 {
 public:
-    SteeringModel(float kp, float kd)
-        : kp(kp), kd(kd) {
-    }
+	SteeringModel(float kp, float kd)
+		: kp(kp), kd(kd) {
+	}
 
-    Vec2 computeLateralAcceleration(
-        const Vec2& position,
-        const Vec2& velocity,
-        const Vec2& targetPoint
-    ) const;
+	Vec2 computeLateralAcceleration(
+		const Vec2& position,
+		const Vec2& velocity,
+		const Vec2& targetPoint,
+		const Vec2& targetTangent
+	) const;
 
 private:
-    float kp;
-    float kd;
+	float kp;
+	float kd;
+	float headingKp = 2.0f;
 
-    float aLatMax = 6.0f;
-    float minTurnRadius = 2.0f;
+	float aLatMax = 6.0f;
+	float minTurnRadius = 2.0f;
 };

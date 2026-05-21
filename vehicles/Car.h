@@ -70,6 +70,7 @@ protected:
 	Vec2  position;
 	Vec2  velocity;
 	Vec2  acceleration;
+
 	float speed = 0.0f;
 
 	// --- Tuning (subclasses may override in constructor) ---
@@ -78,8 +79,8 @@ protected:
 	float maxSpeed = 20.0f;
 	float lookaheadBase = 0.1f;
 	float lookaheadSpeedFactor = 0.03f;
-	float kp = 5.0f;
-	float kd = 3.0f;
+	float kp = 6.0f;
+	float kd = 4.0f;
 
 	SteeringModel steering{ kp, kd };
 };

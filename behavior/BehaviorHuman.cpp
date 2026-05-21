@@ -33,6 +33,9 @@ MotionCommand BehaviorHuman::compute(
 	newCmd.targetPoint =
 		plan.targetPoint;
 
+	newCmd.targetTangent =
+		plan.targetTangent;
+
 	float desiredSpeed =
 		std::min(
 			maxSpeed,

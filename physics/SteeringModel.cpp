@@ -4,8 +4,8 @@
 Vec2 SteeringModel::computeLateralAcceleration(
 	const Vec2& position,
 	const Vec2& velocity,
-	const Vec2& targetPoint
-) const
+	const Vec2& targetPoint,
+	const Vec2& targetTangent) const
 {
 	float speed =
 		velocity.length();
@@ -34,8 +34,12 @@ Vec2 SteeringModel::computeLateralAcceleration(
 	float lateralVelocity =
 		velocity.dot(right);
 
+	float headingError =
+		forward.cross(targetTangent);
+
 	float commandedLatAcc =
 		kp * lateralError
+		+ headingKp * headingError
 		- kd * lateralVelocity;
 
 	float speedGain =
