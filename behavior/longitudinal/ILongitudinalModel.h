@@ -14,13 +14,13 @@
 class ILongitudinalModel
 {
 public:
-    virtual ~ILongitudinalModel() = default;
+	virtual ~ILongitudinalModel() = default;
 
-    virtual float computeAcceleration(
-        const CarState& self,
-        const PerceptionState& perception,
-        float desiredSpeed,
-        float maxAccel,
-        float maxDecel
-    ) = 0;
+	virtual float computeAcceleration(
+		const CarState& self,
+		const PerceptionState& perception,
+		float desiredSpeed,
+		float maxAccel,
+		float maxDecel
+	) = 0;
 };
