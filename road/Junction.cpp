@@ -78,7 +78,7 @@ Junction::Junction(int index)
 		lines.emplace_back(3.5f, 0.f, 100.f, 0.f, 0.3f);
 		lines.emplace_back(-100.f, -3.5f, 0.f, -3.5f, 0.3f);
 		lines.emplace_back(-100.f, 3.5f, -40.f, 3.5f, 0.3f);
-		lines.emplace_back(-100.f, 0.f, 0.f, 0.f, 0.3f);
+		lines.emplace_back(-100.f, 0.f, -2.f, 0.f, 0.3f);
 		lines.emplace_back(-40.f, 3.5f, -26.f, 7.0f, 0.3f);
 		lines.emplace_back(-26.f, 7.0f, 10.f, 7.0f, 0.3f);
 		lines.emplace_back(10.f, 7.0f, 24.f, 3.5f, 0.3f);
@@ -109,14 +109,15 @@ Junction::Junction(int index)
 		// Left → up (left turn)
 		tp3 = {
 			Vec2(-90.f,1.75f),  Vec2(-90.f,1.75f),  Vec2(-60.f,1.75f),
-			Vec2(-30.f,1.75f),  Vec2(-1.5f,1.75f), Vec2(1.75f,1.75f),
-			Vec2(1.75f,-1.5f),Vec2(1.75f,-30.f), Vec2(1.75f,-60.f),
+			Vec2(-30.f,1.75f),  Vec2(-3.5f,1.75f), Vec2(1.75f,1.75f),
+			Vec2(1.75f,-0.5f),Vec2(1.75f,-30.f), Vec2(1.75f,-60.f),
 			Vec2(1.75f,-90.f),Vec2(1.75f,-90.f)
 		};
-		//circles.append_range(drawTravel(tp2));
+		//circles.append_range(drawTravel(tp3));
 		travels.emplace_back(tp1, 5, 1);
 		travels.emplace_back(tp2, 5, 2);
 		travels.emplace_back(tp3, 1, 3);
+		//circles.append_range(drawTravel(tp3));
 		break;
 
 		// ------------------------------------------------------------------
@@ -188,8 +189,8 @@ Junction::Junction(int index)
 		tp3 = {
 			Vec2(150.f,-1.75f), Vec2(150.f,-1.75f), Vec2(120.f,-1.75f),
 			Vec2(100.f,-1.75f), Vec2(90.f,-1.75f), Vec2(60.f,-1.75f),
-			Vec2(35.f,-1.75f), Vec2(22.f, -2.5f), Vec2(16.2f,  -6.f),
-			Vec2(1.75f,-16.f), Vec2(1.75f, -35.f), Vec2(1.75f, -60.f),
+			Vec2(35.f,-1.75f), Vec2(20.f, -2.5f), Vec2(16.2f,  -6.f),
+			Vec2(1.75f,-10.f), Vec2(1.75f, -35.f), Vec2(1.75f, -60.f),
 			Vec2(1.75f, -90.f), Vec2(1.75f,-120.f), Vec2(1.75f,-150.f),
 			Vec2(1.75f,-150.f)
 		};
@@ -224,7 +225,7 @@ Junction::Junction(int index)
 			Vec2(150.f, 1.75f), Vec2(150.f, 1.75f)
 		};
 
-		//circles.append_range(drawTravel(tp6));
+		//circles.append_range(drawTravel(tp3));
 		travels.emplace_back(tp1, 1, 1);
 		travels.emplace_back(tp2, 1, 2);
 		travels.emplace_back(tp3, 1, 3);

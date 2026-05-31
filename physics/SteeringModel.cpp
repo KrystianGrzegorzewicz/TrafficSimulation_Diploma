@@ -2,70 +2,99 @@
 #include <algorithm>
 
 Vec2 SteeringModel::computeLateralAcceleration(
+	const Travel& travel,
+	int segment,
+	float t,
 	const Vec2& position,
 	const Vec2& velocity,
-	const Vec2& targetPoint
+	float lookaheadBase,
+	float lookaheadSpeedFactor,
+	const MotionCommand& cmd
 ) const
 {
-	float speed =
-		velocity.length();
+	const auto& p = travel.TravelPoints;
 
-	Vec2 toTarget =
-		targetPoint -
-		position;
-
-	if (toTarget.lengthSquared() < 1e-6f)
+	if (segment + 2 >= (int)p.size())
 	{
-		return Vec2(0, 0);
+		return Vec2(0.f, 0.f);
 	}
 
+	Vec2 p0 = p[segment];
+	Vec2 p1 = p[segment + 1];
+	Vec2 p2 = p[segment + 2];
+
+	float speed = velocity.length();
+
+	float lookahead =
+		lookaheadBase +
+		speed * lookaheadSpeedFactor;
+
+	float tLook =
+		std::min(t + lookahead, 1.0f);
+
+	Vec2 tangent =
+		travel.bezierDerivative(
+			p0,
+			p1,
+			p2,
+			tLook);
+
 	Vec2 forward =
-		(speed > 0.1f)
-		? velocity.normalized()
-		: toTarget.normalized();
+		tangent.normalized();
 
 	Vec2 right(
 		-forward.y,
 		forward.x);
 
-	float lateralError =
-		toTarget.dot(right);
+	Vec2 toTarget =
+		cmd.targetPoint - position;
 
-	float lateralVelocity =
+	float forwardMag =
+		toTarget.dot(forward);
+
+	Vec2 lateralError =
+		toTarget -
+		forward * forwardMag;
+
+	float lateralVel =
 		velocity.dot(right);
 
-	float commandedLatAcc =
-		kp * lateralError
-		- kd * lateralVelocity;
+	Vec2 a_lateral =
+		lateralError * kp
+		- right * lateralVel * kd;
 
-	float speedGain =
-		std::clamp(
-			speed / 12.0f,
-			0.5f,
-			1.4f);
+	float safeSpeed =
+		std::max(
+			speed * 0.9f,
+			0.1f);
 
-	commandedLatAcc *=
-		speedGain;
+	float maxFromRadius =
+		(safeSpeed * safeSpeed)
+		/ minTurnRadius;
 
-	if (speed > 0.5f)
+	float maxLatAcc =
+		std::min(
+			aLatMax,
+			maxFromRadius);
+
+	float latLen =
+		a_lateral.length();
+
+	if (latLen > maxLatAcc)
 	{
-		float maxCurvatureAcc =
-			(speed * speed)
-			/ minTurnRadius;
-
-		commandedLatAcc =
-			std::clamp(
-				commandedLatAcc,
-				-maxCurvatureAcc,
-				maxCurvatureAcc);
+		a_lateral =
+			a_lateral / latLen
+			* maxLatAcc;
 	}
 
-	commandedLatAcc =
+	float lowSpeedDamping =
 		std::clamp(
-			commandedLatAcc,
-			-aLatMax,
-			aLatMax);
+			speed / 5.0f,
+			0.0f,
+			1.0f);
 
-	return right *
-		commandedLatAcc;
+	a_lateral *=
+		lowSpeedDamping;
+
+	return a_lateral;
 }

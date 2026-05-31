@@ -1,6 +1,9 @@
 #pragma once
 
 #include "core/Vec2.h"
+#include "road/Travel.h"
+#include "behavior/BehaviorOutput.h"
+#include "behavior/MotionCommand.h"
 
 // Pure lateral controller.
 //
@@ -19,9 +22,14 @@ public:
 	}
 
 	Vec2 computeLateralAcceleration(
+		const Travel& travel,
+		int segment,
+		float t,
 		const Vec2& position,
 		const Vec2& velocity,
-		const Vec2& targetPoint
+		float lookaheadBase,
+		float lookaheadSpeedFactor,
+		const MotionCommand& cmd
 	) const;
 
 private:
