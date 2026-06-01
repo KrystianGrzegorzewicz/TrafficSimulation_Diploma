@@ -37,5 +37,5 @@ private:
 	float kd;
 
 	float aLatMax = 6.0f;
-	float minTurnRadius = 2.0f;
+	float minTurnRadius = 1.0f;
 };

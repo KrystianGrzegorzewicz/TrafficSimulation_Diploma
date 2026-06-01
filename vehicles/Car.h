@@ -46,6 +46,7 @@ protected:
 	bool isFinishedInternal();
 	void updateClosestT();
 	bool advanceSegmentIfNeeded();
+	Vec2 getPathForward() const;
 
 	// Shared physics — called by every subclass
 	void integrate(const Vec2& desiredAcceleration, float dt);

@@ -93,7 +93,25 @@ bool Car::isFinishedInternal()
 	}
 	return false;
 }
+Vec2 Car::getPathForward() const
+{
+	const auto& p = travel.TravelPoints;
 
+	if (segment + 2 >= (int)p.size())
+		return Vec2(1.f, 0.f);
+
+	Vec2 tangent =
+		travel.bezierDerivative(
+			p[segment],
+			p[segment + 1],
+			p[segment + 2],
+			t);
+
+	if (tangent.length() < 0.0001f)
+		return Vec2(1.f, 0.f);
+
+	return tangent.normalized();
+}
 void Car::updateClosestT()
 {
 	const auto& p = travel.TravelPoints;
@@ -257,6 +275,17 @@ void Car::integrate(
 	// semi-implicit Euler
 	velocity += acceleration * dt;
 
+	Vec2 pathForward = getPathForward();
+
+	float forwardSpeed =
+		velocity.dot(pathForward);
+
+	if (forwardSpeed < 0.0f)
+	{
+		velocity -=
+			pathForward * forwardSpeed;
+	}
+
 	float speed = velocity.length();
 
 	if (speed > maxSpeed)
@@ -333,10 +362,7 @@ void Car::executeUpdate(
 			cmd
 		);
 
-	Vec2 forward =
-		velocity.length() > 0.1f
-		? velocity.normalized()
-		: Vec2(1.f, 0.f);
+	Vec2 forward = getPathForward();
 
 	Vec2 longitudinalAcc =
 		forward * cmd.longitudinalAcceleration;

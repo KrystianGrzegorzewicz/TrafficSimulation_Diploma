@@ -32,6 +32,7 @@ float IDMLongitudinalModel::computeAcceleration(
 		float dv = perception.relativeSpeed;
 
 		float desiredGap =
+			4.5f +
 			s0 +
 			v * T +
 			(v * dv) /
@@ -45,9 +46,12 @@ float IDMLongitudinalModel::computeAcceleration(
 		maxAccel *
 		(1.0f - freeRoad - interaction);
 
-	return std::clamp(
+	accel = std::clamp(
 		accel,
 		-maxDecel,
 		maxAccel
 	);
+
+	return accel;
+
 }

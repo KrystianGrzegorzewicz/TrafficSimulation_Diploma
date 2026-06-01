@@ -5,6 +5,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <cstdlib>
 #include "simulation/Simulation.h"
 #include "core/Config.h"
 
@@ -66,6 +67,14 @@ int main()
 	if (conf.gui)
 	{
 		std::print("Started gui\n");
+
+
+		int result = system("start python visualizer.py");
+
+		if (result != 0) {
+			// handle error
+		}
+
 
 		// ---- TCP server setup (unchanged from original) ----
 		SOCKET server_fd = socket(AF_INET, SOCK_STREAM, 0);

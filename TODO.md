@@ -10,14 +10,14 @@
 ## fizyka
 [ ] priorytety tras
 [ ] rozbić perception na kategorie
-[ ] wzory ruchu - doczytać jakie są istniejące modele - zapoznanie się z refactorem
+[x] wzory ruchu - doczytać jakie są istniejące modele - zapoznanie się z refactorem
 [x] bloki stop, światła, przejścia dla pieszych
 [x] podpiąć zachowanie do bloków
 
 ## behawioralizm
 [x] rozdzielenie zachowania na av i człowieka
 [ ] ocena ryzyka, dołączanie do ruchu
-[ ] logika rozmyta takagi-sugeno
+[ ] logika rozmyta
 [ ] dodanie czasu reakcji do człowieka
 [ ] fov, wyłączone linie (bloki)
 

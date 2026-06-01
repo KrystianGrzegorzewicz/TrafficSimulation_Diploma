@@ -56,6 +56,14 @@ Vec2 SteeringModel::computeLateralAcceleration(
 		toTarget -
 		forward * forwardMag;
 
+	float forwardVel =
+		velocity.dot(forward);
+
+	if (forwardVel < 0.0f)
+	{
+		forwardVel = 0.0f;
+	}
+
 	float lateralVel =
 		velocity.dot(right);
 
@@ -65,7 +73,7 @@ Vec2 SteeringModel::computeLateralAcceleration(
 
 	float safeSpeed =
 		std::max(
-			speed * 0.9f,
+			forwardVel,
 			0.1f);
 
 	float maxFromRadius =
