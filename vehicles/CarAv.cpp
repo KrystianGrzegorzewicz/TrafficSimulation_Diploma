@@ -15,9 +15,9 @@ CarAV::CarAV(
 	this->color[2] = 10;
 
 	// AV tuning
-	maxSpeed = 23.0f;
-	maxAccel = 5.0f;
-	maxDecel = 7.0f;
+	maxSpeed = 18.0f;
+	maxAccel = 3.7f;
+	maxDecel = 5.5f;
 
 	/*kp = 8.0f;
 	kd = 2.0f;*/

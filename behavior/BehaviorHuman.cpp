@@ -55,7 +55,7 @@ MotionCommand BehaviorHuman::compute(
 	{
 		float hazardFactor =
 			std::clamp(
-				perception.hazardDistance / 35.f,
+				perception.hazardDistance / 50.f,
 				0.f,
 				1.f);
 
@@ -72,7 +72,12 @@ MotionCommand BehaviorHuman::compute(
 			maxDecel);
 
 	if (perception.hasBlockHazard &&
-		perception.hazardDistance < 4.0f)
+		perception.hazardDistance < 6.0f)
+	{
+		newCmd.emergencyBrake = true;
+	}
+
+	if (perception.distanceToCarAhead < 6.0f)
 	{
 		newCmd.emergencyBrake = true;
 	}

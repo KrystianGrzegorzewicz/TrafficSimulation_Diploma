@@ -36,12 +36,12 @@ void PerceptionHuman::updateCarAhead(
 {
 	FOVResult fov = calculateFOV(self);
 
-	Vec2 forward = (self.velocity.length() > 0.5f)
-		? self.velocity.normalized()
-		: Vec2(1.f, 0.f);
+	Vec2 forward = self.forward;
 	Vec2 right(-forward.y, forward.x);
 
 	float bestScore = std::numeric_limits<float>::max();
+	out.distanceToCarAhead = std::numeric_limits<float>::max();
+	out.hasCarAhead = false;
 
 	for (const auto& o : others)
 	{
@@ -65,8 +65,11 @@ void PerceptionHuman::updateCarAhead(
 		// Only approach if the other vehicle is actually closing
 		Vec2  relVel = o.velocity - self.velocity;
 		float closingSpeed = -relVel.dot(dir);
-		if (closingSpeed <= 0.1f)
+		if (closingSpeed <= 0.1f) {
+			if (dist < out.distanceToCarAhead)
+				out.distanceToCarAhead = dist;
 			continue;
+		}
 
 		// TTC score — lower is more urgent
 		float ttc = dist / closingSpeed;
@@ -101,9 +104,7 @@ void PerceptionHuman::updateBlockHazard(
 	const auto& blocks = world.junction->getBlocks();
 	if (blocks.empty()) return;
 
-	Vec2 forward = (self.velocity.length() > 0.5f)
-		? self.velocity.normalized()
-		: Vec2(1.f, 0.f);
+	Vec2 forward = self.forward;
 
 	float bestThreat = 0.f;
 	int   bestIdx = -1;
@@ -135,8 +136,8 @@ void PerceptionHuman::updateBlockHazard(
 		else if (bestIdx < 0 && dist < bestDist)
 		{
 			// Track closest inactive block as fallback
-			bestIdx = i;
-			bestDist = dist;
+			//bestIdx = i;
+			//bestDist = dist;
 		}
 	}
 

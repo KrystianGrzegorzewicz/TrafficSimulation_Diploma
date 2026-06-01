@@ -32,7 +32,7 @@ float IDMLongitudinalModel::computeAcceleration(
 		float dv = perception.relativeSpeed;
 
 		float desiredGap =
-			4.5f +
+			2.5f +
 			s0 +
 			v * T +
 			(v * dv) /
@@ -53,5 +53,4 @@ float IDMLongitudinalModel::computeAcceleration(
 	);
 
 	return accel;
-
 }

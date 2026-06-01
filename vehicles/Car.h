@@ -71,6 +71,7 @@ protected:
 	Vec2  position;
 	Vec2  velocity;
 	Vec2  acceleration;
+	Vec2  forward;
 
 	float speed = 0.0f;
 

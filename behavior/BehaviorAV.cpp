@@ -61,7 +61,11 @@ MotionCommand BehaviorAV::compute(
 			maxDecel);
 
 	if (perception.hasBlockHazard &&
-		perception.hazardDistance < 3.0f)
+		perception.hazardDistance < 6.0f)
+	{
+		cmd.emergencyBrake = true;
+	}
+	if (perception.distanceToCarAhead < 6.0f)
 	{
 		cmd.emergencyBrake = true;
 	}

@@ -11,9 +11,9 @@ struct Config {
 
 	Config() :
 		gui(true),
-		simSpeed(1.0f),
+		simSpeed(2.0f),
 		spawnRate(1.0f),
-		AVRate(0.2f),
+		AVRate(0.5f),
 		junction(3),
 		saveCsv(false)
 	{

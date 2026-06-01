@@ -71,7 +71,7 @@ int* Car::getColor()          const { return const_cast<int*>(color); }
 
 CarState Car::getState() const
 {
-	return { position, velocity, acceleration, travelId, id };
+	return { position, velocity, acceleration, forward, travelId, id };
 }
 
 // ---------------------------------------------------------------------------
@@ -235,10 +235,11 @@ void Car::integrate(
 {
 	const Vec2 oldVelocity = velocity;
 
-	Vec2 forward =
+	/*Vec2 forward =
 		velocity.length() > 0.1f
 		? velocity.normalized()
-		: Vec2(1, 0);
+		: Vec2(1, 0);*/
+	forward = getPathForward();
 
 	Vec2 right(-forward.y, forward.x);
 
@@ -275,15 +276,13 @@ void Car::integrate(
 	// semi-implicit Euler
 	velocity += acceleration * dt;
 
-	Vec2 pathForward = getPathForward();
-
 	float forwardSpeed =
-		velocity.dot(pathForward);
+		velocity.dot(forward);
 
 	if (forwardSpeed < 0.0f)
 	{
 		velocity -=
-			pathForward * forwardSpeed;
+			forward * forwardSpeed;
 	}
 
 	float speed = velocity.length();
@@ -331,6 +330,7 @@ void Car::executeUpdate(
 		return;
 
 	CarState self = getState();
+	self.forward = getPathForward();
 
 	perception.update(
 		self,

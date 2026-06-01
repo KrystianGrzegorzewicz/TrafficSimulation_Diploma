@@ -91,7 +91,7 @@ Junction::Junction(int index)
 
 		// Right → left (straight)
 		tp1 = {
-			Vec2(100.f,-1.75f), Vec2(100.f,-1.75f), Vec2(90.f,-1.75f),
+			Vec2(100.f,-1.75f), Vec2(99.f,-1.75f), Vec2(90.f,-1.75f),
 			Vec2(60.f,-1.75f), Vec2(30.f,-1.75f), Vec2(5.f,-1.75f),
 			Vec2(-5.f,-1.75f), Vec2(-30.f,-1.75f), Vec2(-60.f,-1.75f),
 			Vec2(-90.f,-1.75f), Vec2(-100.f,-1.75f),Vec2(-100.f,-1.75f)
@@ -110,7 +110,7 @@ Junction::Junction(int index)
 		tp3 = {
 			Vec2(-90.f,1.75f),  Vec2(-90.f,1.75f),  Vec2(-60.f,1.75f),
 			Vec2(-30.f,1.75f),  Vec2(-3.5f,1.75f), Vec2(1.75f,1.75f),
-			Vec2(1.75f,-0.5f),Vec2(1.75f,-30.f), Vec2(1.75f,-60.f),
+			Vec2(1.75f,-3.5f),Vec2(1.75f,-30.f), Vec2(1.75f,-60.f),
 			Vec2(1.75f,-90.f),Vec2(1.75f,-90.f)
 		};
 		//circles.append_range(drawTravel(tp3));
@@ -122,13 +122,14 @@ Junction::Junction(int index)
 
 		// ------------------------------------------------------------------
 	case 3: // Single lane with pedestrian crossing block
-		blocks.emplace_back(0.f, -1.75f, 5.f, 1.75f, 10.f, 5.f);
+		blocks.emplace_back(0.f, -1.75f, 5.f, 1.75f, 20.f, 15.f);
 
-		lines.emplace_back(-100.f, -1.75f, 100.f, -1.75f, 0.2f);
-		lines.emplace_back(-100.f, 1.75f, 100.f, 1.75f, 0.2f);
+		lines.emplace_back(-300.f, -1.75f, 100.f, -1.75f, 0.2f);
+		lines.emplace_back(-300.f, 1.75f, 100.f, 1.75f, 0.2f);
 
 		tp1 = {
-			Vec2(-100.f,0.f), Vec2(-100.f,0.f), Vec2(-60.f,0.f),
+			Vec2(-300.f,0.f), Vec2(-299.f,0.f), Vec2(-200.f,0.f),
+			Vec2(-150.f,0.f), Vec2(-100.f,0.f), Vec2(-60.f,0.f),
 			Vec2(-30.f,0.f), Vec2(0.f,0.f), Vec2(30.f,0.f),
 			Vec2(60.f,0.f), Vec2(100.f,0.f), Vec2(100.f, 0.f)
 		};

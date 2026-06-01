@@ -42,6 +42,8 @@ void PerceptionAV::updateCarAhead(
 	Vec2 right(-forward.y, forward.x);
 
 	float bestScore = std::numeric_limits<float>::max();
+	out.distanceToCarAhead = std::numeric_limits<float>::max();
+	out.hasCarAhead = false;
 
 	for (const auto& o : others)
 	{
@@ -65,8 +67,11 @@ void PerceptionAV::updateCarAhead(
 		// Only approach if the other vehicle is actually closing
 		Vec2  relVel = o.velocity - self.velocity;
 		float closingSpeed = -relVel.dot(dir);
-		if (closingSpeed <= 0.1f)
+		if (closingSpeed <= 0.1f) {
+			if (dist < out.distanceToCarAhead)
+				out.distanceToCarAhead = dist;
 			continue;
+		}
 
 		// TTC score — lower is more urgent
 		float ttc = dist / closingSpeed;
@@ -135,8 +140,8 @@ void PerceptionAV::updateBlockHazard(
 		else if (bestIdx < 0 && dist < bestDist)
 		{
 			// Track closest inactive block as fallback
-			bestIdx = i;
-			bestDist = dist;
+			//bestIdx = i;
+			//bestDist = dist;
 		}
 	}
 
