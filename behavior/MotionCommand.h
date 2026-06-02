@@ -6,4 +6,5 @@ struct MotionCommand {
 	float longitudinalAcceleration = 0; // from LongitudinalModel
 	bool emergencyBrake = false;
 	Vec2 targetTangent;
+	float internalDt = 0.01f;
 };

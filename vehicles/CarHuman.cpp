@@ -4,9 +4,11 @@
 CarHuman::CarHuman(
 	float initialSpeed,
 	Travel travel,
+	DriverPersonality personality,
 	std::unique_ptr<IBehavior> beh,
 	std::unique_ptr<IPerception> perc)
 	: Car(initialSpeed, std::move(travel)),
+	personality(personality),
 	behavior(std::move(beh)),
 	perception(std::move(perc))
 {

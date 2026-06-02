@@ -1,8 +1,17 @@
 #include "behavior/BehaviorHuman.h"
+#include "behavior/longitudinal/IDMLongitudinalModel.h"
+
 #include <algorithm>
 
-BehaviorHuman::BehaviorHuman(std::unique_ptr<ILongitudinalModel> model)
-	: longitudinalModel(std::move(model)) {
+BehaviorHuman::BehaviorHuman(
+	std::unique_ptr<ILongitudinalModel> model,
+	const DriverPersonality& personality)
+	: longitudinalModel(std::move(model))
+	, personality(personality)
+{
+	reactionTime =
+		0.8f *
+		personality.reactionFactor;
 }
 
 MotionCommand BehaviorHuman::compute(
@@ -17,10 +26,81 @@ MotionCommand BehaviorHuman::compute(
 	float,
 	const PerceptionState& perception)
 {
-	MotionCommand newCmd;
+	MotionCommand cmd;
+
+	//----------------------------------------------------
+	// Driver-specific IDM tuning
+	//----------------------------------------------------
+
+	if (auto* idm =
+		dynamic_cast<IDMLongitudinalModel*>(
+			longitudinalModel.get()))
+	{
+		idm->setDriverFactors(
+			personality.gapFactor,
+			personality.accelFactor);
+	}
+
+	//----------------------------------------------------
+	// Update reaction queue timers
+	//----------------------------------------------------
+
+	constexpr float dt = 0.01f;
+
+	for (auto& item : reactionQueue)
+	{
+		item.timeRemaining -= dt;
+	}
+
+	float delayedAccel = 0.0f;
+	bool haveDelayedCommand = false;
+
+	while (!reactionQueue.empty())
+	{
+		if (reactionQueue.front().timeRemaining <= 0.0f)
+		{
+			delayedAccel =
+				reactionQueue.front().accel;
+
+			reactionQueue.pop_front();
+
+			haveDelayedCommand = true;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	//----------------------------------------------------
+	// Current speed
+	//----------------------------------------------------
 
 	float speed =
 		self.velocity.length();
+
+	//----------------------------------------------------
+	// Detect stop -> apply start delay
+	//----------------------------------------------------
+
+	if (speed < 0.2f)
+	{
+		if (!wasStopped)
+		{
+			wasStopped = true;
+
+			startDelayTimer =
+				personality.startDelay;
+		}
+	}
+	else
+	{
+		wasStopped = false;
+	}
+
+	//----------------------------------------------------
+	// Path planning
+	//----------------------------------------------------
 
 	PathPlan plan =
 		planner.compute(
@@ -30,77 +110,107 @@ MotionCommand BehaviorHuman::compute(
 			speed,
 			6.0f);
 
-	newCmd.targetPoint =
+	cmd.targetPoint =
 		plan.targetPoint;
+
+	//----------------------------------------------------
+	// Curve speed anticipation
+	//----------------------------------------------------
 
 	float desiredSpeed =
 		std::min(
 			maxSpeed,
-			plan.maxCurveSpeed);
+			plan.maxCurveSpeed *
+			personality.curveFactor);
 
-	// Human anticipatory braking
 	float overspeed =
-		speed -
-		desiredSpeed;
+		speed - desiredSpeed;
 
-	if (overspeed > 0.f)
+	if (overspeed > 0.0f)
 	{
 		desiredSpeed -=
 			overspeed * 0.55f;
 	}
 
+	//----------------------------------------------------
 	// Hazard anticipation
+	//----------------------------------------------------
+
 	if (perception.hasBlockHazard &&
 		perception.hazardIsActive)
 	{
 		float hazardFactor =
 			std::clamp(
-				perception.hazardDistance / 50.f,
-				0.f,
-				1.f);
+				perception.hazardDistance / 50.0f,
+				0.0f,
+				1.0f);
 
 		desiredSpeed *= hazardFactor;
 	}
 
-	newCmd.longitudinalAcceleration =
-		longitudinalModel
-		->computeAcceleration(
+	//----------------------------------------------------
+	// Compute desired acceleration
+	//----------------------------------------------------
+
+	float desiredAccel =
+		longitudinalModel->computeAcceleration(
 			self,
 			perception,
 			desiredSpeed,
 			maxAccel,
 			maxDecel);
 
+	//----------------------------------------------------
+	// Store command in reaction queue
+	//----------------------------------------------------
+
+	reactionQueue.push_back(
+		{
+			desiredAccel,
+			reactionTime
+		});
+
+	//----------------------------------------------------
+	// Apply delayed command
+	//----------------------------------------------------
+
+	if (haveDelayedCommand)
+	{
+		cmd.longitudinalAcceleration =
+			delayedAccel;
+	}
+	else
+	{
+		cmd.longitudinalAcceleration =
+			0.0f;
+	}
+
+	//----------------------------------------------------
+	// Human restart delay
+	//----------------------------------------------------
+
+	if (startDelayTimer > 0.0f)
+	{
+		startDelayTimer -= dt;
+
+		cmd.longitudinalAcceleration =
+			0.0f;
+	}
+
+	//----------------------------------------------------
+	// Emergency braking
+	//----------------------------------------------------
+
 	if (perception.hasBlockHazard &&
 		perception.hazardDistance < 6.0f)
 	{
-		newCmd.emergencyBrake = true;
+		cmd.emergencyBrake = true;
 	}
 
 	if (perception.distanceToCarAhead < 6.0f)
 	{
-		newCmd.emergencyBrake = true;
+		cmd.emergencyBrake = true;
 	}
 
-	// Natural human delay
-	reactionBuffer.push_back(newCmd);
-
-	const int stepsDelay = 12;
-
-	if ((int)reactionBuffer.size()
-		<= stepsDelay)
-	{
-		MotionCommand idle;
-		idle.targetPoint =
-			plan.targetPoint;
-
-		return idle;
-	}
-
-	MotionCommand delayed =
-		reactionBuffer.front();
-
-	reactionBuffer.pop_front();
-
-	return delayed;
+	return cmd;
 }

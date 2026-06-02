@@ -39,4 +39,5 @@ private:
 
 	bool       saveCsv = false;
 	std::ofstream logFile;
+	std::ofstream personalityFile;
 };

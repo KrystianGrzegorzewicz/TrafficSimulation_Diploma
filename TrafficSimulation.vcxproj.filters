@@ -72,11 +72,15 @@
     <ClCompile Include="planning\PathPlanner.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="vehicles\DriverPersonalityGenerator.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="visualizer.py" />
     <None Include="TODO.md" />
     <None Include="data\data_charts.py" />
+    <None Include="data\personality_charts.py" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="behavior\BehaviorAV.h">
@@ -161,6 +165,12 @@
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="planning\PathPlanner.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="vehicles\DriverPersonality.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="vehicles\DriverPersonalityGenerator.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,6 +5,7 @@
 #include "core/Vec2.h"
 #include "perception/IPerception.h"
 #include "behavior/IBehavior.h"
+#include "vehicles/DriverPersonality.h"
 
 // Base vehicle.  Owns:
 //   - physical state (position, velocity, acceleration)
@@ -39,6 +40,10 @@ public:
 	bool hasFilteredTarget = false;
 
 	CarState getState()	const;  // convenience for WorldState assembly
+	virtual const DriverPersonality* getPersonality() const
+	{
+		return nullptr;
+	}
 
 protected:
 	// Shared path helpers

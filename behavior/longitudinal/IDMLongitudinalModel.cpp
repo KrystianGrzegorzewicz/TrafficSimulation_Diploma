@@ -11,8 +11,8 @@ float IDMLongitudinalModel::computeAcceleration(
 )
 {
 	constexpr float delta = 4.0f;
-	constexpr float s0 = 3.0f;
-	constexpr float T = 1.2f;
+	float s0 = 3.0f * gapFactor;
+	float T = 1.2f * gapFactor;
 
 	float v = self.velocity.length();
 
@@ -43,7 +43,8 @@ float IDMLongitudinalModel::computeAcceleration(
 	}
 
 	float accel =
-		maxAccel *
+		(maxAccel * accelFactor)
+		*
 		(1.0f - freeRoad - interaction);
 
 	accel = std::clamp(
@@ -53,4 +54,15 @@ float IDMLongitudinalModel::computeAcceleration(
 	);
 
 	return accel;
+}
+
+void IDMLongitudinalModel::setDriverFactors(
+	float gapFactor,
+	float accelFactor)
+{
+	this->gapFactor =
+		gapFactor;
+
+	this->accelFactor =
+		accelFactor;
 }

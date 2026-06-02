@@ -1,5 +1,6 @@
 #include "simulation/Simulation.h"
 #include "vehicles/VehicleFactory.h"
+#include "vehicles/DriverPersonality.h"
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
@@ -40,15 +41,34 @@ Simulation::Simulation(float spawnRate, int junctionIndex, bool saveCsv, const f
 	// WorldState holds a non-owning pointer to our junction
 	worldState.junction = &junction;
 
-	// Spawn first vehicle immediately
-	spawnVehicle();
-
 	if (saveCsv)
 	{
-		std::string filename = "data/cars_" + getTimestamp() + ".csv";
+		std::string timestamp =
+			getTimestamp();
+
+		std::string filename = "data/cars_" + timestamp + ".csv";
 		logFile.open(filename);
+		std::string personalityFilename =
+			"data/personality_" +
+			timestamp +
+			".csv";
+
+		personalityFile.open(
+			personalityFilename);
+
+		personalityFile
+			<< "id,"
+			<< "aggression,"
+			<< "accel_factor,"
+			<< "gap_factor,"
+			<< "reaction_factor,"
+			<< "start_delay,"
+			<< "curve_factor\n";
+
 		logFile << "time,id,travel_id,x,y,vx,vy,ax,ay\n";
 	}
+	// Spawn first vehicle immediately
+	spawnVehicle();
 }
 
 // ---------------------------------------------------------------------------
@@ -59,6 +79,9 @@ Simulation::~Simulation()
 {
 	if (logFile.is_open())
 		logFile.close();
+
+	if (personalityFile.is_open())
+		personalityFile.close();
 }
 
 // ---------------------------------------------------------------------------
@@ -102,12 +125,45 @@ void Simulation::step(float dt)
 
 void Simulation::spawnVehicle()
 {
+	std::unique_ptr<Car> vehicle;
+
+	if (AVrate > 0.f &&
+		(rand() / (float)RAND_MAX) < AVrate)
+	{
+		vehicle =
+			VehicleFactory::createAV(
+				14.f,
+				junction.getRandomTravel());
+	}
+	else
+	{
+		vehicle =
+			VehicleFactory::createHuman(
+				14.f,
+				junction.getRandomTravel());
+	}
+
+	if (saveCsv)
+	{
+		const DriverPersonality* personality =
+			vehicle->getPersonality();
+
+		if (personality != nullptr)
+		{
+			personalityFile
+				<< vehicle->getId() << ","
+				<< personality->aggression << ","
+				<< personality->accelFactor << ","
+				<< personality->gapFactor << ","
+				<< personality->reactionFactor << ","
+				<< personality->startDelay << ","
+				<< personality->curveFactor
+				<< "\n";
+		}
+	}
+
 	vehicles.push_back(
-		//randomly choose between human and AV based on AVrate
-		(AVrate > 0.f && (rand() / (float)RAND_MAX) < AVrate)
-		? VehicleFactory::createAV(14.f, junction.getRandomTravel())
-		: VehicleFactory::createHuman(14.f, junction.getRandomTravel())
-	);
+		std::move(vehicle));
 }
 
 void Simulation::rebuildVehicleStates()

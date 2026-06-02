@@ -350,6 +350,8 @@ void Car::executeUpdate(
 			lookaheadSpeedFactor,
 			perceptionState);
 
+	cmd.internalDt = dt;
+
 	Vec2 lateralAcc =
 		steering.computeLateralAcceleration(
 			travel,

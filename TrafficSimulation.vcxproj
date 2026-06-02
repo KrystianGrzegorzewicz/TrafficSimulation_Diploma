@@ -146,10 +146,12 @@
     <ClCompile Include="vehicles\Car.cpp" />
     <ClCompile Include="vehicles\CarAv.cpp" />
     <ClCompile Include="vehicles\CarHuman.cpp" />
+    <ClCompile Include="vehicles\DriverPersonalityGenerator.cpp" />
     <ClCompile Include="vehicles\VehicleFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="data\data_charts.py" />
+    <None Include="data\personality_charts.py" />
     <None Include="TODO.md" />
     <None Include="visualizer.py" />
   </ItemGroup>
@@ -181,6 +183,8 @@
     <ClInclude Include="vehicles\CarAv.h" />
     <ClInclude Include="vehicles\CarHuman.h" />
     <ClInclude Include="vehicles\CarState.h" />
+    <ClInclude Include="vehicles\DriverPersonality.h" />
+    <ClInclude Include="vehicles\DriverPersonalityGenerator.h" />
     <ClInclude Include="vehicles\VehicleFactory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -7,6 +7,7 @@
 #include <thread>
 #include <cstdlib>
 #include "simulation/Simulation.h"
+#include "vehicles/DriverPersonalityGenerator.h"
 #include "core/Config.h"
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -39,6 +40,12 @@ static Config parseConfig()
 		std::print("Set autonomous vehicle rate (0.0 - 1.0): ");
 		std::cin >> conf.AVRate;
 
+		std::print("Aggression bias (0.0 - 1.0): ");
+		std::cin >> conf.aggressionBias;
+
+		std::print("Aggression sharpness (0.0 - 1.0): ");
+		std::cin >> conf.aggressionSharpness;
+
 		std::print("Set junction sample (1, 2, 3, 4): ");
 		std::cin >> conf.junction;
 	}
@@ -57,6 +64,11 @@ int main()
 
 	const Config conf = parseConfig();
 
+	DriverPersonalityGenerator::configure(
+		conf.aggressionBias,
+		conf.aggressionSharpness
+	);
+
 	// All time logic now lives inside Simulation::step()
 	Simulation sim(conf.spawnRate, conf.junction, conf.saveCsv, conf.AVRate);
 
@@ -68,13 +80,11 @@ int main()
 	{
 		std::print("Started gui\n");
 
-
 		int result = system("start python visualizer.py");
 
 		if (result != 0) {
 			// handle error
 		}
-
 
 		// ---- TCP server setup (unchanged from original) ----
 		SOCKET server_fd = socket(AF_INET, SOCK_STREAM, 0);

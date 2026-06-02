@@ -3,13 +3,16 @@
 #include "behavior/IBehavior.h"
 #include "behavior/longitudinal/ILongitudinalModel.h"
 #include "planning/PathPlanner.h"
+#include "vehicles/DriverPersonality.h"
 #include <memory>
 #include <deque>
 
 class BehaviorHuman : public IBehavior
 {
 public:
-	explicit BehaviorHuman(std::unique_ptr<ILongitudinalModel> longitudinalModel);
+	explicit BehaviorHuman(
+		std::unique_ptr<ILongitudinalModel> longitudinalModel,
+		const DriverPersonality& personality);
 
 	MotionCommand compute(
 		Travel& travel,
@@ -22,13 +25,23 @@ public:
 		float lookaheadBase,
 		float lookaheadSpeedFactor,
 		const PerceptionState& perception) override;
+	DriverPersonality personality;
 
 private:
 	std::unique_ptr<ILongitudinalModel> longitudinalModel;
 	PathPlanner planner;
 
-	std::deque<MotionCommand> reactionBuffer;
+	struct DelayedAccel
+	{
+		float accel;
+		float timeRemaining;
+	};
 
-	float reactionTime = 0.8f;      // sekundy (tuning)
+	std::deque<DelayedAccel> reactionQueue;
+
+	float reactionTime = 0.4f;      // sekundy (tuning)
 	float accumulatedTime = 0.0f;
+
+	bool wasStopped = false;
+	float startDelayTimer = 0.0f;
 };
