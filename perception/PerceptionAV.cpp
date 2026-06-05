@@ -106,9 +106,7 @@ void PerceptionAV::updateBlockHazard(
 	const auto& blocks = world.junction->getBlocks();
 	if (blocks.empty()) return;
 
-	Vec2 forward = (self.velocity.length() > 0.5f)
-		? self.velocity.normalized()
-		: Vec2(1.f, 0.f);
+	Vec2 forward = self.forward;
 
 	float bestThreat = 0.f;
 	int   bestIdx = -1;

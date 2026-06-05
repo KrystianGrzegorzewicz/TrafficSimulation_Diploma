@@ -88,11 +88,11 @@ Vec2 SteeringModel::computeLateralAcceleration(
 		(safeSpeed * safeSpeed)
 		/ minTurnRadius;
 
-	std::cout << "safeSpeed="
+	/*std::cout << "safeSpeed="
 		<< safeSpeed
 		<< " maxFromRadius="
 		<< maxFromRadius
-		<< std::endl;
+		<< std::endl;*/
 
 	float maxLatAcc =
 		std::min(

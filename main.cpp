@@ -72,7 +72,7 @@ int main()
 	// All time logic now lives inside Simulation::step()
 	Simulation sim(conf.spawnRate, conf.junction, conf.saveCsv, conf.AVRate);
 
-	const float fixedDt = 0.1f;
+	const float fixedDt = 0.01f;
 	const float maxRealDt = 0.05f;
 	const float sendInterval = 1.f / 60.f;
 
