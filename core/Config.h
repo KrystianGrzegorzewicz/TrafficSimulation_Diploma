@@ -13,10 +13,10 @@ struct Config {
 
 	Config() :
 		gui(true),
-		simSpeed(10.0f),
-		spawnRate(1.0f),
-		AVRate(0.5f),
-		junction(3),
+		simSpeed(1.0f),
+		spawnRate(0.001f),
+		AVRate(1.0f),
+		junction(1),
 		saveCsv(true),
 		aggressionBias(0.5f),
 		aggressionSharpness(0.5f)

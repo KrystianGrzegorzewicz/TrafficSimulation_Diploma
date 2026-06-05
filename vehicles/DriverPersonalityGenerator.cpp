@@ -46,7 +46,7 @@ DriverPersonality DriverPersonalityGenerator::generate()
 		p.aggression;
 
 	p.accelFactor =
-		0.7f + a * 0.6f;
+		0.9f + a * 0.2f;
 
 	p.gapFactor =
 		1.4f - a * 0.8f;
@@ -55,10 +55,10 @@ DriverPersonality DriverPersonalityGenerator::generate()
 		1.5f - a;
 
 	p.startDelay =
-		1.8f - a * 1.4f;
+		1.0f - a * 0.6f;
 
 	p.curveFactor =
-		0.6f + a * 0.4f;
+		0.9f + a * 0.1f;
 
 	return p;
 }

@@ -85,7 +85,7 @@ protected:
 	float maxDecel = 6.0f;
 	float maxSpeed = 20.0f;
 	float lookaheadBase = 0.1f;
-	float lookaheadSpeedFactor = 0.04f;
+	float lookaheadSpeedFactor = 0.05f;
 	float kp = 6.0f;
 	float kd = 4.0f;
 

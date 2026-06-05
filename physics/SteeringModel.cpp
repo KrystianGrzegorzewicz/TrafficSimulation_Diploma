@@ -1,5 +1,6 @@
 #include "physics/SteeringModel.h"
 #include <algorithm>
+#include <iostream>
 
 Vec2 SteeringModel::computeLateralAcceleration(
 	const Travel& travel,
@@ -38,7 +39,14 @@ Vec2 SteeringModel::computeLateralAcceleration(
 			p1,
 			p2,
 			tLook);
+	Vec2 curvePoint =
+		travel.bezier(
+			p0, p1, p2, tLook);
 
+	/*std::cout
+		<< "distToCurve="
+		<< (position - curvePoint).length()
+		<< std::endl;*/
 	Vec2 forward =
 		tangent.normalized();
 
@@ -79,6 +87,12 @@ Vec2 SteeringModel::computeLateralAcceleration(
 	float maxFromRadius =
 		(safeSpeed * safeSpeed)
 		/ minTurnRadius;
+
+	std::cout << "safeSpeed="
+		<< safeSpeed
+		<< " maxFromRadius="
+		<< maxFromRadius
+		<< std::endl;
 
 	float maxLatAcc =
 		std::min(

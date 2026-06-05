@@ -62,14 +62,15 @@ Junction::Junction(int index)
 		};
 		// Right → left
 		tp3 = {
-			Vec2(90.f,-1.75f), Vec2(90.f,-1.75f), Vec2(60.f,-1.75f),
+			Vec2(90.f,-1.75f), Vec2(85.f,-1.75f), Vec2(60.f,-1.75f),
 			Vec2(30.f,-1.75f), Vec2(15.f,-1.75f), Vec2(5.f,-1.75f),
 			Vec2(-5.f,-1.75f), Vec2(-30.f,-1.75f),Vec2(-60.f,-1.75f),
 			Vec2(-90.f,-1.75f), Vec2(-90.f,-1.75f)
 		};
-		travels.emplace_back(tp1, 2, 1);
-		travels.emplace_back(tp2, 2, 2);
-		travels.emplace_back(tp3, 1, 3);
+		travels.emplace_back(tp1, 0, 1);
+		travels.emplace_back(tp2, 1, 2);
+		travels.emplace_back(tp3, 0, 3);
+		circles.append_range(drawTravel(tp2));
 		break;
 
 		// ------------------------------------------------------------------
@@ -113,11 +114,10 @@ Junction::Junction(int index)
 			Vec2(1.75f,-3.5f),Vec2(1.75f,-30.f), Vec2(1.75f,-60.f),
 			Vec2(1.75f,-90.f),Vec2(1.75f,-90.f)
 		};
-		//circles.append_range(drawTravel(tp3));
+		circles.append_range(drawTravel(tp3));
 		travels.emplace_back(tp1, 5, 1);
 		travels.emplace_back(tp2, 5, 2);
 		travels.emplace_back(tp3, 1, 3);
-		//circles.append_range(drawTravel(tp3));
 		break;
 
 		// ------------------------------------------------------------------
@@ -188,7 +188,7 @@ Junction::Junction(int index)
 		};
 		// Travel 3: right → up (short arc)
 		tp3 = {
-			Vec2(150.f,-1.75f), Vec2(150.f,-1.75f), Vec2(120.f,-1.75f),
+			Vec2(150.f,-1.75f), Vec2(145.f,-1.75f), Vec2(120.f,-1.75f),
 			Vec2(100.f,-1.75f), Vec2(90.f,-1.75f), Vec2(60.f,-1.75f),
 			Vec2(35.f,-1.75f), Vec2(20.f, -2.5f), Vec2(16.2f,  -6.f),
 			Vec2(1.75f,-10.f), Vec2(1.75f, -35.f), Vec2(1.75f, -60.f),
@@ -197,7 +197,7 @@ Junction::Junction(int index)
 		};
 		// Travel 4: right → left (through roundabout)
 		tp4 = {
-			Vec2(150.f,-1.75f), Vec2(150.f,-1.75f), Vec2(120.f,-1.75f),
+			Vec2(150.f,-1.75f), Vec2(145.f,-1.75f), Vec2(120.f,-1.75f),
 			Vec2(100.f,-1.75f), Vec2(90.f,-1.75f), Vec2(60.f,-1.75f),
 			Vec2(35.f,-1.75f), Vec2(19.f,  -2.f), Vec2(16.2f,  -4.f),
 			Vec2(10.5f,-7.f),  Vec2(6.7f,-11.f),  Vec2(0.f,-16.f),

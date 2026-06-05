@@ -2,6 +2,7 @@
 #include "perception/IPerception.h"
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 int Car::nextId = 0;
 Car::~Car() = default;
@@ -377,6 +378,15 @@ void Car::executeUpdate(
 		totalAcc =
 			forward * (-maxDecel);
 	}
+	/*std::cout
+		<< "seg=" << segment
+		<< " t=" << t
+		<< " pos=(" << position.x << "," << position.y << ")"
+		<< " target=(" << cmd.targetPoint.x << "," << cmd.targetPoint.y << ")"
+		<< std::endl;
+	std::cout
+		<< "speed=" << speed
+		<< std::endl;*/
 
 	integrate(totalAcc, dt);
 }

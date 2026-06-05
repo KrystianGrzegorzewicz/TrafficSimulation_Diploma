@@ -10,7 +10,7 @@ BehaviorHuman::BehaviorHuman(
 	, personality(personality)
 {
 	reactionTime =
-		0.8f *
+		0.1f + 0.2f *
 		personality.reactionFactor;
 }
 
@@ -202,12 +202,12 @@ MotionCommand BehaviorHuman::compute(
 	//----------------------------------------------------
 
 	if (perception.hasBlockHazard &&
-		perception.hazardDistance < 6.0f)
+		perception.hazardDistance < 10.0f * personality.gapFactor)
 	{
 		cmd.emergencyBrake = true;
 	}
 
-	if (perception.distanceToCarAhead < 6.0f)
+	if (perception.distanceToCarAhead < 10.0f * personality.gapFactor)
 	{
 		cmd.emergencyBrake = true;
 	}
