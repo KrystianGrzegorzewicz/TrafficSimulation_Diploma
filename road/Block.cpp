@@ -4,10 +4,10 @@
 #include <iostream>
 
 Block::Block(float x0, float y0, float xn, float yn,
-	float onDur, float offDur)
+	float onDur, float offDur, float initTime)
 	: x0y0(x0, y0), xnyn(xn, yn)
 	, onDuration(onDur), offDuration(offDur)
-	, elapsedTime(0.f), isCurrentlyOn(true)
+	, elapsedTime(initTime), isCurrentlyOn(true)
 {
 	color[0] = 255;
 	color[1] = 0;

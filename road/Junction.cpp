@@ -9,7 +9,7 @@
 
 Junction::Junction()
 {
-	blocks.emplace_back(0.0f, -1.75f, 5.0f, 1.75f, 10.0f, 5.0f);
+	blocks.emplace_back(0.0f, -1.75f, 5.0f, 1.75f, 10.0f, 5.0f, 0.0f);
 
 	lines.emplace_back(-100.0f, -1.75f, 100.0f, -1.75f, 0.2f);
 	lines.emplace_back(-100.0f, 1.75f, 100.0f, 1.75f, 0.2f);
@@ -28,7 +28,8 @@ Junction::Junction()
 
 Junction::Junction(int index)
 {
-	std::vector<Vec2> tp1, tp2, tp3, tp4, tp5, tp6;
+	std::vector<Vec2> tp1, tp2, tp3, tp4, tp5, tp6, tp7, tp8, tp9, tp10, tp11, tp12, tp13, tp14;
+	float lightCycle, bufforTime;
 
 	switch (index)
 	{
@@ -122,7 +123,7 @@ Junction::Junction(int index)
 
 		// ------------------------------------------------------------------
 	case 3: // Single lane with pedestrian crossing block
-		blocks.emplace_back(0.f, -1.75f, 5.f, 1.75f, 20.f, 15.f);
+		blocks.emplace_back(0.f, -1.75f, 5.f, 1.75f, 20.f, 15.f, 0.0f);
 
 		lines.emplace_back(-300.f, -1.75f, 100.f, -1.75f, 0.2f);
 		lines.emplace_back(-300.f, 1.75f, 100.f, 1.75f, 0.2f);
@@ -237,6 +238,231 @@ Junction::Junction(int index)
 		break;
 
 		// ------------------------------------------------------------------
+	case 5: // with traffic lights
+		lightCycle = 50.f; // seconds
+		bufforTime = 5.f; // seconds of all-red buffer between light changes
+		//lights
+		blocks.emplace_back(0.0f, 19.0f, 3.5f, 20.0f,
+			0.8f * lightCycle + 4 * bufforTime,
+			0.2f * lightCycle,
+			0.0f * lightCycle + bufforTime); //down left 4
+		blocks.emplace_back(3.5f, 19.0f, 10.5f, 20.0f,
+			0.6f * lightCycle + 4 * bufforTime,
+			0.4f * lightCycle,
+			0.6f * lightCycle + 4 * bufforTime); //down right+up 1
+
+		blocks.emplace_back(-3.5f, -20.0f, 0.0f, -19.0f,
+			0.8f * lightCycle + 4 * bufforTime,
+			0.2f * lightCycle,
+			0.0f * lightCycle + bufforTime); //up right 4
+		blocks.emplace_back(-10.5f, -20.0f, -3.5f, -19.0f,
+			0.6f * lightCycle + 4 * bufforTime,
+			0.4f * lightCycle,
+			0.6f * lightCycle + 4 * bufforTime); //up left+down 1
+
+		blocks.emplace_back(19.0f, -3.5f, 20.0f, 0.0f,
+			0.8f * lightCycle + 4 * bufforTime,
+			0.2f * lightCycle,
+			0.4f * lightCycle + 3 * bufforTime); //right 2
+		blocks.emplace_back(-20.0f, 0.0f, -19.0f, 3.5f,
+			0.8f * lightCycle + 4 * bufforTime,
+			0.2f * lightCycle,
+			0.2f * lightCycle + 2 * bufforTime); //left 3
+
+		lines.emplace_back(0.f, 10.f, 0.f, 250.f, 0.5f);
+		lines.emplace_back(-3.5f, 10.f, -3.5f, 250.f, 0.5f);
+		lines.emplace_back(0.f, 10.f, -3.5f, 10.f, 0.5f);
+		lines.emplace_back(-7.0f, 10.f, -7.0f, 250.f, 0.2f);
+		lines.emplace_back(-10.5f, 20.f, -10.5f, 250.f, 0.5f);
+
+		lines.emplace_back(0.f, -10.f, 0.f, -250.f, 0.5f);
+		lines.emplace_back(3.5f, -10.f, 3.5f, -250.f, 0.5f);
+		lines.emplace_back(0.f, -10.f, 3.5f, -10.f, 0.5f);
+		lines.emplace_back(7.0f, -10.f, 7.0f, -250.f, 0.2f);
+		lines.emplace_back(10.5f, -20.f, 10.5f, -250.f, 0.5f);
+
+		lines.emplace_back(20.f, -3.5f, 200.f, -3.5f, 0.5f);
+		lines.emplace_back(20.f, 0.0f, 200.f, 0.0f, 0.5f);
+		lines.emplace_back(20.f, 3.5f, 200.f, 3.5f, 0.5f);
+
+		lines.emplace_back(-20.f, -3.5f, -200.f, -3.5f, 0.5f);
+		lines.emplace_back(-20.f, 0.0f, -200.f, 0.0f, 0.5f);
+		lines.emplace_back(-20.f, 3.5f, -200.f, 3.5f, 0.5f);
+
+		lines.emplace_back(3.5f, 10.f, 3.5f, 100.f, 0.2f);
+		lines.emplace_back(7.0f, 10.f, 7.0f, 100.f, 0.2f);
+		lines.emplace_back(10.5f, 20.f, 10.5f, 100.f, 0.5f);
+		lines.emplace_back(3.5f, 100.f, 0.0f, 130.f, 0.2f);
+		lines.emplace_back(7.0f, 100.f, 3.5f, 130.f, 0.2f);
+		lines.emplace_back(10.5f, 100.f, 7.0f, 130.f, 0.5f);
+		lines.emplace_back(3.5f, 130.f, 3.5f, 250.f, 0.2f);
+		lines.emplace_back(7.0f, 130.f, 7.0f, 250.f, 0.5f);
+
+		lines.emplace_back(-3.5f, -10.f, -3.5f, -100.f, 0.2f);
+		lines.emplace_back(-7.0f, -10.f, -7.0f, -100.f, 0.2f);
+		lines.emplace_back(-10.5f, -20.f, -10.5f, -100.f, 0.5f);
+		lines.emplace_back(-3.5f, -100.f, 0.0f, -130.f, 0.2f);
+		lines.emplace_back(-7.0f, -100.f, -3.5f, -130.f, 0.2f);
+		lines.emplace_back(-10.5f, -100.f, -7.0f, -130.f, 0.5f);
+		lines.emplace_back(-3.5f, -130.f, -3.5f, -250.f, 0.2f);
+		lines.emplace_back(-7.0f, -130.f, -7.0f, -250.f, 0.5f);
+
+		lines.emplace_back(10.5f, 20.f, 20.0f, 3.5f, 0.5f);
+		lines.emplace_back(-10.5f, -20.f, -20.0f, -3.5f, 0.5f);
+		lines.emplace_back(20.0f, -3.5f, 10.5f, -20.0f, 0.5f);
+		lines.emplace_back(-20.0f, 3.5f, -10.5f, 20.0f, 0.5f);
+
+		//down right
+		tp1 = {
+			Vec2(5.25f,250.f), Vec2(5.25f,240.f), Vec2(5.25f,200.f),
+			Vec2(5.25f,150.f), Vec2(5.25f,130.f), Vec2(5.25f,122.5f),
+			Vec2(7.5f,115.f), Vec2(9.25f,107.5f), Vec2(9.25f,100.f),
+			Vec2(9.25f,80.f), Vec2(9.25f,50.f), Vec2(9.25f,30.f),
+			Vec2(9.25f,20.f), Vec2(9.25f,1.75f), Vec2(20.0f,1.75f),
+			Vec2(30.0f,1.75f), Vec2(50.0f,1.75f), Vec2(80.0f,1.75f),
+			Vec2(100.0f,1.75f), Vec2(150.0f,1.75f), Vec2(200.0f,1.75f)
+		};
+		//down up 2
+		tp2 = {
+			Vec2(5.25f,250.f), Vec2(5.25f,240.f), Vec2(5.25f,200.f),
+			Vec2(5.25f,150.f), Vec2(5.25f,130.f), Vec2(5.25f,122.5f),
+			Vec2(7.5f,115.f), Vec2(9.25f,107.5f), Vec2(9.25f,100.f),
+			Vec2(9.25f,80.f), Vec2(9.25f,50.f), Vec2(9.25f,30.f),
+			Vec2(9.25f,20.f), Vec2(9.25f,0.f), Vec2(9.25f,-20.f),
+			Vec2(9.25f,-50.f), Vec2(9.25f,-100.f), Vec2(9.25f,-150.f),
+			Vec2(9.25f,-200.f), Vec2(9.25f,-240.f), Vec2(9.25f,-250.f)
+		};
+		//down up 1
+		tp3 = {
+			Vec2(1.75f,250.f), Vec2(1.75f,240.f), Vec2(1.75f,200.f),
+			Vec2(1.75f,150.f), Vec2(1.75f,130.f), Vec2(1.75f,122.5f),
+			Vec2(4.0f,115.f), Vec2(5.75f,107.5f), Vec2(5.75f,100.f),
+			Vec2(5.75f,80.f), Vec2(5.75f,50.f), Vec2(5.75f,30.f),
+			Vec2(5.75f,20.f), Vec2(5.75f,0.f), Vec2(5.75f,-20.f),
+			Vec2(5.75f,-50.f), Vec2(5.75f,-100.f), Vec2(5.75f,-150.f),
+			Vec2(5.75f,-200.f), Vec2(5.75f,-240.f), Vec2(5.75f,-250.f)
+		};
+		//down left
+		tp4 = {
+			Vec2(1.75f,250.f), Vec2(1.75f,240.f), Vec2(1.75f,200.f),
+			Vec2(1.75f,150.f), Vec2(1.75f,130.f), Vec2(1.75f,100.0f),
+			Vec2(1.75f,80.f), Vec2(1.75f,50.f), Vec2(1.75f,20.0f),
+			Vec2(1.75f,-1.75f), Vec2(-6.0f,-1.75f), Vec2(-10.0f,-1.75f),
+			Vec2(-20.0f,-1.75f), Vec2(-50.0f,-1.75f), Vec2(-80.0f,-1.75f),
+			Vec2(-120.0f,-1.75f), Vec2(-150.0f,-1.75f), Vec2(-180.0f,-1.75f),
+			Vec2(-200.0f,-1.75f)
+		};
+		//up left
+		tp5 = {
+			Vec2(-5.25f,-250.f), Vec2(-5.25f,-240.f), Vec2(-5.25f,-200.f),
+			Vec2(-5.25f,-150.f), Vec2(-5.25f,-130.f), Vec2(-5.25f,-122.5f),
+			Vec2(-7.5f,-115.f), Vec2(-9.25f,-107.5f), Vec2(-9.25f,-100.f),
+			Vec2(-9.25f,-80.f), Vec2(-9.25f,-50.f), Vec2(-9.25f,-30.f),
+			Vec2(-9.25f,-20.f), Vec2(-9.25f,-1.75f), Vec2(-20.0f,-1.75f),
+			Vec2(-30.0f,-1.75f), Vec2(-50.0f,-1.75f), Vec2(-80.0f,-1.75f),
+			Vec2(-100.0f,-1.75f), Vec2(-150.0f,-1.75f), Vec2(-200.0f,-1.75f)
+		};
+		//up down 2
+		tp6 = {
+			Vec2(-5.25f,-250.f), Vec2(-5.25f,-240.f), Vec2(-5.25f,-200.f),
+			Vec2(-5.25f,-150.f), Vec2(-5.25f,-130.f), Vec2(-5.25f,-122.5f),
+			Vec2(-7.5f,-115.f), Vec2(-9.25f,-107.5f), Vec2(-9.25f,-100.f),
+			Vec2(-9.25f,-80.f), Vec2(-9.25f,-50.f), Vec2(-9.25f,-30.f),
+			Vec2(-9.25f,-20.f), Vec2(-9.25f,-1.75f), Vec2(-20.0f,-1.75f),
+			Vec2(-30.0f,-1.75f), Vec2(-50.0f,-1.75f), Vec2(-80.0f,-1.75f),
+			Vec2(-100.0f,-1.75f), Vec2(-150.0f,-1.75f), Vec2(-200.0f,-1.75f),
+			Vec2(-9.25f,-200.f), Vec2(-9.25f,-240.f), Vec2(-9.25f,-250.f)
+		};
+		//up down 1
+		tp7 = {
+			Vec2(-1.75f,-250.f), Vec2(-1.75f,-240.f), Vec2(-1.75f,-200.f),
+			Vec2(-1.75f,-150.f), Vec2(-1.75f,-130.f), Vec2(-1.75f,-122.5f),
+			Vec2(-4.0f,-115.f), Vec2(-5.75f,-107.5f), Vec2(-5.75f,-100.f),
+			Vec2(-5.75f,-80.f), Vec2(-5.75f,-50.f), Vec2(-5.75f,-30.f),
+			Vec2(-5.75f,-20.f), Vec2(-5.75f,-1.75f), Vec2(-20.0f,-1.75f),
+			Vec2(-30.0f,-1.75f), Vec2(-50.0f,-1.75f), Vec2(-80.0f,-1.75f),
+			Vec2(-100.0f,-1.75f), Vec2(-150.0f,-1.75f), Vec2(-200.0f,-1.75f)
+		};
+		//up right
+		tp8 = {
+			Vec2(-1.75f,-250.f), Vec2(-1.75f,-240.f), Vec2(-1.75f,-200.f),
+			Vec2(-1.75f,-150.f), Vec2(-1.75f,-130.f), Vec2(-1.75f,-100.0f),
+			Vec2(-1.75f,-80.f), Vec2(-1.75f,-50.f), Vec2(-1.75f,-20.0f),
+			Vec2(-1.75f,1.75f), Vec2(6.0f,1.75f), Vec2(10.0f,1.75f),
+			Vec2(20.0f,1.75f), Vec2(50.0f,1.75f), Vec2(80.0f,1.75f),
+			Vec2(120.0f,1.75f), Vec2(150.0f,1.75f), Vec2(180.0f,1.75f),
+			Vec2(200.0f,1.75f)
+		};
+		//left right
+		tp9 = {
+			Vec2(-200.0f,1.75f), Vec2(-180.0f,1.75f), Vec2(-150.0f,1.75f),
+			Vec2(-120.0f,1.75f), Vec2(-80.0f,1.75f), Vec2(-50.0f,1.75f),
+			Vec2(-20.0f,1.75f), Vec2(-1.75f,1.75f), Vec2(1.75f,1.75f),
+			Vec2(20.0f,1.75f), Vec2(50.0f,1.75f), Vec2(80.0f,1.75f),
+			Vec2(120.0f,1.75f), Vec2(150.0f,1.75f), Vec2(180.0f,1.75f),
+			Vec2(200.0f,1.75f)
+		};
+		//left up
+		tp10 = {
+			Vec2(-200.0f,1.75f), Vec2(-180.0f,1.75f), Vec2(-150.0f,1.75f),
+			Vec2(-120.0f,1.75f), Vec2(-80.0f,1.75f), Vec2(-50.0f,1.75f),
+			Vec2(-20.0f,1.75f), Vec2(-10.0f,1.75f), Vec2(-5.0f,1.75f),
+			Vec2(8.75f,1.75f), Vec2(8.75f,-10.0f), Vec2(8.75f,-30.0f),
+			Vec2(8.75f,-80.0f), Vec2(8.75f,-120.0f), Vec2(8.75f,-180.0f),
+			Vec2(8.75f,-230.0f), Vec2(8.75f,-250.0f)
+		};
+		//left down
+		tp11 = {
+			Vec2(-200.0f,1.75f), Vec2(-180.0f,1.75f), Vec2(-150.0f,1.75f),
+			Vec2(-120.0f,1.75f), Vec2(-80.0f,1.75f), Vec2(-50.0f,1.75f),
+			Vec2(-20.0f,1.75f), Vec2(-8.75f,1.75f), Vec2(-8.75f,20.0f),
+			Vec2(-8.75f,50.0f), Vec2(-8.75f,100.0f), Vec2(-8.75f,150.0f),
+			Vec2(-8.75f,200.0f), Vec2(-8.75f,230.0f), Vec2(-8.75f,250.0f)
+		};
+		//right left
+		tp12 = {
+			Vec2(200.0f,-1.75f), Vec2(180.0f,-1.75f), Vec2(150.0f,-1.75f),
+			Vec2(120.0f,-1.75f), Vec2(80.0f,-1.75f), Vec2(50.0f,-1.75f),
+			Vec2(20.0f,-1.75f), Vec2(1.75f,-1.75f), Vec2(-1.75f,-1.75f),
+			Vec2(-20.0f,-1.75f), Vec2(-50.0f,-1.75f), Vec2(-80.0f,-1.75f),
+			Vec2(-120.0f,-1.75f), Vec2(-150.0f,-1.75f), Vec2(-180.0f,-1.75f),
+			Vec2(-200.0f,-1.75f)
+		};
+		//right down
+		tp13 = {
+			Vec2(200.0f,-1.75f), Vec2(180.0f,-1.75f), Vec2(150.0f,-1.75f),
+			Vec2(120.0f,-1.75f), Vec2(80.0f,-1.75f), Vec2(50.0f,-1.75f),
+			Vec2(20.0f,-1.75f), Vec2(10.0f,-1.75f), Vec2(5.0f,-1.75f),
+			Vec2(-8.75f,-1.75f), Vec2(-8.75f,10.0f), Vec2(-8.75f,30.0f),
+			Vec2(-8.75f,80.0f), Vec2(-8.75f,120.0f), Vec2(-8.75f,180.0f),
+			Vec2(-8.75f,230.0f), Vec2(-8.75f,250.0f)
+		};
+		//right up
+		tp14 = {
+			Vec2(200.0f,-1.75f), Vec2(180.0f,-1.75f), Vec2(150.0f,-1.75f),
+			Vec2(120.0f,-1.75f), Vec2(80.0f,-1.75f), Vec2(50.0f,-1.75f),
+			Vec2(20.0f,-1.75f), Vec2(8.75f,-1.75f), Vec2(8.75f,-20.0f),
+			Vec2(8.75f,-50.0f), Vec2(8.75f,-100.0f), Vec2(8.75f,-150.0f),
+			Vec2(8.75f,-200.0f), Vec2(8.75f,-230.0f), Vec2(8.75f,-250.0f)
+		};
+
+		travels.emplace_back(tp1, 1, 1);
+		travels.emplace_back(tp2, 1, 1);
+		travels.emplace_back(tp3, 1, 1);
+		travels.emplace_back(tp4, 1, 1);
+		travels.emplace_back(tp5, 1, 1);
+		travels.emplace_back(tp6, 1, 1);
+		travels.emplace_back(tp7, 1, 1);
+		travels.emplace_back(tp8, 1, 1);
+		travels.emplace_back(tp9, 1, 1);
+		travels.emplace_back(tp10, 1, 1);
+		travels.emplace_back(tp11, 1, 1);
+		travels.emplace_back(tp12, 1, 1);
+		travels.emplace_back(tp13, 1, 1);
+		travels.emplace_back(tp14, 1, 1);
+
+		//circles.append_range(drawTravel(tp12));
+		break;
 	default:
 		std::cerr << "Junction: unknown index " << index << "\n";
 		break;
