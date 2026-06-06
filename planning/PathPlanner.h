@@ -4,6 +4,7 @@
 
 struct PathPlan {
 	Vec2 targetPoint;
+	Vec2 targetTangent;
 	float maxCurveSpeed;
 	float lookaheadDistance;
 };

@@ -105,6 +105,7 @@ void PerceptionHuman::updateBlockHazard(
 	if (blocks.empty()) return;
 
 	Vec2 forward = self.forward;
+	Vec2 right(-forward.y, forward.x);
 
 	float bestThreat = 0.f;
 	int   bestIdx = -1;
@@ -112,32 +113,42 @@ void PerceptionHuman::updateBlockHazard(
 
 	for (int i = 0; i < static_cast<int>(blocks.size()); ++i)
 	{
-		Vec2  toBlock = blocks[i].getCenter() - self.position;
-		float dist = toBlock.length();
+		Vec2 toBlock =
+			blocks[i].getCenter() - self.position;
 
-		if (dist > kBlockMaxView) continue;
+		float longitudinal =
+			toBlock.dot(forward);
 
-		// Ignore blocks behind or far to the side
-		if (dist > 0.1f && forward.dot(toBlock / dist) < 0.3f) continue;
+		float lateral =
+			std::fabs(
+				toBlock.dot(right));
+
+		// za pojazdem
+		if (longitudinal < 0.0f)
+			continue;
+
+		// za daleko
+		if (longitudinal > kBlockMaxView)
+			continue;
+
+		// maksymalnie 2 metry od osi jazdy
+		if (lateral > 1.0f)
+			continue;
 
 		if (blocks[i].isActive())
 		{
-			float threat = std::clamp(
-				1.f - (dist / kBlockThreatDist), 0.f, 1.f);
+			float threat =
+				std::clamp(
+					1.f - longitudinal / kBlockThreatDist,
+					0.f,
+					1.f);
 
-			if (threat > bestThreat ||
-				(bestIdx >= 0 && !blocks[bestIdx].isActive()))
+			if (threat > bestThreat)
 			{
 				bestThreat = threat;
 				bestIdx = i;
-				bestDist = dist;
+				bestDist = longitudinal;
 			}
-		}
-		else if (bestIdx < 0 && dist < bestDist)
-		{
-			// Track closest inactive block as fallback
-			//bestIdx = i;
-			//bestDist = dist;
 		}
 	}
 

@@ -21,7 +21,23 @@ PathPlan PathPlanner::compute(
 			pts[segment + 2],
 			t);
 
+	float radius =
+		travel.bezierRadius(
+			pts[segment],
+			pts[segment + 1],
+			pts[segment + 2],
+			t);
+
 	float curveFactor =
+		std::clamp(
+			radius / 25.f,
+			0.2f,
+			1.0f);
+
+	float lookaheadDist =
+		(2.0f + speed * 0.4f)
+		* curveFactor;
+	/*float curveFactor =
 		1.0f /
 		(1.0f + curvature * 35.0f);
 
@@ -33,7 +49,7 @@ PathPlan PathPlanner::compute(
 		std::clamp(
 			curveFactor,
 			0.30f,
-			1.0f);
+			1.0f);*/
 
 	out.lookaheadDistance =
 		lookaheadDist;
@@ -44,7 +60,15 @@ PathPlan PathPlanner::compute(
 			segment,
 			t,
 			lookaheadDist);
+	Vec2 tangent =
+		travel.bezierDerivative(
+			pts[segment],
+			pts[segment + 1],
+			pts[segment + 2],
+			std::min(t + 0.1f, 1.0f));
 
+	out.targetTangent =
+		tangent.normalized();
 	float reactionTime = 3.0f;
 
 	float brakingDistance =

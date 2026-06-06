@@ -72,12 +72,28 @@ Vec2 SteeringModel::computeLateralAcceleration(
 		forwardVel = 0.0f;
 	}
 
+	Vec2 velDir =
+		velocity.length() > 0.1f
+		? velocity.normalized()
+		: forward;
+
+	float headingError =
+		velDir.cross(
+			cmd.targetTangent);
+
 	float lateralVel =
 		velocity.dot(right);
+	float headingGain = 10.0f;
+
+	Vec2 headingCorrection =
+		right *
+		headingError *
+		headingGain;
 
 	Vec2 a_lateral =
 		lateralError * kp
-		- right * lateralVel * kd;
+		- right * lateralVel * kd
+		+ headingCorrection;
 
 	float safeSpeed =
 		std::max(
