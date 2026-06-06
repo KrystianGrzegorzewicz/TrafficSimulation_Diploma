@@ -61,6 +61,7 @@ int main()
 {
 	WSADATA wsa;
 	WSAStartup(MAKEWORD(2, 2), &wsa);
+	srand(static_cast<unsigned>(time(nullptr)));
 
 	const Config conf = parseConfig();
 

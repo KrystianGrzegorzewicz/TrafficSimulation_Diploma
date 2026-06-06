@@ -516,7 +516,6 @@ Travel Junction::getRandomTravel()
 	for (const auto& tr : travels)
 		total += tr.getWeight();
 
-	srand(time(0));
 	int rnd = rand() % total;
 	for (const auto& tr : travels)
 	{
