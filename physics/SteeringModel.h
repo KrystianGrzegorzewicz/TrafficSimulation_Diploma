@@ -5,15 +5,6 @@
 #include "behavior/BehaviorOutput.h"
 #include "behavior/MotionCommand.h"
 
-// Pure lateral controller.
-//
-// Literature:
-// Classical PD trajectory tracking controller.
-//
-// Steering computes ONLY lateral acceleration.
-// No planning.
-// No perception.
-// No road geometry.
 class SteeringModel
 {
 public:

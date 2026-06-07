@@ -1,11 +1,8 @@
 #include "road/Junction.h"
+
 #include <random>
 #include <ctime>
 #include <iostream>
-
-// ---------------------------------------------------------------------------
-// Default constructor — minimal straight-road layout
-// ---------------------------------------------------------------------------
 
 Junction::Junction()
 {
@@ -22,10 +19,6 @@ Junction::Junction()
 	travels.emplace_back(tp, 1, 1);
 }
 
-// ---------------------------------------------------------------------------
-// Indexed constructor — all junction layouts
-// ---------------------------------------------------------------------------
-
 Junction::Junction(int index)
 {
 	std::vector<Vec2> tp1, tp2, tp3, tp4, tp5, tp6, tp7, tp8, tp9, tp10, tp11, tp12, tp13, tp14;
@@ -35,7 +28,6 @@ Junction::Junction(int index)
 	{
 		// ------------------------------------------------------------------
 	case 0:
-		// Default (empty — handled by default ctor logic above)
 		break;
 
 		// ------------------------------------------------------------------
@@ -476,10 +468,6 @@ Junction::Junction(int index)
 	}
 }
 
-// ---------------------------------------------------------------------------
-// Accessors
-// ---------------------------------------------------------------------------
-
 std::vector<Block>& Junction::getBlocks()
 {
 	return blocks;
@@ -500,10 +488,6 @@ std::vector<Circle> Junction::getCircles() const
 	return circles;
 }
 
-// ---------------------------------------------------------------------------
-// Random weighted travel selection
-// ---------------------------------------------------------------------------
-
 Travel Junction::getRandomTravel()
 {
 	if (travels.empty())
@@ -523,11 +507,11 @@ Travel Junction::getRandomTravel()
 		rnd -= tr.getWeight();
 	}
 
-	return travels.back();   // unreachable, but satisfies the compiler
+	return travels.back();
 }
 std::vector<Circle> Junction::drawTravel(std::vector<Vec2> travelPoints) {
 	Travel tempTravel(travelPoints, 1, 0);
-	const float STEP = 0.05f; // gęstość punktów
+	const float STEP = 0.05f;
 	std::vector<Circle> circles;
 	for (const Vec2& point : travelPoints) {
 		circles.push_back(Circle(point.x, point.y, 0.5f, false));

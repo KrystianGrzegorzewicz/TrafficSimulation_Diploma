@@ -1,4 +1,5 @@
 #include "physics/SteeringModel.h"
+
 #include <algorithm>
 #include <iostream>
 
@@ -16,123 +17,46 @@ Vec2 SteeringModel::computeLateralAcceleration(
 	const auto& p = travel.TravelPoints;
 
 	if (segment + 2 >= (int)p.size())
-	{
 		return Vec2(0.f, 0.f);
-	}
 
+	//Path geometry
 	Vec2 p0 = p[segment];
 	Vec2 p1 = p[segment + 1];
 	Vec2 p2 = p[segment + 2];
 
-	float speed = velocity.length();
+	Vec2 pathPoint = travel.bezier(p0, p1, p2, t);
+	Vec2 tangent = travel.bezierDerivative(p0, p1, p2, t).normalized();
+	Vec2 right(-tangent.y, tangent.x);
 
-	float lookahead =
-		lookaheadBase +
-		speed * lookaheadSpeedFactor;
+	//Cross-track error
+	Vec2 toPath = pathPoint - position;
+	float e_lat = toPath.dot(right);
 
-	float tLook =
-		std::min(t + lookahead, 1.0f);
-
-	Vec2 tangent =
-		travel.bezierDerivative(
-			p0,
-			p1,
-			p2,
-			tLook);
-	Vec2 curvePoint =
-		travel.bezier(
-			p0, p1, p2, tLook);
-
-	/*std::cout
-		<< "distToCurve="
-		<< (position - curvePoint).length()
-		<< std::endl;*/
-	Vec2 forward =
-		tangent.normalized();
-
-	Vec2 right(
-		-forward.y,
-		forward.x);
-
-	Vec2 toTarget =
-		cmd.targetPoint - position;
-
-	float forwardMag =
-		toTarget.dot(forward);
-
-	Vec2 lateralError =
-		toTarget -
-		forward * forwardMag;
-
-	float forwardVel =
-		velocity.dot(forward);
-
-	if (forwardVel < 0.0f)
-	{
-		forwardVel = 0.0f;
-	}
-
+	//Heading error
 	Vec2 velDir =
 		velocity.length() > 0.1f
 		? velocity.normalized()
-		: forward;
+		: tangent;
 
-	float headingError =
-		velDir.cross(
-			cmd.targetTangent);
+	float e_heading = velDir.cross(tangent);
 
-	float lateralVel =
-		velocity.dot(right);
-	float headingGain = 10.0f;
+	//Lateral velocity (derivative term)
+	float e_lat_dot = velocity.dot(right);
 
-	Vec2 headingCorrection =
-		right *
-		headingError *
-		headingGain;
+	//True PD control
+	float a_lat = kp * e_lat - kd * e_lat_dot + 1 * e_heading;
 
-	Vec2 a_lateral =
-		lateralError * kp
-		- right * lateralVel * kd
-		+ headingCorrection;
+	//Clamp by physical limits
+	float speed = velocity.length();
+	float maxFromRadius = (speed * speed) / minTurnRadius;
+	float maxLatAcc = std::min(aLatMax, maxFromRadius);
 
-	float safeSpeed =
-		std::max(
-			forwardVel,
-			0.1f);
+	if (std::fabs(a_lat) > maxLatAcc)
+		a_lat = (a_lat > 0 ? 1.f : -1.f) * maxLatAcc;
 
-	float maxFromRadius =
-		(safeSpeed * safeSpeed)
-		/ minTurnRadius;
+	//Low-speed damping
+	float lowSpeedDamping = std::clamp(speed / 5.0f, 0.0f, 1.0f);
+	a_lat *= lowSpeedDamping;
 
-	/*std::cout << "safeSpeed="
-		<< safeSpeed
-		<< " maxFromRadius="
-		<< maxFromRadius
-		<< std::endl;*/
-
-	float maxLatAcc =
-		std::min(
-			aLatMax,
-			maxFromRadius);
-
-	float latLen =
-		a_lateral.length();
-
-	if (latLen > maxLatAcc)
-	{
-		a_lateral =
-			a_lateral / latLen
-			* maxLatAcc;
-	}
-
-	float lowSpeedDamping =
-		std::clamp(
-			speed / 5.0f,
-			0.0f,
-			1.0f);
-
-	a_lateral *=
-		lowSpeedDamping;
-
-	return a_lateral;
+	return right * a_lat;
 }

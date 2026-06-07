@@ -1,6 +1,3 @@
-// ============================================================
-// road/Circle.cpp
-// ============================================================
 #include "road/Circle.h"
 
 Circle::Circle(float cx, float cy, float radius, bool filled)
@@ -11,9 +8,9 @@ Circle::Circle(float cx, float cy, float radius, bool filled)
 	color[2] = 200;
 }
 
-Vec2  Circle::getCenter()   const { return center; }
-float Circle::getRadius()   const { return radius; }
-bool  Circle::isFilled()    const { return filled; }
+Vec2  Circle::getCenter() const { return center; }
+float Circle::getRadius() const { return radius; }
+bool  Circle::isFilled() const { return filled; }
 
 int Circle::getColor(int index) const
 {

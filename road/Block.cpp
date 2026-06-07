@@ -1,4 +1,5 @@
 #include "road/Block.h"
+
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -26,11 +27,15 @@ void Block::update(float dt)
 
 	if (isCurrentlyOn)
 	{
-		color[0] = 200; color[1] = 0;  color[2] = 0;
+		color[0] = 200;
+		color[1] = 0;
+		color[2] = 0;
 	}
 	else
 	{
-		color[0] = 80;  color[1] = 20; color[2] = 20;
+		color[0] = 80;
+		color[1] = 20;
+		color[2] = 20;
 	}
 }
 
@@ -47,9 +52,9 @@ int  Block::getColor(int index)
 	return 0;
 }
 
-Vec2 Block::getTopLeft()     const { return x0y0; }
+Vec2 Block::getTopLeft() const { return x0y0; }
 Vec2 Block::getBottomRight() const { return xnyn; }
-bool Block::isActive()       const { return isCurrentlyOn; }
+bool Block::isActive() const { return isCurrentlyOn; }
 
 float Block::getProgress() const
 {
@@ -60,8 +65,7 @@ float Block::getProgress() const
 
 Vec2 Block::getCenter() const
 {
-	return Vec2((x0y0.x + xnyn.x) * 0.5f,
-		(x0y0.y + xnyn.y) * 0.5f);
+	return Vec2((x0y0.x + xnyn.x) * 0.5f, (x0y0.y + xnyn.y) * 0.5f);
 }
 
 bool Block::containsPoint(const Vec2& point) const
@@ -70,8 +74,7 @@ bool Block::containsPoint(const Vec2& point) const
 	float maxX = std::max(x0y0.x, xnyn.x);
 	float minY = std::min(x0y0.y, xnyn.y);
 	float maxY = std::max(x0y0.y, xnyn.y);
-	return point.x >= minX && point.x <= maxX
-		&& point.y >= minY && point.y <= maxY;
+	return point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY;
 }
 
 float Block::getDistanceToPoint(const Vec2& point) const

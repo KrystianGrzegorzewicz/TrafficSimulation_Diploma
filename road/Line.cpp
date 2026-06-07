@@ -1,6 +1,3 @@
-// ============================================================
-// road/Line.cpp
-// ============================================================
 #include "road/Line.h"
 
 Line::Line(float x1, float y1, float x2, float y2, float thickness)
@@ -11,9 +8,9 @@ Line::Line(float x1, float y1, float x2, float y2, float thickness)
 	color[2] = 200;
 }
 
-Vec2  Line::getStart()              const { return start; }
-Vec2  Line::getEnd()                const { return end; }
-float Line::getThickness()          const { return thickness; }
+Vec2  Line::getStart() const { return start; }
+Vec2  Line::getEnd() const { return end; }
+float Line::getThickness() const { return thickness; }
 
 int Line::getColor(int index) const
 {

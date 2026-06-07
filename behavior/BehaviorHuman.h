@@ -1,9 +1,10 @@
-// behavior/BehaviorHuman.h
 #pragma once
+
 #include "behavior/IBehavior.h"
 #include "behavior/longitudinal/ILongitudinalModel.h"
 #include "planning/PathPlanner.h"
 #include "vehicles/DriverPersonality.h"
+
 #include <memory>
 #include <deque>
 
@@ -41,7 +42,6 @@ private:
 
 	float reactionTime = 0.4f;      // sekundy (tuning)
 	float accumulatedTime = 0.0f;
-
 	bool wasStopped = false;
 	float startDelayTimer = 0.0f;
 };

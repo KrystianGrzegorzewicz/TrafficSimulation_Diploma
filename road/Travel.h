@@ -1,5 +1,7 @@
 #pragma once
+
 #include "core/Vec2.h"
+
 #include <vector>
 
 class Travel {

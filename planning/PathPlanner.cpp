@@ -1,5 +1,5 @@
-// planning/PathPlanner.cpp
 #include "planning/PathPlanner.h"
+
 #include <algorithm>
 
 PathPlan PathPlanner::compute(
@@ -10,9 +10,7 @@ PathPlan PathPlanner::compute(
 	float aLatMax)
 {
 	PathPlan out;
-
-	const auto& pts =
-		travel.TravelPoints;
+	const auto& pts = travel.TravelPoints;
 
 	float curvature =
 		travel.bezierCurvature(
@@ -28,38 +26,18 @@ PathPlan PathPlanner::compute(
 			pts[segment + 2],
 			t);
 
-	float curveFactor =
-		std::clamp(
-			radius / 25.f,
-			0.2f,
-			1.0f);
+	float curveFactor = std::clamp(radius / 25.f, 0.2f, 1.0f);
 
-	float lookaheadDist =
-		(2.0f + speed * 0.4f)
-		* curveFactor;
-	/*float curveFactor =
-		1.0f /
-		(1.0f + curvature * 35.0f);
+	float lookaheadDist = (2.0f + speed * 0.4f) * curveFactor;
 
-	float lookaheadDist =
-		2.5f +
-		speed * 0.45f;
-
-	lookaheadDist *=
-		std::clamp(
-			curveFactor,
-			0.30f,
-			1.0f);*/
-
-	out.lookaheadDistance =
-		lookaheadDist;
-
+	out.lookaheadDistance = lookaheadDist;
 	out.targetPoint =
 		computeTargetArcLength(
 			travel,
 			segment,
 			t,
 			lookaheadDist);
+
 	Vec2 tangent =
 		travel.bezierDerivative(
 			pts[segment],
@@ -67,26 +45,12 @@ PathPlan PathPlanner::compute(
 			pts[segment + 2],
 			std::min(t + 0.1f, 1.0f));
 
-	out.targetTangent =
-		tangent.normalized();
+	out.targetTangent = tangent.normalized();
 	float reactionTime = 3.0f;
+	float brakingDistance = (speed * speed) / (2.f * 5.0f);
 
-	float brakingDistance =
-		(speed * speed)
-		/ (2.f * 5.0f);
-
-	float previewDistance =
-		std::max(
-			25.f,
-			speed * reactionTime +
-			brakingDistance);
-
-	out.maxCurveSpeed =
-		travel.computeSpeedLimitAhead(
-			segment,
-			t,
-			previewDistance,
-			aLatMax);
+	float previewDistance = std::max(25.f, speed * reactionTime + brakingDistance);
+	out.maxCurveSpeed = travel.computeSpeedLimitAhead(segment, t, previewDistance, aLatMax);
 
 	return out;
 }
@@ -97,7 +61,6 @@ Vec2 PathPlanner::computeTargetArcLength(
 	float lookaheadDist)
 {
 	const auto& p = travel.TravelPoints;
-
 	int seg = segment;
 	float localT = t;
 	float remainMeters = lookaheadDist;

@@ -7,14 +7,12 @@
 #include "perception/PerceptionHuman.h"
 #include "perception/PerceptionAV.h"
 #include "vehicles/DriverPersonalityGenerator.h"
+
 #include <memory>
 
-std::unique_ptr<Car> VehicleFactory::createHuman(
-	float speed,
-	Travel travel)
+std::unique_ptr<Car> VehicleFactory::createHuman(float speed, Travel travel)
 {
-	DriverPersonality personality =
-		DriverPersonalityGenerator::generate();
+	DriverPersonality personality = DriverPersonalityGenerator::generate();
 
 	return std::make_unique<CarHuman>(
 		speed,

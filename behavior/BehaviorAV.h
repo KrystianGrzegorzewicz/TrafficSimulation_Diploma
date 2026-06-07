@@ -1,7 +1,9 @@
 #pragma once
+
 #include "behavior/IBehavior.h"
 #include "behavior/longitudinal/ILongitudinalModel.h"
 #include "planning/PathPlanner.h"
+
 #include <memory>
 
 class BehaviorAV : public IBehavior

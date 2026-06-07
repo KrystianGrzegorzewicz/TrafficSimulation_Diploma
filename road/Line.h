@@ -1,4 +1,5 @@
 #pragma once
+
 #include "core/Vec2.h"
 
 class Line {
@@ -16,6 +17,5 @@ public:
 	Vec2 getEnd() const;
 	float getThickness() const;
 	int getColor(int index) const;
-
 	void setColor(int r, int g, int b);
 };

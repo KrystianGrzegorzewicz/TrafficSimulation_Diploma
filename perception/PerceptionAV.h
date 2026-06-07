@@ -1,11 +1,7 @@
 #pragma once
+
 #include "perception/IPerception.h"
 
-// Human-driver perception model.
-// Implements:
-//   - Dynamic FOV (speed- and lateral-acceleration-driven cone narrowing)
-//   - TTC-scored car-ahead detection
-//   - Block hazard detection (replaces old BlockPerception class)
 class PerceptionAV : public IPerception
 {
 public:

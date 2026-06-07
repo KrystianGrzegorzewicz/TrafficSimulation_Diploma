@@ -1,14 +1,11 @@
 #include "perception/PerceptionHuman.h"
 #include "road/Junction.h"
+
 #include <algorithm>
 #include <cmath>
 #include <limits>
 
 #define DEG2RAD (3.14159265359f / 180.0f)
-
-// ---------------------------------------------------------------------------
-// Public entry point
-// ---------------------------------------------------------------------------
 
 void PerceptionHuman::update(
 	const CarState& self,
@@ -16,17 +13,13 @@ void PerceptionHuman::update(
 	PerceptionState& out
 )
 {
-	out = PerceptionState{};   // reset all fields to defaults
+	out = PerceptionState{};
 
 	updateCarAhead(self, world.vehicleStates, out);
 
 	if (world.junction)
 		updateBlockHazard(self, world, out);
 }
-
-// ---------------------------------------------------------------------------
-// Car-ahead detection (TTC-scored, dynamic FOV + lane filter)
-// ---------------------------------------------------------------------------
 
 void PerceptionHuman::updateCarAhead(
 	const CarState& self,
@@ -79,21 +72,14 @@ void PerceptionHuman::updateCarAhead(
 			out.hasCarAhead = true;
 			out.carAhead = o;
 			out.distanceToCarAhead = dist;
-			out.relativeSpeed =
-				self.velocity.length() - o.velocity.length();
-			out.relativeAcceleration =
-				self.acceleration.length() - o.acceleration.length();
+			out.relativeSpeed = self.velocity.length() - o.velocity.length();
+			out.relativeAcceleration = self.acceleration.length() - o.acceleration.length();
 		}
 	}
 
-	// Store FOV params so callers can inspect them if needed
 	out.fovDot = fov.fovDot;
 	out.maxViewDistance = fov.maxViewDistance;
 }
-
-// ---------------------------------------------------------------------------
-// Block hazard detection (replaces old BlockPerception class entirely)
-// ---------------------------------------------------------------------------
 
 void PerceptionHuman::updateBlockHazard(
 	const CarState& self,
@@ -108,40 +94,27 @@ void PerceptionHuman::updateBlockHazard(
 	Vec2 right(-forward.y, forward.x);
 
 	float bestThreat = 0.f;
-	int   bestIdx = -1;
+	int bestIdx = -1;
 	float bestDist = 999999.f;
 
 	for (int i = 0; i < static_cast<int>(blocks.size()); ++i)
 	{
-		Vec2 toBlock =
-			blocks[i].getCenter() - self.position;
+		Vec2 toBlock = blocks[i].getCenter() - self.position;
+		float longitudinal = toBlock.dot(forward);
+		float lateral = std::fabs(toBlock.dot(right));
 
-		float longitudinal =
-			toBlock.dot(forward);
-
-		float lateral =
-			std::fabs(
-				toBlock.dot(right));
-
-		// za pojazdem
 		if (longitudinal < 0.0f)
 			continue;
 
-		// za daleko
 		if (longitudinal > kBlockMaxView)
 			continue;
 
-		// maksymalnie 2 metry od osi jazdy
-		if (lateral > 1.0f)
+		if (lateral > 0.5f)
 			continue;
 
 		if (blocks[i].isActive())
 		{
-			float threat =
-				std::clamp(
-					1.f - longitudinal / kBlockThreatDist,
-					0.f,
-					1.f);
+			float threat = std::clamp(1.f - longitudinal / kBlockThreatDist, 0.f, 1.f);
 
 			if (threat > bestThreat)
 			{
@@ -162,13 +135,7 @@ void PerceptionHuman::updateBlockHazard(
 	}
 }
 
-// ---------------------------------------------------------------------------
-// Dynamic FOV calculation (ported from old Perception.cpp::calculateFOV)
-// ---------------------------------------------------------------------------
-
-PerceptionHuman::FOVResult PerceptionHuman::calculateFOV(
-	const CarState& self
-) const
+PerceptionHuman::FOVResult PerceptionHuman::calculateFOV(const CarState& self) const
 {
 	float speed = self.velocity.length();
 
@@ -190,17 +157,14 @@ PerceptionHuman::FOVResult PerceptionHuman::calculateFOV(
 	// Blend between wide (low speed) and narrow (high speed) cone
 	float minAngle = kFovAngleNarrow * DEG2RAD;
 	float maxAngle = kFovAngleWide * DEG2RAD;
-
 	float blendT = std::clamp(speedFactor - turningFactor * 0.7f, 0.0f, 1.0f);
 	float angle = maxAngle - blendT * (maxAngle - minAngle);
-
 	float fovDot = std::cos(angle);
 
 	// View distance: grows with speed (sqrt scaling)
 	float viewT = std::clamp(speed / 20.0f, 0.0f, 1.0f);
 	viewT = std::sqrt(viewT);
-	float maxViewDistance =
-		kMaxViewDistMin + viewT * (kMaxViewDistMax - kMaxViewDistMin);
+	float maxViewDistance = kMaxViewDistMin + viewT * (kMaxViewDistMax - kMaxViewDistMin);
 
 	return { fovDot, maxViewDistance };
 }

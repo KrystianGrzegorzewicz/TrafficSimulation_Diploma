@@ -1,4 +1,5 @@
 #pragma once
+
 #include "core/Vec2.h"
 
 class Circle {
@@ -16,6 +17,5 @@ public:
 	float getRadius() const;
 	bool isFilled() const;
 	int getColor(int index) const;
-
 	void setColor(int r, int g, int b);
 };

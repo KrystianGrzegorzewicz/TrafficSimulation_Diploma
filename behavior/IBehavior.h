@@ -5,12 +5,6 @@
 #include "road/Travel.h"
 #include "vehicles/CarState.h"
 
-// High-level vehicle behavior.
-//
-// Responsible for motion planning:
-// - desired speed
-// - longitudinal acceleration
-// - lookahead target point
 class IBehavior
 {
 public:

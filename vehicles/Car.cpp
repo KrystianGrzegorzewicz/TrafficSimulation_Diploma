@@ -1,5 +1,6 @@
 #include "vehicles/Car.h"
 #include "perception/IPerception.h"
+
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -29,12 +30,7 @@ Car::Car(float initialSpeed, Travel travelIn)
 	Vec2 tangent(1.f, 0.f);
 
 	if (pts.size() >= 3) {
-		tangent = travel.bezierDerivative(
-			pts[0],
-			pts[1],
-			pts[2],
-			0.0f
-		);
+		tangent = travel.bezierDerivative(pts[0], pts[1], pts[2], 0.0f);
 
 		if (tangent.length() < 0.0001f) {
 			tangent = pts[1] - pts[0];
@@ -47,37 +43,25 @@ Car::Car(float initialSpeed, Travel travelIn)
 		tangent.normalize();
 	}
 
-	// Important:
-	// zero speed means zero velocity, and zero velocity has no direction.
-	// So give every newly spawned car a tiny minimum launch speed.
 	const float minLaunchSpeed = 2.0f;
 
 	speed = std::max(initialSpeed, minLaunchSpeed);
 	velocity = tangent * speed;
-
 	acceleration = Vec2(0.f, 0.f);
 }
 
-// ---------------------------------------------------------------------------
-// Public accessors
-// ---------------------------------------------------------------------------
-
-int  Car::getId()                  const { return id; }
-int  Car::getTravelId()            const { return travelId; }
-Vec2 Car::getPosition()            const { return position; }
-Vec2 Car::getVelocityVector()      const { return velocity; }
-Vec2 Car::getAccelerationVector()  const { return acceleration; }
-bool Car::isFinished()             const { return finished; }
-int* Car::getColor()          const { return const_cast<int*>(color); }
+int  Car::getId() const { return id; }
+int  Car::getTravelId() const { return travelId; }
+Vec2 Car::getPosition() const { return position; }
+Vec2 Car::getVelocityVector() const { return velocity; }
+Vec2 Car::getAccelerationVector() const { return acceleration; }
+bool Car::isFinished() const { return finished; }
+int* Car::getColor() const { return const_cast<int*>(color); }
 
 CarState Car::getState() const
 {
 	return { position, velocity, acceleration, forward, travelId, id };
 }
-
-// ---------------------------------------------------------------------------
-// Protected path helpers — shared by CarHuman and CarAV
-// ---------------------------------------------------------------------------
 
 bool Car::isPathValid() const
 {
@@ -101,18 +85,14 @@ Vec2 Car::getPathForward() const
 	if (segment + 2 >= (int)p.size())
 		return Vec2(1.f, 0.f);
 
-	Vec2 tangent =
-		travel.bezierDerivative(
-			p[segment],
-			p[segment + 1],
-			p[segment + 2],
-			t);
+	Vec2 tangent = travel.bezierDerivative(p[segment], p[segment + 1], p[segment + 2], t);
 
 	if (tangent.length() < 0.0001f)
 		return Vec2(1.f, 0.f);
 
 	return tangent.normalized();
 }
+
 void Car::updateClosestT()
 {
 	const auto& p = travel.TravelPoints;
@@ -124,40 +104,19 @@ void Car::updateClosestT()
 	const Vec2& p1 = p[segment + 1];
 	const Vec2& p2 = p[segment + 2];
 
-	// --- adaptive search window ---
 	float speed = velocity.length();
-
-	// większe okno przy dużej prędkości
-	float searchRadiusT =
-		std::clamp(0.08f + speed * 0.008f,
-			0.08f,
-			0.35f);
-
-	float startT =
-		std::max(0.0f, t - searchRadiusT);
-
-	float endT =
-		std::min(1.0f, t + searchRadiusT);
-
+	float searchRadiusT = std::clamp(0.08f + speed * 0.008f, 0.08f, 0.35f);
+	float startT = std::max(0.0f, t - searchRadiusT);
+	float endT = std::min(1.0f, t + searchRadiusT);
 	float bestT = t;
 	float bestDist2 = FLT_MAX;
-
-	// coarse search
 	const int coarseSteps = 30;
 
 	for (int i = 0; i <= coarseSteps; ++i)
 	{
-		float testT =
-			startT +
-			(endT - startT) *
-			(i / (float)coarseSteps);
-
-		Vec2 curvePoint =
-			travel.bezier(p0, p1, p2, testT);
-
-		float d2 =
-			(curvePoint - position)
-			.lengthSquared();
+		float testT = startT + (endT - startT) * (i / (float)coarseSteps);
+		Vec2 curvePoint = travel.bezier(p0, p1, p2, testT);
+		float d2 = (curvePoint - position).lengthSquared();
 
 		if (d2 < bestDist2)
 		{
@@ -166,7 +125,6 @@ void Car::updateClosestT()
 		}
 	}
 
-	// fine refinement
 	float refineRange = 0.03f;
 
 	for (int iter = 0; iter < 3; ++iter)
@@ -176,20 +134,9 @@ void Car::updateClosestT()
 
 		for (int i = -8; i <= 8; ++i)
 		{
-			float testT =
-				std::clamp(
-					bestT + i * refineRange / 8.f,
-					0.f,
-					1.f
-				);
-
-			Vec2 pt =
-				travel.bezier(
-					p0, p1, p2, testT);
-
-			float d2 =
-				(pt - position)
-				.lengthSquared();
+			float testT = std::clamp(bestT + i * refineRange / 8.f, 0.f, 1.f);
+			Vec2 pt = travel.bezier(p0, p1, p2, testT);
+			float d2 = (pt - position).lengthSquared();
 
 			if (d2 < localBestD2)
 			{
@@ -217,94 +164,55 @@ bool Car::advanceSegmentIfNeeded()
 		{
 			finished = true;
 			velocity = Vec2(0.f, 0.f);
+
 			return false;
 		}
-
 		return true;
 	}
-
 	return false;
 }
 
-// ---------------------------------------------------------------------------
-// Protected physics — identical for every vehicle type
-// ---------------------------------------------------------------------------
-
-void Car::integrate(
-	const Vec2& desiredAcceleration,
-	float dt)
+void Car::integrate(const Vec2& desiredAcceleration, float dt)
 {
 	const Vec2 oldVelocity = velocity;
-
-	/*Vec2 forward =
-		velocity.length() > 0.1f
-		? velocity.normalized()
-		: Vec2(1, 0);*/
 	forward = getPathForward();
 
 	Vec2 right(-forward.y, forward.x);
-
-	float aLong =
-		desiredAcceleration.dot(forward);
-
-	float aLat =
-		desiredAcceleration.dot(right);
+	float aLong = desiredAcceleration.dot(forward);
+	float aLat = desiredAcceleration.dot(right);
 
 	// separate limits
-	aLong = std::clamp(
-		aLong,
-		-maxDecel,
-		maxAccel);
+	aLong = std::clamp(aLong, -maxDecel, maxAccel);
 
 	// friction circle
 	const float tireGrip = 9.0f;
+	float maxLatAvailable = std::sqrt(std::max(0.f, tireGrip * tireGrip - aLong * aLong));
 
-	float maxLatAvailable =
-		std::sqrt(std::max(
-			0.f,
-			tireGrip * tireGrip
-			- aLong * aLong));
-
-	aLat = std::clamp(
-		aLat,
-		-maxLatAvailable,
-		maxLatAvailable);
-
-	acceleration =
-		forward * aLong +
-		right * aLat;
+	aLat = std::clamp(aLat, -maxLatAvailable, maxLatAvailable);
+	acceleration = forward * aLong + right * aLat;
 
 	// semi-implicit Euler
 	velocity += acceleration * dt;
-
-	float forwardSpeed =
-		velocity.dot(forward);
+	float forwardSpeed = velocity.dot(forward);
 
 	if (forwardSpeed < 0.0f)
 	{
-		velocity -=
-			forward * forwardSpeed;
+		velocity -= forward * forwardSpeed;
 	}
 
 	float speed = velocity.length();
 
 	if (speed > maxSpeed)
 	{
-		velocity =
-			velocity.normalized()
-			* maxSpeed;
+		velocity = velocity.normalized() * maxSpeed;
 	}
 
 	position += velocity * dt;
-
-	this->speed =
-		velocity.length();
+	this->speed = velocity.length();
 
 	if (dt > 1e-5f)
 	{
-		acceleration =
-			(velocity - oldVelocity)
-			/ dt;
+		acceleration = (velocity - oldVelocity) / dt;
 	}
 }
 void Car::executeUpdate(
@@ -324,7 +232,6 @@ void Car::executeUpdate(
 	}
 
 	updateClosestT();
-
 	advanceSegmentIfNeeded();
 
 	if (isFinishedInternal())
@@ -333,10 +240,7 @@ void Car::executeUpdate(
 	CarState self = getState();
 	self.forward = getPathForward();
 
-	perception.update(
-		self,
-		world,
-		perceptionState);
+	perception.update(self, world, perceptionState);
 
 	MotionCommand cmd =
 		behavior.compute(
@@ -349,7 +253,8 @@ void Car::executeUpdate(
 			maxDecel,
 			lookaheadBase,
 			lookaheadSpeedFactor,
-			perceptionState);
+			perceptionState
+		);
 
 	cmd.internalDt = dt;
 
@@ -366,27 +271,11 @@ void Car::executeUpdate(
 		);
 
 	Vec2 forward = getPathForward();
-
-	Vec2 longitudinalAcc =
-		forward * cmd.longitudinalAcceleration;
-
-	Vec2 totalAcc =
-		lateralAcc + longitudinalAcc;
+	Vec2 longitudinalAcc = forward * cmd.longitudinalAcceleration;
+	Vec2 totalAcc = lateralAcc + longitudinalAcc;
 
 	if (cmd.emergencyBrake)
-	{
-		totalAcc =
-			forward * (-maxDecel);
-	}
-	/*std::cout
-		<< "seg=" << segment
-		<< " t=" << t
-		<< " pos=(" << position.x << "," << position.y << ")"
-		<< " target=(" << cmd.targetPoint.x << "," << cmd.targetPoint.y << ")"
-		<< std::endl;
-	std::cout
-		<< "speed=" << speed
-		<< std::endl;*/
+		totalAcc = forward * (-maxDecel);
 
 	integrate(totalAcc, dt);
 }

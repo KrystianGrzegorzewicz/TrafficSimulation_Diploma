@@ -1,4 +1,5 @@
 #include "behavior/BehaviorAV.h"
+
 #include <algorithm>
 
 BehaviorAV::BehaviorAV(std::unique_ptr<ILongitudinalModel> model)
@@ -19,35 +20,16 @@ MotionCommand BehaviorAV::compute(
 {
 	MotionCommand cmd;
 
-	float speed =
-		self.velocity.length();
+	float speed = self.velocity.length();
+	PathPlan plan = planner.compute(travel, segment, t, speed, 7.5f);
 
-	PathPlan plan =
-		planner.compute(
-			travel,
-			segment,
-			t,
-			speed,
-			7.5f);
-
-	cmd.targetPoint =
-		plan.targetPoint;
-
-	float desiredSpeed =
-		std::min(
-			maxSpeed,
-			plan.maxCurveSpeed);
+	cmd.targetPoint = plan.targetPoint;
+	float desiredSpeed = std::min(maxSpeed, plan.maxCurveSpeed);
 
 	// Predictive hazard braking
-	if (perception.hasBlockHazard &&
-		perception.hazardIsActive)
+	if (perception.hasBlockHazard && perception.hazardIsActive)
 	{
-		float hazardFactor =
-			std::clamp(
-				perception.hazardDistance / 45.f,
-				0.f,
-				1.f);
-
+		float hazardFactor = std::clamp(perception.hazardDistance / 45.f, 0.f, 1.f);
 		desiredSpeed *= hazardFactor;
 	}
 
@@ -60,15 +42,10 @@ MotionCommand BehaviorAV::compute(
 			maxAccel,
 			maxDecel);
 
-	if (perception.hasBlockHazard &&
-		perception.hazardDistance < 6.0f)
-	{
+	if (perception.hasBlockHazard && perception.hazardDistance < 6.0f)
 		cmd.emergencyBrake = true;
-	}
 	if (perception.distanceToCarAhead < 6.0f)
-	{
 		cmd.emergencyBrake = true;
-	}
 
 	return cmd;
 }

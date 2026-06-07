@@ -1,4 +1,5 @@
 #include "road/Travel.h"
+
 #include <cmath>
 #include <limits>
 
@@ -6,10 +7,6 @@ Travel::Travel(std::vector<Vec2> points, int w, int id)
 	: TravelPoints(std::move(points)), weight(w), id(id)
 {
 }
-
-// ---------------------------------------------------------------------------
-// Quadratic Bézier evaluation
-// ---------------------------------------------------------------------------
 
 Vec2 Travel::bezier(
 	const Vec2& p0, const Vec2& p1, const Vec2& p2, float t) const
@@ -23,10 +20,6 @@ Vec2 Travel::bezierDerivative(
 {
 	return (p1 - p0) * (2.f * (1.f - t)) + (p2 - p1) * (2.f * t);
 }
-
-// ---------------------------------------------------------------------------
-// Curvature κ = |B'×B''| / |B'|³
-// ---------------------------------------------------------------------------
 
 float Travel::bezierCurvature(
 	const Vec2& p0, const Vec2& p1, const Vec2& p2, float t) const
@@ -49,10 +42,6 @@ float Travel::bezierRadius(
 	return 1.f / k;
 }
 
-// ---------------------------------------------------------------------------
-// Maximum cornering speed at a given t: v = sqrt(aLatMax * R)
-// ---------------------------------------------------------------------------
-
 float Travel::maxSpeedAt(
 	const Vec2& p0, const Vec2& p1, const Vec2& p2,
 	float t, float aLatMax) const
@@ -60,10 +49,6 @@ float Travel::maxSpeedAt(
 	float R = bezierRadius(p0, p1, p2, t);
 	return std::sqrt(aLatMax * R);
 }
-
-// ---------------------------------------------------------------------------
-// Minimum speed limit over a lookahead window
-// ---------------------------------------------------------------------------
 
 float Travel::computeSpeedLimitAhead(
 	int segment,
@@ -81,30 +66,16 @@ float Travel::computeSpeedLimitAhead(
 
 	int seg = segment;
 	float localT = t;
-
 	float traveled = 0.f;
 	const float step = 0.01f;
 
-	// ------------------------------------------------
-	// SAMPLE CURVATURE AHEAD
-	// ------------------------------------------------
-
-	while (traveled < lookaheadDistance
-		&& seg + 2 < (int)TravelPoints.size())
+	while (traveled < lookaheadDistance && seg + 2 < (int)TravelPoints.size())
 	{
-		const Vec2& p0 =
-			TravelPoints[seg];
+		const Vec2& p0 = TravelPoints[seg];
+		const Vec2& p1 = TravelPoints[seg + 1];
+		const Vec2& p2 = TravelPoints[seg + 2];
 
-		const Vec2& p1 =
-			TravelPoints[seg + 1];
-
-		const Vec2& p2 =
-			TravelPoints[seg + 2];
-
-		float curvature =
-			bezierCurvature(
-				p0, p1, p2, localT);
-
+		float curvature = bezierCurvature(p0, p1, p2, localT);
 		float curveSpeed;
 
 		if (curvature < 1e-5f)
@@ -113,29 +84,14 @@ float Travel::computeSpeedLimitAhead(
 		}
 		else
 		{
-			float radius =
-				1.f / curvature;
-
-			// conservative
-			curveSpeed =
-				std::sqrt(
-					aLatMax * radius)
-				* 0.72f;
+			float radius = 1.f / curvature;
+			curveSpeed = std::sqrt(aLatMax * radius) * 0.72f;
 		}
 
-		samples.push_back({
-			traveled,
-			curveSpeed
-			});
+		samples.push_back({ traveled,curveSpeed });
 
-		Vec2 deriv =
-			bezierDerivative(
-				p0, p1, p2,
-				localT);
-
-		float ds =
-			deriv.length()
-			* step;
+		Vec2 deriv = bezierDerivative(p0, p1, p2, localT);
+		float ds = deriv.length() * step;
 
 		traveled += ds;
 		localT += step;
@@ -150,43 +106,19 @@ float Travel::computeSpeedLimitAhead(
 	if (samples.empty())
 		return 999.f;
 
-	// ------------------------------------------------
-	// BACKWARD BRAKING PROPAGATION
-	// ------------------------------------------------
-
-	// comfort braking
 	const float planningDecel = 4.5f;
+	float allowedSpeed = samples.back().curveSpeed;
 
-	float allowedSpeed =
-		samples.back().curveSpeed;
-
-	for (int i =
-		(int)samples.size() - 2;
-		i >= 0;
-		--i)
+	for (int i = (int)samples.size() - 2; i >= 0; --i)
 	{
-		float ds =
-			samples[i + 1].distance
-			- samples[i].distance;
+		float ds = samples[i + 1].distance - samples[i].distance;
+		float maxEnterSpeed = std::sqrt(allowedSpeed * allowedSpeed + 2.f * planningDecel * ds);
 
-		// v² = u² + 2as
-		float maxEnterSpeed =
-			std::sqrt(
-				allowedSpeed *
-				allowedSpeed
-				+
-				2.f *
-				planningDecel *
-				ds);
-
-		allowedSpeed =
-			std::min(
-				samples[i].curveSpeed,
-				maxEnterSpeed);
+		allowedSpeed = std::min(samples[i].curveSpeed, maxEnterSpeed);
 	}
 
 	return allowedSpeed;
 }
 
 int Travel::getWeight() const { return weight; }
-int Travel::getId()     const { return id; }
+int Travel::getId() const { return id; }

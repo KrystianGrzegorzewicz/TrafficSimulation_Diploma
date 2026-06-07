@@ -1,14 +1,11 @@
 #include "simulation/Simulation.h"
 #include "vehicles/VehicleFactory.h"
 #include "vehicles/DriverPersonality.h"
+
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
 #include <chrono>
-
-// ---------------------------------------------------------------------------
-// Timestamp helper (unchanged from original)
-// ---------------------------------------------------------------------------
 
 static std::string getTimestamp()
 {
@@ -27,18 +24,12 @@ static std::string getTimestamp()
 	return oss.str();
 }
 
-// ---------------------------------------------------------------------------
-// Constructor
-// ---------------------------------------------------------------------------
-
 Simulation::Simulation(float spawnRate, int junctionIndex, bool saveCsv, const float AVrate)
 	: junction(junctionIndex)
 	, saveCsv(saveCsv)
 	, AVrate(AVrate)
 {
 	spawnPeriod = (spawnRate > 0.f) ? (1.f / spawnRate) : 1e9f;
-
-	// WorldState holds a non-owning pointer to our junction
 	worldState.junction = &junction;
 
 	if (saveCsv)
@@ -67,13 +58,8 @@ Simulation::Simulation(float spawnRate, int junctionIndex, bool saveCsv, const f
 
 		logFile << "time,id,travel_id,x,y,vx,vy,ax,ay\n";
 	}
-	// Spawn first vehicle immediately
 	spawnVehicle();
 }
-
-// ---------------------------------------------------------------------------
-// Destructor
-// ---------------------------------------------------------------------------
 
 Simulation::~Simulation()
 {
@@ -83,10 +69,6 @@ Simulation::~Simulation()
 	if (personalityFile.is_open())
 		personalityFile.close();
 }
-
-// ---------------------------------------------------------------------------
-// step() — single fixed-dt tick
-// ---------------------------------------------------------------------------
 
 void Simulation::step(float dt)
 {
@@ -101,7 +83,7 @@ void Simulation::step(float dt)
 		spawnAccumulator -= spawnPeriod;
 	}
 
-	// Tick block on/off cycles (pedestrian crossings, traffic lights, etc.)
+	// Tick block on/off cycles
 	for (auto& block : junction.getBlocks())
 		block.update(dt);
 
@@ -119,28 +101,17 @@ void Simulation::step(float dt)
 		sendCsv();
 }
 
-// ---------------------------------------------------------------------------
-// Private helpers
-// ---------------------------------------------------------------------------
-
 void Simulation::spawnVehicle()
 {
 	std::unique_ptr<Car> vehicle;
 
-	if (AVrate > 0.f &&
-		(rand() / (float)RAND_MAX) < AVrate)
+	if (AVrate > 0.f && (rand() / (float)RAND_MAX) < AVrate)
 	{
-		vehicle =
-			VehicleFactory::createAV(
-				14.f,
-				junction.getRandomTravel());
+		vehicle = VehicleFactory::createAV(14.f, junction.getRandomTravel());
 	}
 	else
 	{
-		vehicle =
-			VehicleFactory::createHuman(
-				14.f,
-				junction.getRandomTravel());
+		vehicle = VehicleFactory::createHuman(14.f, junction.getRandomTravel());
 	}
 
 	if (saveCsv)
@@ -162,8 +133,7 @@ void Simulation::spawnVehicle()
 		}
 	}
 
-	vehicles.push_back(
-		std::move(vehicle));
+	vehicles.push_back(std::move(vehicle));
 }
 
 void Simulation::rebuildVehicleStates()
@@ -186,10 +156,6 @@ void Simulation::pruneFinished()
 	);
 }
 
-// ---------------------------------------------------------------------------
-// CSV logging
-// ---------------------------------------------------------------------------
-
 void Simulation::sendCsv()
 {
 	for (const auto& v : vehicles)
@@ -207,16 +173,11 @@ void Simulation::sendCsv()
 	}
 }
 
-// ---------------------------------------------------------------------------
-// JSON serialisation (unchanged output format — visualizer.py compatibility)
-// ---------------------------------------------------------------------------
-
 std::string Simulation::getWorldJson()
 {
 	std::ostringstream ss;
 	ss << "{";
 
-	// ---- Vehicles ----
 	ss << "\"cars\":[";
 	for (std::size_t i = 0; i < vehicles.size(); ++i)
 	{
@@ -240,7 +201,6 @@ std::string Simulation::getWorldJson()
 	}
 	ss << "]";
 
-	// ---- Blocks ----
 	ss << ",\"blocks\":[";
 	const auto& blocks = junction.getBlocks();
 	for (std::size_t i = 0; i < blocks.size(); ++i)
@@ -259,7 +219,6 @@ std::string Simulation::getWorldJson()
 	}
 	ss << "]";
 
-	// ---- Lines ----
 	ss << ",\"lines\":[";
 	auto lines = junction.getLines();
 	for (std::size_t i = 0; i < lines.size(); ++i)
@@ -281,7 +240,6 @@ std::string Simulation::getWorldJson()
 	}
 	ss << "]";
 
-	// ---- Circles ----
 	ss << ",\"circles\":[";
 	auto circles = junction.getCircles();
 	for (std::size_t i = 0; i < circles.size(); ++i)
