@@ -15,7 +15,7 @@ void PerceptionHuman::update(
 {
 	out = PerceptionState{};
 
-	updateCarAhead(self, world.vehicleStates, out);
+	updateCarAhead(self, world, out);
 
 	if (world.junction)
 		updateBlockHazard(self, world, out);
@@ -23,11 +23,17 @@ void PerceptionHuman::update(
 
 void PerceptionHuman::updateCarAhead(
 	const CarState& self,
-	const std::vector<CarState>& others,
+	const WorldState& world,
 	PerceptionState& out
 )
 {
 	FOVResult fov = calculateFOV(self);
+
+	const Block* perceptionMask = nullptr;
+
+	if (world.junction)
+		perceptionMask = world.junction->getPerceptionMaskForTravel(self.travelId, self.position);
+	const auto& others = world.vehicleStates;
 
 	Vec2 forward = self.forward;
 	Vec2 right(-forward.y, forward.x);
@@ -38,6 +44,13 @@ void PerceptionHuman::updateCarAhead(
 
 	for (const auto& o : others)
 	{
+		if (o.id == self.id)
+			continue;
+		if (perceptionMask)
+		{
+			if (perceptionMask->containsPoint(o.position))
+				continue;
+		}
 		Vec2  relPos = o.position - self.position;
 		float dist = relPos.length();
 

@@ -4,15 +4,42 @@
 #include <cmath>
 #include <iostream>
 
-Block::Block(float x0, float y0, float xn, float yn,
-	float onDur, float offDur, float initTime)
-	: x0y0(x0, y0), xnyn(xn, yn)
-	, onDuration(onDur), offDuration(offDur)
-	, elapsedTime(initTime), isCurrentlyOn(true)
+Block::Block(
+	float x0,
+	float y0,
+	float xn,
+	float yn,
+	float onDur,
+	float offDur,
+	float initTime,
+	BlockType type,
+	std::vector<int> maskedTravels)
+	:
+	x0y0(x0, y0),
+	xnyn(xn, yn),
+	onDuration(onDur),
+	offDuration(offDur),
+	elapsedTime(initTime),
+	isCurrentlyOn(true),
+	type(type),
+	maskedTravelIds(std::move(maskedTravels))
 {
 	color[0] = 255;
 	color[1] = 0;
 	color[2] = 0;
+}
+
+BlockType Block::getType() const
+{
+	return type;
+}
+
+bool Block::masksTravel(int travelId) const
+{
+	return std::find(
+		maskedTravelIds.begin(),
+		maskedTravelIds.end(),
+		travelId) != maskedTravelIds.end();
 }
 
 void Block::update(float dt)

@@ -15,11 +15,11 @@ struct Config {
 
 	Config() :
 		gui(true),
-		simSpeed(2.0f),
-		spawnRate(1.0f),
-		AVRate(0.5f),
-		junction(2),
-		saveCsv(true),
+		simSpeed(6.0f),
+		spawnRate(0.7f),
+		AVRate(0.0f),
+		junction(5),
+		saveCsv(false),
 		aggressionBias(0.5f),
 		aggressionSharpness(0.5f)
 	{

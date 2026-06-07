@@ -14,7 +14,7 @@ public:
 private:
 	void updateCarAhead(
 		const CarState& self,
-		const std::vector<CarState>& others,
+		const WorldState& world,
 		PerceptionState& out
 	);
 

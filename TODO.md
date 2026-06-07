@@ -18,7 +18,7 @@
 [x] rozdzielenie zachowania na av i człowieka
 [ ] ocena ryzyka, dołączanie do ruchu
 [ ] logika rozmyta
-[ ] dodanie czasu reakcji do człowieka
+[x] dodanie czasu reakcji do człowieka
 [ ] fov, wyłączone linie (bloki)
 
 # zbieranie danych

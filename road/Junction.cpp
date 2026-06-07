@@ -231,6 +231,18 @@ Junction::Junction(int index)
 
 		// ------------------------------------------------------------------
 	case 5: // with traffic lights
+		//mask
+		/*blocks.emplace_back(
+			-15.f,
+			-5.f,
+			15.f,
+			5.f,
+			0.f,
+			999999.f,
+			0.f,
+			BlockType::PerceptionMask,
+			{ 1 }
+		);*/
 		lightCycle = 50.f; // seconds
 		bufforTime = 5.f; // seconds of all-red buffer between light changes
 		//lights
@@ -326,21 +338,21 @@ Junction::Junction(int index)
 		tp2 = {
 			Vec2(5.25f,250.f), Vec2(5.25f,240.f), Vec2(5.25f,200.f),
 			Vec2(5.25f,150.f), Vec2(5.25f,130.f), Vec2(5.25f,122.5f),
-			Vec2(7.5f,115.f), Vec2(9.25f,107.5f), Vec2(9.25f,100.f),
-			Vec2(9.25f,80.f), Vec2(9.25f,50.f), Vec2(9.25f,30.f),
-			Vec2(9.25f,20.f), Vec2(9.25f,0.f), Vec2(9.25f,-20.f),
-			Vec2(9.25f,-50.f), Vec2(9.25f,-100.f), Vec2(9.25f,-150.f),
-			Vec2(9.25f,-200.f), Vec2(9.25f,-240.f), Vec2(9.25f,-250.f)
+			Vec2(7.5f,115.f), Vec2(8.75f,107.5f), Vec2(8.75f,100.f),
+			Vec2(8.75f,80.f), Vec2(8.75f,50.f), Vec2(8.75f,30.f),
+			Vec2(8.75f,20.f), Vec2(8.75f,0.f), Vec2(8.75f,-20.f),
+			Vec2(8.75f,-50.f), Vec2(8.75f,-100.f), Vec2(8.75f,-150.f),
+			Vec2(8.75f,-200.f), Vec2(8.75f,-240.f), Vec2(8.75f,-250.f)
 		};
 		//down up 1
 		tp3 = {
 			Vec2(1.75f,250.f), Vec2(1.75f,240.f), Vec2(1.75f,200.f),
 			Vec2(1.75f,150.f), Vec2(1.75f,130.f), Vec2(1.75f,122.5f),
-			Vec2(4.0f,115.f), Vec2(5.75f,107.5f), Vec2(5.75f,100.f),
-			Vec2(5.75f,80.f), Vec2(5.75f,50.f), Vec2(5.75f,30.f),
-			Vec2(5.75f,20.f), Vec2(5.75f,0.f), Vec2(5.75f,-20.f),
-			Vec2(5.75f,-50.f), Vec2(5.75f,-100.f), Vec2(5.75f,-150.f),
-			Vec2(5.75f,-200.f), Vec2(5.75f,-240.f), Vec2(5.75f,-250.f)
+			Vec2(4.0f,115.f), Vec2(5.25f,107.5f), Vec2(5.25f,100.f),
+			Vec2(5.25f,80.f), Vec2(5.25f,50.f), Vec2(5.25f,30.f),
+			Vec2(5.25f,20.f), Vec2(5.25f,0.f), Vec2(5.25f,-20.f),
+			Vec2(5.25f,-50.f), Vec2(5.25f,-100.f), Vec2(5.25f,-150.f),
+			Vec2(5.25f,-200.f), Vec2(5.25f,-240.f), Vec2(5.25f,-250.f)
 		};
 		//down left
 		tp4 = {
@@ -531,4 +543,23 @@ std::vector<Circle> Junction::drawTravel(std::vector<Vec2> travelPoints) {
 		}
 	}
 	return circles;
+}
+
+const Block* Junction::getPerceptionMaskForTravel(int travelId, const Vec2& point) const
+{
+	for (const auto& block : blocks)
+	{
+		if (block.getType() != BlockType::PerceptionMask)
+			continue;
+
+		if (!block.masksTravel(travelId))
+			continue;
+
+		if (!block.containsPoint(point))
+			continue;
+
+		return &block;
+	}
+
+	return nullptr;
 }

@@ -15,7 +15,7 @@ void PerceptionAV::update(
 {
 	out = PerceptionState{};
 
-	updateCarAhead(self, world.vehicleStates, out);
+	updateCarAhead(self, world, out);
 
 	if (world.junction)
 		updateBlockHazard(self, world, out);
@@ -23,15 +23,18 @@ void PerceptionAV::update(
 
 void PerceptionAV::updateCarAhead(
 	const CarState& self,
-	const std::vector<CarState>& others,
-	PerceptionState& out
-)
+	const WorldState& world,
+	PerceptionState& out)
 {
 	FOVResult fov = calculateFOV(self);
+	const auto& others = world.vehicleStates;
 
-	Vec2 forward = (self.velocity.length() > 0.5f)
-		? self.velocity.normalized()
-		: Vec2(1.f, 0.f);
+	const Block* perceptionMask = nullptr;
+
+	if (world.junction)
+		perceptionMask = world.junction->getPerceptionMaskForTravel(self.travelId, self.position);
+
+	Vec2 forward = self.forward;
 	Vec2 right(-forward.y, forward.x);
 
 	float bestScore = std::numeric_limits<float>::max();
@@ -40,6 +43,15 @@ void PerceptionAV::updateCarAhead(
 
 	for (const auto& o : others)
 	{
+		if (o.id == self.id)
+			continue;
+
+		if (perceptionMask)
+		{
+			if (perceptionMask->containsPoint(o.position))
+				continue;
+		}
+
 		Vec2  relPos = o.position - self.position;
 		float dist = relPos.length();
 
