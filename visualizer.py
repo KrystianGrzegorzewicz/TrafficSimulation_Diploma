@@ -112,14 +112,19 @@ def draw_car(x, y, vx, vy, ax, ay, color_r, color_g, color_b):
     rect = rotated.get_rect(center=(x, y))
     screen.blit(rotated, rect.topleft)
 
-    pygame.draw.line(screen, (150, 50, 50), (x, y), (x + ax, y + ay), 4)
-    pygame.draw.line(screen, (50, 200, 50), (x, y), (x + vx, y + vy), 2)
+    pygame.draw.line(screen, (255, 69, 0), (x, y), (x + ax, y + ay), 4)
+    pygame.draw.line(screen, (0, 200, 255), (x, y), (x + vx, y + vy), 2)
 
 def draw_blocks():
     for block in blocks:
         x1, y1 = to_screen(block["x1"], block["y1"])
         x2, y2 = to_screen(block["x2"], block["y2"])
-        color = (200, 0, 0) if block["active"] == 1 else (50, 50, 50)
+        if block["isMask"] == 1:
+            color = (255, 255, 255)
+        elif block["active"] == 1:
+            color = (200, 0, 0)
+        else:
+            color = (100, 100, 100)
         pygame.draw.rect(screen, color, (x1, y1, x2 - x1, y2 - y1))
 
 def draw_lines():

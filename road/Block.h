@@ -27,18 +27,10 @@ private:
 
 	BlockType type;
 
-	std::vector<int> maskedTravelIds;
+	std::vector<int>* maskedTravelIds;
 
 public:
-	Block(
-		float x0,
-		float y0,
-		float xn,
-		float yn,
-		float onDur = 0.0f,
-		float offDur = 1.0f,
-		float initTime = 0.0f
-	);
+	Block();
 	Block(
 		float x0,
 		float y0,

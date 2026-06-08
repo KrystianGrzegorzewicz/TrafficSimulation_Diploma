@@ -6,7 +6,12 @@
 
 Junction::Junction()
 {
+	blocks.push_back(Block(-100.0f, -100.0f, 100.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
+
 	blocks.emplace_back(0.0f, -1.75f, 5.0f, 1.75f, 10.0f, 5.0f, 0.0f);
+	//Block b(-100.0f, -100.0f, 100.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::Visual, {});
+	//blocks.emplace_back(-100.0f, -100.0f,100.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::Visual, {});
+	//blocks.push_back(b);
 
 	lines.emplace_back(-100.0f, -1.75f, 100.0f, -1.75f, 0.2f);
 	lines.emplace_back(-100.0f, 1.75f, 100.0f, 1.75f, 0.2f);
@@ -32,6 +37,9 @@ Junction::Junction(int index)
 
 		// ------------------------------------------------------------------
 	case 1: // Conflict-free right turn
+		//mask
+		blocks.push_back(Block(-100.0f, -50.0f, 100.0f, 50.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
+
 		lines.emplace_back(-100.f, -3.5f, 100.f, -3.5f, 0.3f);
 		lines.emplace_back(-100.f, 0.f, 100.f, 0.f, 0.1f);
 		lines.emplace_back(-100.f, 3.5f, -3.5f, 3.5f, 0.3f);
@@ -68,6 +76,10 @@ Junction::Junction(int index)
 
 		// ------------------------------------------------------------------
 	case 2: // Left turn — one conflict point
+		//mask
+		//blocks.push_back(Block(-100.0f, -100.0f, 100.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
+		blocks.push_back(Block(-100.0f, 0.0f, 100.0f, 10.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {1}));
+
 		lines.emplace_back(3.5f, 0.f, 3.5f, 3.5f, 0.3f);
 		lines.emplace_back(3.5f, 0.f, 100.f, 0.f, 0.3f);
 		lines.emplace_back(-100.f, -3.5f, 0.f, -3.5f, 0.3f);
@@ -115,6 +127,9 @@ Junction::Junction(int index)
 
 		// ------------------------------------------------------------------
 	case 3: // Single lane with pedestrian crossing block
+		//mask
+		blocks.push_back(Block(-300.0f, -100.0f, 300.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
+
 		blocks.emplace_back(0.f, -1.75f, 5.f, 1.75f, 20.f, 15.f, 0.0f);
 
 		lines.emplace_back(-300.f, -1.75f, 100.f, -1.75f, 0.2f);
@@ -131,6 +146,9 @@ Junction::Junction(int index)
 
 		// ------------------------------------------------------------------
 	case 4: // Simple roundabout
+		//mask
+		blocks.push_back(Block(-150.0f, -100.0f, 150.0f, 150.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
+
 		circles.emplace_back(0.f, 0.f, 11.f, true);
 		circles.emplace_back(0.f, 0.f, 17.f, false);
 
@@ -232,17 +250,8 @@ Junction::Junction(int index)
 		// ------------------------------------------------------------------
 	case 5: // with traffic lights
 		//mask
-		/*blocks.emplace_back(
-			-15.f,
-			-5.f,
-			15.f,
-			5.f,
-			0.f,
-			999999.f,
-			0.f,
-			BlockType::PerceptionMask,
-			{ 1 }
-		);*/
+		blocks.push_back(Block(-300.0f, -300.0f, 300.0f, 300.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
+
 		lightCycle = 50.f; // seconds
 		bufforTime = 5.f; // seconds of all-red buffer between light changes
 		//lights

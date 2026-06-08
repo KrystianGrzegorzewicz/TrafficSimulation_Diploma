@@ -208,12 +208,14 @@ std::string Simulation::getWorldJson()
 		Vec2 tl = blocks[i].getTopLeft();
 		Vec2 br = blocks[i].getBottomRight();
 		bool active = blocks[i].isActive();
+		bool isMask = (blocks[i].getType() == BlockType::PerceptionMask);
 
 		ss << "{\"x1\":" << tl.x
 			<< ",\"y1\":" << tl.y
 			<< ",\"x2\":" << br.x
 			<< ",\"y2\":" << br.y
-			<< ",\"active\":" << (active ? 1 : 0) << "}";
+			<< ",\"active\":" << (active ? 1 : 0)
+			<< ",\"isMask\":" << (isMask ? 1 : 0) << "}";
 
 		if (i + 1 < blocks.size()) ss << ",";
 	}

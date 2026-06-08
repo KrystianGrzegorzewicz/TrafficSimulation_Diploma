@@ -4,6 +4,12 @@
 #include <cmath>
 #include <iostream>
 
+Block::Block() {
+	color[0] = 255;
+	color[1] = 0;
+	color[2] = 0;
+}
+
 Block::Block(
 	float x0,
 	float y0,
@@ -22,7 +28,7 @@ Block::Block(
 	elapsedTime(initTime),
 	isCurrentlyOn(true),
 	type(type),
-	maskedTravelIds(std::move(maskedTravels))
+	maskedTravelIds(new std::vector<int>(std::move(maskedTravels)))
 {
 	color[0] = 255;
 	color[1] = 0;
@@ -37,9 +43,9 @@ BlockType Block::getType() const
 bool Block::masksTravel(int travelId) const
 {
 	return std::find(
-		maskedTravelIds.begin(),
-		maskedTravelIds.end(),
-		travelId) != maskedTravelIds.end();
+		maskedTravelIds->begin(),
+		maskedTravelIds->end(),
+		travelId) != maskedTravelIds->end();
 }
 
 void Block::update(float dt)
