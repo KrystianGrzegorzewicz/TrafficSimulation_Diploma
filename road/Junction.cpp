@@ -78,7 +78,7 @@ Junction::Junction(int index)
 	case 2: // Left turn — one conflict point
 		//mask
 		//blocks.push_back(Block(-100.0f, -100.0f, 100.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
-		blocks.push_back(Block(-100.0f, 0.0f, 100.0f, 10.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {1}));
+		blocks.push_back(Block(-100.0f, 0.0f, 100.0f, 10.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 1 }));
 
 		lines.emplace_back(3.5f, 0.f, 3.5f, 3.5f, 0.3f);
 		lines.emplace_back(3.5f, 0.f, 100.f, 0.f, 0.3f);
@@ -251,6 +251,14 @@ Junction::Junction(int index)
 	case 5: // with traffic lights
 		//mask
 		blocks.push_back(Block(-300.0f, -300.0f, 300.0f, 300.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
+		blocks.push_back(Block(11.0f, -100.0f, 100.0f, 0.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 1, 2, 3, 8, 9, 10 }));
+		blocks.push_back(Block(-100.0f, 0.0f, -11.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 4, 5, 6, 7, 12, 13 }));
+		blocks.push_back(Block(-11.0f, -100.0f, 11.0f, -3.5f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 4 }));
+		blocks.push_back(Block(-3.5f, -10.0f, 11.0f, 0.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 4 }));
+		blocks.push_back(Block(-11.0f, 3.5f, 11.0f, 100.f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 8 }));
+		blocks.push_back(Block(-11.0f, 0.0f, 3.5f, 10.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 8 }));
+		blocks.push_back(Block(-11.0f, -100.0f, 0.0f, -10.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 1, 2, 3, 4, 9, 10, 11, 12, 13, 14 }));
+		blocks.push_back(Block(0.0f, 10.0f, 11.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }));
 
 		lightCycle = 50.f; // seconds
 		bufforTime = 5.f; // seconds of all-red buffer between light changes
@@ -367,11 +375,10 @@ Junction::Junction(int index)
 		tp4 = {
 			Vec2(1.75f,250.f), Vec2(1.75f,240.f), Vec2(1.75f,200.f),
 			Vec2(1.75f,150.f), Vec2(1.75f,130.f), Vec2(1.75f,100.0f),
-			Vec2(1.75f,80.f), Vec2(1.75f,50.f), Vec2(1.75f,20.0f),
-			Vec2(1.75f,0.0f), Vec2(-6.0f,0.0f), Vec2(-10.0f,-1.75f),
-			Vec2(-20.0f,-1.75f), Vec2(-50.0f,-1.75f), Vec2(-80.0f,-1.75f),
-			Vec2(-120.0f,-1.75f), Vec2(-150.0f,-1.75f), Vec2(-180.0f,-1.75f),
-			Vec2(-200.0f,-1.75f)
+			Vec2(1.75f,80.f), Vec2(1.75f,50.f), Vec2(1.75f,12.0f),
+			Vec2(1.75f,-1.75f), Vec2(-20.0f,-1.75f), Vec2(-50.0f,-1.75f),
+			Vec2(-80.0f,-1.75f), Vec2(-120.0f,-1.75f), Vec2(-150.0f,-1.75f),
+			Vec2(-180.0f,-1.75f), Vec2(-200.0f,-1.75f)
 		};
 		//up left
 		tp5 = {
@@ -407,11 +414,10 @@ Junction::Junction(int index)
 		tp8 = {
 			Vec2(-1.75f,-250.f), Vec2(-1.75f,-240.f), Vec2(-1.75f,-200.f),
 			Vec2(-1.75f,-150.f), Vec2(-1.75f,-130.f), Vec2(-1.75f,-100.0f),
-			Vec2(-1.75f,-80.f), Vec2(-1.75f,-50.f), Vec2(-1.75f,-20.0f),
-			Vec2(-1.75f,0.0f), Vec2(6.0f,0.0f), Vec2(10.0f,1.75f),
-			Vec2(20.0f,1.75f), Vec2(50.0f,1.75f), Vec2(80.0f,1.75f),
-			Vec2(120.0f,1.75f), Vec2(150.0f,1.75f), Vec2(180.0f,1.75f),
-			Vec2(200.0f,1.75f)
+			Vec2(-1.75f,-80.f), Vec2(-1.75f,-50.f), Vec2(-1.75f,-12.0f),
+			Vec2(-1.75f,1.75f), Vec2(20.0f,1.75f), Vec2(50.0f,1.75f),
+			Vec2(80.0f,1.75f), Vec2(120.0f,1.75f), Vec2(150.0f,1.75f),
+			Vec2(180.0f,1.75f), Vec2(200.0f,1.75f)
 		};
 		//left right
 		tp9 = {
@@ -466,22 +472,22 @@ Junction::Junction(int index)
 			Vec2(8.75f,-200.0f), Vec2(8.75f,-230.0f), Vec2(8.75f,-250.0f)
 		};
 
-		travels.emplace_back(tp1, 1, 1);
-		travels.emplace_back(tp2, 2, 2);
-		travels.emplace_back(tp3, 2, 3);
-		travels.emplace_back(tp4, 1, 4);
-		travels.emplace_back(tp5, 1, 5);
-		travels.emplace_back(tp6, 2, 6);
-		travels.emplace_back(tp7, 2, 7);
-		travels.emplace_back(tp8, 1, 8);
-		travels.emplace_back(tp9, 1, 9);
-		travels.emplace_back(tp10, 1, 10);
-		travels.emplace_back(tp11, 1, 11);
-		travels.emplace_back(tp12, 1, 12);
-		travels.emplace_back(tp13, 1, 13);
-		travels.emplace_back(tp14, 1, 14);
+		travels.emplace_back(tp1, 3, 1);
+		travels.emplace_back(tp2, 6, 2);
+		travels.emplace_back(tp3, 6, 3);
+		travels.emplace_back(tp4, 3, 4);
+		travels.emplace_back(tp5, 3, 5);
+		travels.emplace_back(tp6, 6, 6);
+		travels.emplace_back(tp7, 6, 7);
+		travels.emplace_back(tp8, 3, 8);
+		travels.emplace_back(tp9, 2, 9);
+		travels.emplace_back(tp10, 2, 10);
+		travels.emplace_back(tp11, 2, 11);
+		travels.emplace_back(tp12, 2, 12);
+		travels.emplace_back(tp13, 2, 13);
+		travels.emplace_back(tp14, 2, 14);
 
-		//circles.append_range(drawTravel(tp8));
+		circles.append_range(drawTravel(tp5));
 		break;
 	default:
 		std::cerr << "Junction: unknown index " << index << "\n";

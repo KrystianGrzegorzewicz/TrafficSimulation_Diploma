@@ -100,6 +100,7 @@ void PerceptionHuman::updateBlockHazard(
 	PerceptionState& out
 )
 {
+	const Block* perceptionMask = world.junction->getPerceptionMaskForTravel(self.travelId, self.position);
 	const auto& blocks = world.junction->getBlocks();
 	if (blocks.empty()) return;
 
@@ -112,6 +113,13 @@ void PerceptionHuman::updateBlockHazard(
 
 	for (int i = 0; i < static_cast<int>(blocks.size()); ++i)
 	{
+		if (perceptionMask)
+		{
+			if (perceptionMask->containsPoint(blocks[i].getCenter()))
+			{
+				continue;
+			}
+		}
 		Vec2 toBlock = blocks[i].getCenter() - self.position;
 		float longitudinal = toBlock.dot(forward);
 		float lateral = std::fabs(toBlock.dot(right));
