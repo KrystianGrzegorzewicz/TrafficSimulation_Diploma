@@ -132,6 +132,7 @@
     <ClCompile Include="behavior\BehaviorHuman.cpp" />
     <ClCompile Include="behavior\longitudinal\FuzzyLongitudinalModel.cpp" />
     <ClCompile Include="behavior\longitudinal\IDMLongitudinalModel.cpp" />
+    <ClCompile Include="core\Config.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="perception\PerceptionAV.cpp" />
     <ClCompile Include="perception\PerceptionHuman.cpp" />
@@ -152,6 +153,7 @@
   <ItemGroup>
     <None Include="data\data_charts.py" />
     <None Include="data\personality_charts.py" />
+    <None Include="run.bat" />
     <None Include="TODO.md" />
     <None Include="visualizer.py" />
   </ItemGroup>

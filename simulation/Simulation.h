@@ -3,6 +3,7 @@
 #include "simulation/WorldState.h"
 #include "vehicles/Car.h"
 #include "road/Junction.h"
+#include "core/Config.h"
 
 #include <vector>
 #include <memory>
@@ -12,11 +13,19 @@
 class Simulation
 {
 public:
-	Simulation(float spawnRate, int junctionIndex, bool saveCsv, const float AVrate);
+	Simulation(
+		float spawnRate,
+		int junctionIndex,
+		bool saveCsv,
+		float AVrate,
+		const Config& conf
+	);
 	~Simulation();
 
 	void step(float dt);
 	std::string getWorldJson();
+	int getFinishedVehicles() const { return finishedVehicles; }
+	float getCurrentTime() const { return currentTime; }
 	void sendCsv();
 
 private:
@@ -36,4 +45,6 @@ private:
 	bool saveCsv = false;
 	std::ofstream logFile;
 	std::ofstream personalityFile;
+	std::string outputDirectory;
+	int finishedVehicles = 0;
 };

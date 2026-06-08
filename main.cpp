@@ -6,23 +6,35 @@
 #include <ws2tcpip.h>
 #include <chrono>
 #include <thread>
+#include <iostream>
+#include <print>
 
 #pragma comment(lib, "Ws2_32.lib")
 
-int main()
+int main(int argc, char* argv[])
 {
 	WSADATA wsa;
 	WSAStartup(MAKEWORD(2, 2), &wsa);
-	srand(static_cast<unsigned>(time(nullptr)));
 
-	const Config conf = parseConfig();
+	const Config conf = parseConfig(argc, argv);
+
+	if (conf.randomSeed != 0)
+		srand(conf.randomSeed);
+	else
+		srand((unsigned)time(nullptr));
 
 	DriverPersonalityGenerator::configure(
 		conf.aggressionBias,
 		conf.aggressionSharpness
 	);
 
-	Simulation sim(conf.spawnRate, conf.junction, conf.saveCsv, conf.AVRate);
+	Simulation sim(
+		conf.spawnRate,
+		conf.junction,
+		conf.saveCsv,
+		conf.AVRate,
+		conf
+	);
 
 	const float fixedDt = 0.01f;
 	const float maxRealDt = 0.05f;
@@ -80,6 +92,18 @@ int main()
 				sendTimer = 0.f;
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+			if (conf.maxSimulationTime > 0)
+			{
+				if (sim.getCurrentTime() >= conf.maxSimulationTime)
+					break;
+			}
+
+			if (conf.maxVehiclesFinished > 0)
+			{
+				if (sim.getFinishedVehicles() >= conf.maxVehiclesFinished)
+					break;
+			}
 		}
 
 		closesocket(client_socket);

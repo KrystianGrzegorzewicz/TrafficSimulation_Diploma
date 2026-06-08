@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iomanip>
 #include <chrono>
+#include <filesystem>
 
 static std::string getTimestamp()
 {
@@ -24,25 +25,64 @@ static std::string getTimestamp()
 	return oss.str();
 }
 
-Simulation::Simulation(float spawnRate, int junctionIndex, bool saveCsv, const float AVrate)
+Simulation::Simulation(
+	float spawnRate,
+	int junctionIndex,
+	bool saveCsv,
+	float AVrate,
+	const Config& conf)
 	: junction(junctionIndex)
 	, saveCsv(saveCsv)
 	, AVrate(AVrate)
 {
-	spawnPeriod = (spawnRate > 0.f) ? (1.f / spawnRate) : 1e9f;
+	spawnPeriod =
+		(spawnRate > 0.f)
+		? (1.f / spawnRate)
+		: 1e9f;
+
 	worldState.junction = &junction;
 
 	if (saveCsv)
 	{
-		std::string timestamp =
-			getTimestamp();
+		std::ostringstream experimentFolder;
 
-		std::string filename = "data/cars_" + timestamp + ".csv";
-		logFile.open(filename);
-		std::string personalityFilename =
-			"data/personality_" +
-			timestamp +
+		experimentFolder
+			<< "data/";
+
+		if (!conf.experimentName.empty())
+		{
+			experimentFolder
+				<< conf.experimentName;
+		}
+		else
+		{
+			experimentFolder
+				<< "J" << conf.junction
+				<< "_AV" << static_cast<int>(conf.AVRate * 100)
+				<< "_SP" << static_cast<int>(conf.spawnRate * 100)
+				<< "_BIAS" << static_cast<int>(conf.aggressionBias * 100)
+				<< "_SHARP" << static_cast<int>(conf.aggressionSharpness * 100)
+				<< "_SEED" << conf.randomSeed;
+		}
+
+		outputDirectory = experimentFolder.str();
+
+		std::filesystem::create_directories(
+			outputDirectory);
+
+		std::string carsFilename =
+			outputDirectory +
+			"/cars_run" +
+			std::to_string(conf.runId) +
 			".csv";
+
+		std::string personalityFilename =
+			outputDirectory +
+			"/personality_run" +
+			std::to_string(conf.runId) +
+			".csv";
+
+		logFile.open(carsFilename);
 
 		personalityFile.open(
 			personalityFilename);
@@ -56,8 +96,18 @@ Simulation::Simulation(float spawnRate, int junctionIndex, bool saveCsv, const f
 			<< "start_delay,"
 			<< "curve_factor\n";
 
-		logFile << "time,id,travel_id,x,y,vx,vy,ax,ay\n";
+		logFile
+			<< "time,"
+			<< "id,"
+			<< "travel_id,"
+			<< "x,"
+			<< "y,"
+			<< "vx,"
+			<< "vy,"
+			<< "ax,"
+			<< "ay\n";
 	}
+
 	spawnVehicle();
 }
 
@@ -147,13 +197,22 @@ void Simulation::rebuildVehicleStates()
 
 void Simulation::pruneFinished()
 {
-	vehicles.erase(
+	auto it =
 		std::remove_if(
-			vehicles.begin(), vehicles.end(),
-			[](const std::unique_ptr<Car>& c) { return c->isFinished(); }
-		),
-		vehicles.end()
-	);
+			vehicles.begin(),
+			vehicles.end(),
+			[this](const std::unique_ptr<Car>& c)
+			{
+				if (c->isFinished())
+				{
+					finishedVehicles++;
+					return true;
+				}
+
+				return false;
+			});
+
+	vehicles.erase(it, vehicles.end());
 }
 
 void Simulation::sendCsv()
