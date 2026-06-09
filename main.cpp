@@ -113,9 +113,22 @@ int main(int argc, char* argv[])
 	{
 		std::print("Started headless\n");
 		while (true)
+		{
 			sim.step(fixedDt);
-	}
 
+			if (conf.maxSimulationTime > 0)
+			{
+				if (sim.getCurrentTime() >= conf.maxSimulationTime)
+					break;
+			}
+
+			if (conf.maxVehiclesFinished > 0)
+			{
+				if (sim.getFinishedVehicles() >= conf.maxVehiclesFinished)
+					break;
+			}
+		}
+	}
 	WSACleanup();
 	return 0;
 }

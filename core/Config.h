@@ -11,7 +11,7 @@ struct Config
 	float spawnRate = 1.0f;
 	float AVRate = 0.0f;
 
-	int junction = 5;
+	int junction = 3;
 
 	float aggressionBias = 0.5f;
 	float aggressionSharpness = 0.5f;

@@ -137,18 +137,25 @@ void Simulation::step(float dt)
 	for (auto& block : junction.getBlocks())
 		block.update(dt);
 
-	// Snapshot all vehicle states ONCE before any vehicle updates,
-	// so every vehicle reads consistent state from the same instant.
+	// Snapshot all vehicle states once
 	rebuildVehicleStates();
 
-	// Update all vehicles — Simulation is fully agnostic to Human vs AV
+	// Update all vehicles
 	for (auto& v : vehicles)
 		v->update(dt, worldState);
 
 	pruneFinished();
 
+	// --- CSV SAVE ACCUMULATOR ---
 	if (saveCsv)
-		sendCsv();
+	{
+		csvAccumulator += dt;
+		if (csvAccumulator >= 0.1f)   // 100 ms
+		{
+			sendCsv();
+			csvAccumulator = 0.0f;
+		}
+	}
 }
 
 void Simulation::spawnVehicle()

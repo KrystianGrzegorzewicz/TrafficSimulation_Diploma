@@ -43,6 +43,8 @@ private:
 	float AVrate = 0.0f;
 
 	bool saveCsv = false;
+	float csvAccumulator = 0.0f;
+	const float csvPeriod = 0.1f;
 	std::ofstream logFile;
 	std::ofstream personalityFile;
 	std::string outputDirectory;
