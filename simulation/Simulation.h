@@ -47,6 +47,7 @@ private:
 	const float csvPeriod = 0.1f;
 	std::ofstream logFile;
 	std::ofstream personalityFile;
+	std::ofstream anfisFile;
 	std::string outputDirectory;
 	int finishedVehicles = 0;
 };

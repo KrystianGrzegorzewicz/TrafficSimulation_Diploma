@@ -10,6 +10,13 @@
 
 struct WorldState;
 
+struct Anfis {
+	float relDist;
+	float relSpeed;
+	float relAccel;
+	float output;
+};
+
 class Car
 {
 public:
@@ -26,8 +33,13 @@ public:
 	int* getColor()	const;
 	Vec2 filteredTargetPoint;
 	bool hasFilteredTarget = false;
+	Anfis output;
 
 	CarState getState()	const;
+	Anfis getAnfisOutput() const
+	{
+		return output;
+	}
 	virtual const DriverPersonality* getPersonality() const
 	{
 		return nullptr;

@@ -241,6 +241,9 @@ void Car::executeUpdate(
 	self.forward = getPathForward();
 
 	perception.update(self, world, perceptionState);
+	perceptionState.relativeSpeed > 100.0f ? output.relSpeed = 100.0f : output.relSpeed = perceptionState.relativeSpeed;
+	output.relDist = perceptionState.distanceToCarAhead;
+	output.relAccel = perceptionState.relativeAcceleration;
 
 	MotionCommand cmd =
 		behavior.compute(
@@ -272,6 +275,7 @@ void Car::executeUpdate(
 
 	Vec2 forward = getPathForward();
 	Vec2 longitudinalAcc = forward * cmd.longitudinalAcceleration;
+	output.output = cmd.longitudinalAcceleration;
 	Vec2 totalAcc = lateralAcc + longitudinalAcc;
 
 	if (cmd.emergencyBrake)

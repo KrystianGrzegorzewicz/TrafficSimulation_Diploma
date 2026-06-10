@@ -76,6 +76,12 @@ Simulation::Simulation(
 			std::to_string(conf.runId) +
 			".csv";
 
+		std::string anfisFilename =
+			outputDirectory +
+			"/anfis_run" +
+			std::to_string(conf.runId) +
+			".csv";
+
 		std::string personalityFilename =
 			outputDirectory +
 			"/personality_run" +
@@ -83,9 +89,8 @@ Simulation::Simulation(
 			".csv";
 
 		logFile.open(carsFilename);
-
-		personalityFile.open(
-			personalityFilename);
+		personalityFile.open(personalityFilename);
+		anfisFile.open(anfisFilename);
 
 		personalityFile
 			<< "id,"
@@ -106,6 +111,13 @@ Simulation::Simulation(
 			<< "vy,"
 			<< "ax,"
 			<< "ay\n";
+
+/*		anfisFile
+			<< "id,"
+			<< "relDist,"
+			<< "relSpeed,"
+			<< "relAcc,"
+			<< "acceleration\n";*/
 	}
 
 	spawnVehicle();
@@ -141,8 +153,11 @@ void Simulation::step(float dt)
 	rebuildVehicleStates();
 
 	// Update all vehicles
-	for (auto& v : vehicles)
+	for (auto& v : vehicles) {
 		v->update(dt, worldState);
+
+	}
+		
 
 	pruneFinished();
 
@@ -236,6 +251,15 @@ void Simulation::sendCsv()
 			<< pos.x << "," << pos.y << ","
 			<< vel.x << "," << vel.y << ","
 			<< acc.x << "," << acc.y << "\n";
+
+		float tempRelDist = 100.f;
+		v->getAnfisOutput().relDist > 100.0f ? tempRelDist = 100.0f : tempRelDist = v->getAnfisOutput().relDist;
+
+		anfisFile
+			<< tempRelDist << "\t"
+			<< v->getAnfisOutput().relSpeed << "\t"
+			<< v->getAnfisOutput().relAccel << "\t"
+			<< v->getAnfisOutput().output << "\n";
 	}
 }
 

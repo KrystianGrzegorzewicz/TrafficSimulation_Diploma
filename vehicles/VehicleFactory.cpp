@@ -3,6 +3,7 @@
 #include "vehicles/CarAV.h"
 #include "behavior/BehaviorHuman.h"
 #include "behavior/longitudinal/IDMLongitudinalModel.h"
+#include "behavior/longitudinal/FuzzyLongitudinalModel.h"
 #include "behavior/BehaviorAV.h"
 #include "perception/PerceptionHuman.h"
 #include "perception/PerceptionAV.h"
@@ -32,7 +33,7 @@ std::unique_ptr<Car> VehicleFactory::createAV(float speed, Travel travel)
 		speed,
 		std::move(travel),
 		std::make_unique<BehaviorAV>(
-			std::make_unique<IDMLongitudinalModel>()
+			std::make_unique<FuzzyLongitudinalModel>()
 		),
 		std::make_unique<PerceptionAV>()
 	);
