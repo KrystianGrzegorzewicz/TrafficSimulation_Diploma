@@ -11,6 +11,7 @@
 struct WorldState;
 
 struct Anfis {
+	float desiredSpeed;
 	float relDist;
 	float relSpeed;
 	float relAccel;
@@ -28,6 +29,8 @@ public:
 	int	getTravelId() const;
 	Vec2 getPosition() const;
 	Vec2 getVelocityVector() const;
+	float getSpeed() const;
+	float getDesiredSpeed() const;
 	Vec2 getAccelerationVector() const;
 	bool isFinished() const;
 	int* getColor()	const;

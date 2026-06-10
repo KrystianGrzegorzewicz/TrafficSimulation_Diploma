@@ -5,9 +5,9 @@
 struct Config
 {
 	bool gui = true;
-	bool saveCsv = false;
+	bool saveCsv = 0;
 
-	float simSpeed = 1.0f;
+	float simSpeed = 4.0f;
 	float spawnRate = 0.7f;
 	float AVRate = 0.5f;
 
@@ -17,7 +17,7 @@ struct Config
 	float aggressionSharpness = 0.5f;
 
 	float maxSimulationTime = -1.0f;
-	int maxVehiclesFinished = 20;
+	int maxVehiclesFinished = 40;
 
 	int randomSeed = 0;
 	int runId = 0;

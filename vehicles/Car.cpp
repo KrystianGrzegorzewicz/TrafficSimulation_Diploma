@@ -54,6 +54,8 @@ int  Car::getId() const { return id; }
 int  Car::getTravelId() const { return travelId; }
 Vec2 Car::getPosition() const { return position; }
 Vec2 Car::getVelocityVector() const { return velocity; }
+float Car::getSpeed() const { return speed; }
+//float Car::getDesiredSpeed() const { return xxx; }
 Vec2 Car::getAccelerationVector() const { return acceleration; }
 bool Car::isFinished() const { return finished; }
 int* Car::getColor() const { return const_cast<int*>(color); }
@@ -258,6 +260,8 @@ void Car::executeUpdate(
 			lookaheadSpeedFactor,
 			perceptionState
 		);
+
+	output.desiredSpeed = cmd.desiredSpeed;
 
 	cmd.internalDt = dt;
 

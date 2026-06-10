@@ -112,12 +112,12 @@ Simulation::Simulation(
 			<< "ax,"
 			<< "ay\n";
 
-/*		anfisFile
-			<< "id,"
-			<< "relDist,"
-			<< "relSpeed,"
-			<< "relAcc,"
-			<< "acceleration\n";*/
+		/*		anfisFile
+					<< "id,"
+					<< "relDist,"
+					<< "relSpeed,"
+					<< "relAcc,"
+					<< "acceleration\n";*/
 	}
 
 	spawnVehicle();
@@ -155,9 +155,7 @@ void Simulation::step(float dt)
 	// Update all vehicles
 	for (auto& v : vehicles) {
 		v->update(dt, worldState);
-
 	}
-		
 
 	pruneFinished();
 
@@ -256,9 +254,10 @@ void Simulation::sendCsv()
 		v->getAnfisOutput().relDist > 100.0f ? tempRelDist = 100.0f : tempRelDist = v->getAnfisOutput().relDist;
 
 		anfisFile
+			<< v->getSpeed() << "\t"
+			<< v->getAnfisOutput().desiredSpeed << "\t"
 			<< tempRelDist << "\t"
 			<< v->getAnfisOutput().relSpeed << "\t"
-			<< v->getAnfisOutput().relAccel << "\t"
 			<< v->getAnfisOutput().output << "\n";
 	}
 }

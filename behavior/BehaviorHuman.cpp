@@ -88,6 +88,8 @@ MotionCommand BehaviorHuman::compute(
 		desiredSpeed *= hazardFactor;
 	}
 
+	cmd.desiredSpeed = desiredSpeed;
+
 	float desiredAccel =
 		longitudinalModel->computeAcceleration(
 			self,

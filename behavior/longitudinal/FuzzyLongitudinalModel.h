@@ -21,6 +21,6 @@ public:
 		float maxDecel
 	) override;
 private:
-	FIS_TYPE g_fisInput[3];
+	FIS_TYPE g_fisInput[4];
 	FIS_TYPE g_fisOutput[1];
 };
