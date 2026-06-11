@@ -1,6 +1,8 @@
 #include "simulation/Simulation.h"
 #include "vehicles/VehicleFactory.h"
 #include "vehicles/DriverPersonality.h"
+#include "behavior/longitudinal/rondo2_fis.h"
+#include "behavior/longitudinal/headtohead_fis.h"
 
 #include <algorithm>
 #include <sstream>
@@ -119,7 +121,8 @@ Simulation::Simulation(
 					<< "relAcc,"
 					<< "acceleration\n";*/
 	}
-
+	rondo2_init();
+	headtohead_init();
 	spawnVehicle();
 }
 
@@ -177,11 +180,11 @@ void Simulation::spawnVehicle()
 
 	if (AVrate > 0.f && (rand() / (float)RAND_MAX) < AVrate)
 	{
-		vehicle = VehicleFactory::createAV(14.f, junction.getRandomTravel());
+		vehicle = VehicleFactory::createAV(1.f, junction.getRandomTravel());
 	}
 	else
 	{
-		vehicle = VehicleFactory::createHuman(14.f, junction.getRandomTravel());
+		vehicle = VehicleFactory::createHuman(1.f, junction.getRandomTravel());
 	}
 
 	if (saveCsv)
@@ -254,8 +257,8 @@ void Simulation::sendCsv()
 		v->getAnfisOutput().relDist > 100.0f ? tempRelDist = 100.0f : tempRelDist = v->getAnfisOutput().relDist;
 
 		anfisFile
-			<< v->getSpeed() << "\t"
-			<< v->getAnfisOutput().desiredSpeed << "\t"
+			//<< v->getSpeed() << "\t"
+			//<< v->getAnfisOutput().desiredSpeed << "\t"
 			<< tempRelDist << "\t"
 			<< v->getAnfisOutput().relSpeed << "\t"
 			<< v->getAnfisOutput().output << "\n";
