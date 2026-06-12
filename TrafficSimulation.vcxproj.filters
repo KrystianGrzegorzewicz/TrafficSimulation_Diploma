@@ -84,10 +84,10 @@
     <ClCompile Include="core\qfis.c">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="behavior\longitudinal\rondo2_fis.c">
+    <ClCompile Include="behavior\longitudinal\carFollow_fis.c">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="behavior\longitudinal\headtohead_fis.c">
+    <ClCompile Include="behavior\longitudinal\pathPlanning_fis.c">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
   </ItemGroup>
@@ -197,10 +197,10 @@
     <ClInclude Include="core\qfis.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="behavior\longitudinal\rondo2_fis.h">
+    <ClInclude Include="behavior\longitudinal\carFollow_fis.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="behavior\longitudinal\headtohead_fis.h">
+    <ClInclude Include="behavior\longitudinal\pathPlanning_fis.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>

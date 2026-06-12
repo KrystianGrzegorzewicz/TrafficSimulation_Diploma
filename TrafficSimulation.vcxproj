@@ -130,10 +130,10 @@
   <ItemGroup>
     <ClCompile Include="behavior\BehaviorAV.cpp" />
     <ClCompile Include="behavior\BehaviorHuman.cpp" />
+    <ClCompile Include="behavior\longitudinal\carFollow_fis.c" />
     <ClCompile Include="behavior\longitudinal\FuzzyLongitudinalModel.cpp" />
-    <ClCompile Include="behavior\longitudinal\headtohead_fis.c" />
     <ClCompile Include="behavior\longitudinal\IDMLongitudinalModel.cpp" />
-    <ClCompile Include="behavior\longitudinal\rondo2_fis.c" />
+    <ClCompile Include="behavior\longitudinal\pathPlanning_fis.c" />
     <ClCompile Include="core\Config.cpp" />
     <ClCompile Include="core\qffmath.c" />
     <ClCompile Include="core\qfis.c" />
@@ -166,11 +166,11 @@
     <ClInclude Include="behavior\BehaviorHuman.h" />
     <ClInclude Include="behavior\BehaviorOutput.h" />
     <ClInclude Include="behavior\IBehavior.h" />
+    <ClInclude Include="behavior\longitudinal\carFollow_fis.h" />
     <ClInclude Include="behavior\longitudinal\FuzzyLongitudinalModel.h" />
-    <ClInclude Include="behavior\longitudinal\headtohead_fis.h" />
     <ClInclude Include="behavior\longitudinal\IDMLongitudinalModel.h" />
     <ClInclude Include="behavior\longitudinal\ILongitudinalModel.h" />
-    <ClInclude Include="behavior\longitudinal\rondo2_fis.h" />
+    <ClInclude Include="behavior\longitudinal\pathPlanning_fis.h" />
     <ClInclude Include="behavior\MotionCommand.h" />
     <ClInclude Include="core\Config.h" />
     <ClInclude Include="core\qffmath.h" />

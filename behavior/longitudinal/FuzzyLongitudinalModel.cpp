@@ -18,11 +18,11 @@ float FuzzyLongitudinalModel::computeAcceleration(
 	float inputs2[2] = { perception.distanceToCarAhead > 100.0f ? 100.0f : perception.distanceToCarAhead, perception.relativeSpeed };
 	float output2[1];
 
-	rondo2_run(
+	pathPlanning_run(
 		inputs1,
 		output1
 	);
-	headtohead_run(
+	carFollow_run(
 		inputs2,
 		output2
 	);

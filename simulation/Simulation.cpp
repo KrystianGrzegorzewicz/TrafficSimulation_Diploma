@@ -1,8 +1,8 @@
 #include "simulation/Simulation.h"
 #include "vehicles/VehicleFactory.h"
 #include "vehicles/DriverPersonality.h"
-#include "behavior/longitudinal/rondo2_fis.h"
-#include "behavior/longitudinal/headtohead_fis.h"
+#include "behavior/longitudinal/pathPlanning_fis.h"
+#include "behavior/longitudinal/carFollow_fis.h"
 
 #include <algorithm>
 #include <sstream>
@@ -121,8 +121,8 @@ Simulation::Simulation(
 					<< "relAcc,"
 					<< "acceleration\n";*/
 	}
-	rondo2_init();
-	headtohead_init();
+	pathPlanning_init();
+	carFollow_init();
 	spawnVehicle();
 }
 

@@ -487,7 +487,7 @@ Junction::Junction(int index)
 		travels.emplace_back(tp13, 2, 13);
 		travels.emplace_back(tp14, 2, 14);
 
-		circles.append_range(drawTravel(tp5));
+		//circles.append_range(drawTravel(tp5));
 		break;
 	default:
 		std::cerr << "Junction: unknown index " << index << "\n";
