@@ -9,7 +9,7 @@ struct Config
 
 	float simSpeed = 1.0f;
 	float spawnRate = 1.0f;
-	float AVRate = 0.5f;
+	float AVRate = 0.4f;
 
 	int junction = 3;
 
