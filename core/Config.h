@@ -7,11 +7,11 @@ struct Config
 	bool gui = 1;
 	bool saveCsv = 0;
 
-	float simSpeed = 1.0f;
-	float spawnRate = 1.0f;
-	float AVRate = 0.5f;
+	float simSpeed = 5.0f;
+	float spawnRate = 0.50f;
+	float AVRate = 0.0f;
 
-	int junction = 3;
+	int junction = 5;
 
 	float aggressionBias = 0.5f;
 	float aggressionSharpness = 0.5f;
