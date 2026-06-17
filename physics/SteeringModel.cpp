@@ -24,8 +24,20 @@ Vec2 SteeringModel::computeLateralAcceleration(
 	Vec2 p1 = p[segment + 1];
 	Vec2 p2 = p[segment + 2];
 
-	Vec2 pathPoint = travel.bezier(p0, p1, p2, t);
-	Vec2 tangent = travel.bezierDerivative(p0, p1, p2, t).normalized();
+	/*Vec2 pathPoint = travel.bezier(p0, p1, p2, t);
+	Vec2 tangent = travel.bezierDerivative(p0, p1, p2, t).normalized();*/
+	Vec2 pathPoint = cmd.targetPoint;
+	Vec2 tangent;
+	Vec2 toTarget = pathPoint - position;
+	if (toTarget.length() > 0.01f)
+	{
+		tangent = toTarget.normalized();
+	}
+	else
+	{
+		tangent = cmd.targetTangent;
+	}
+
 	Vec2 right(-tangent.y, tangent.x);
 
 	//Cross-track error
@@ -38,7 +50,8 @@ Vec2 SteeringModel::computeLateralAcceleration(
 		? velocity.normalized()
 		: tangent;
 
-	float e_heading = velDir.cross(tangent);
+	/*float e_heading = velDir.cross(tangent);*/
+	float e_heading = std::atan2(velDir.cross(tangent), velDir.dot(tangent));
 
 	//Lateral velocity (derivative term)
 	float e_lat_dot = velocity.dot(right);
@@ -48,11 +61,11 @@ Vec2 SteeringModel::computeLateralAcceleration(
 
 	//Clamp by physical limits
 	float speed = velocity.length();
-	float maxFromRadius = (speed * speed) / minTurnRadius;
-	float maxLatAcc = std::min(aLatMax, maxFromRadius);
+	//float maxFromRadius = (speed * speed) / minTurnRadius;
+	//float maxLatAcc = std::min(aLatMax, maxFromRadius);
 
-	if (std::fabs(a_lat) > maxLatAcc)
-		a_lat = (a_lat > 0 ? 1.f : -1.f) * maxLatAcc;
+	if (std::fabs(a_lat) > aLatMax)
+		a_lat = (a_lat > 0 ? 1.f : -1.f) * aLatMax;
 
 	//Low-speed damping
 	float lowSpeedDamping = std::clamp(speed / 5.0f, 0.0f, 1.0f);

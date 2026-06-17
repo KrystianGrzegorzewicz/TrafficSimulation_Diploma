@@ -5,9 +5,9 @@
 struct Config
 {
 	bool gui = 1;
-	bool saveCsv = 0;
+	bool saveCsv = 1;
 
-	float simSpeed = 5.0f;
+	float simSpeed = 1.0f;
 	float spawnRate = 0.50f;
 	float AVRate = 0.0f;
 

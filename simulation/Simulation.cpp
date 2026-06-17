@@ -36,6 +36,7 @@ Simulation::Simulation(
 	: junction(junctionIndex)
 	, saveCsv(saveCsv)
 	, AVrate(AVrate)
+	, maxVehicles(conf.maxVehiclesFinished)
 {
 	spawnPeriod =
 		(spawnRate > 0.f)
@@ -64,7 +65,7 @@ Simulation::Simulation(
 				<< "_SP" << static_cast<int>(conf.spawnRate * 100)
 				<< "_BIAS" << static_cast<int>(conf.aggressionBias * 100)
 				<< "_SHARP" << static_cast<int>(conf.aggressionSharpness * 100)
-				<< "_SEED" << conf.randomSeed;
+				<< "_MAXVEH" << conf.maxVehiclesFinished;
 		}
 
 		outputDirectory = experimentFolder.str();
@@ -176,6 +177,10 @@ void Simulation::step(float dt)
 
 void Simulation::spawnVehicle()
 {
+	if (maxVehicles >= 0 && vehicleCount >= maxVehicles)
+		return;
+
+	vehicleCount++;
 	std::unique_ptr<Car> vehicle;
 
 	if (AVrate > 0.f && (rand() / (float)RAND_MAX) < AVrate)

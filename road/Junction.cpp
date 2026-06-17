@@ -119,10 +119,10 @@ Junction::Junction(int index)
 			Vec2(1.75f,-3.5f),Vec2(1.75f,-30.f), Vec2(1.75f,-60.f),
 			Vec2(1.75f,-90.f),Vec2(1.75f,-90.f)
 		};
-		circles.append_range(drawTravel(tp3));
+		//circles.append_range(drawTravel(tp3));
 		travels.emplace_back(tp1, 5, 1);
 		travels.emplace_back(tp2, 5, 2);
-		travels.emplace_back(tp3, 1, 3);
+		travels.emplace_back(tp3, 2, 3);
 		break;
 
 		// ------------------------------------------------------------------
@@ -148,6 +148,9 @@ Junction::Junction(int index)
 	case 4: // Simple roundabout
 		//mask
 		blocks.push_back(Block(-150.0f, -100.0f, 150.0f, 150.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
+		blocks.push_back(Block(-150.0f, 0.0f, -15.0f, 20.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 3, 4, 5, 6 }));
+		blocks.push_back(Block(15.0f, -15.0f, 150.0f, 0.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 1, 2, 5, 6 }));
+		blocks.push_back(Block(-15.0f, -150.0f, 0.0f, -15.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 1, 2, 3, 4 }));
 
 		circles.emplace_back(0.f, 0.f, 11.f, true);
 		circles.emplace_back(0.f, 0.f, 17.f, false);
@@ -251,8 +254,8 @@ Junction::Junction(int index)
 	case 5: // with traffic lights
 		//mask
 		blocks.push_back(Block(-300.0f, -300.0f, 300.0f, 300.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
-		blocks.push_back(Block(11.0f, -100.0f, 100.0f, 0.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 1, 2, 3, 8, 9, 10 }));
-		blocks.push_back(Block(-100.0f, 0.0f, -11.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 4, 5, 6, 7, 12, 13 }));
+		blocks.push_back(Block(11.0f, -100.0f, 100.0f, 0.2f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 1, 2, 3, 8, 9, 10 }));
+		blocks.push_back(Block(-100.0f, -0.2f, -11.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 4, 5, 6, 7, 12, 13 }));
 		blocks.push_back(Block(-11.0f, -100.0f, 11.0f, -3.5f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 4 }));
 		blocks.push_back(Block(-3.5f, -10.0f, 11.0f, 0.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 4 }));
 		blocks.push_back(Block(-11.0f, 3.5f, 11.0f, 100.f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 8 }));
@@ -487,7 +490,7 @@ Junction::Junction(int index)
 		travels.emplace_back(tp13, 2, 13);
 		travels.emplace_back(tp14, 2, 14);
 
-		//circles.append_range(drawTravel(tp5));
+		//circles.append_range(drawTravel(tp1));
 		break;
 	default:
 		std::cerr << "Junction: unknown index " << index << "\n";

@@ -1,16 +1,24 @@
 @echo off
 
-set EXP=SP10_AV00_J5_BIA05_SHA05_MAX30
-
-for /L %%i in (1,1,10) do (
-
-	start "" /B x64/Debug/TrafficSimulation.exe ^
-		--nogui ^
-		--spawn 1.0 ^
-		--av 0.0 ^
-		--junction 5 ^
-		--seed %%i ^
-		--run %%i ^
-		--max-finished 30 ^
-		--experiment %EXP% 
+for /L %%i in (3,1,5) do (
+	for /L %%j in (1,1,1) do (
+		for %%k in (0.25 0.50 0.75) do (
+			for %%l in (0.25 0.50 0.75) do (
+				for %%m in (0.4 0.7 1.0) do (
+					start "" /B x64/Debug/TrafficSimulation.exe ^
+						--nogui ^
+						--spawn %%m ^
+						--av 0.0 ^
+						--junction %%i ^
+						--bias %%k ^
+						--sharpness %%l ^
+						--seed %%j ^
+						--run %%j ^
+						--max-finished 30 ^
+						--max-time 500
+				)
+			)
+		)
+	)
+		
 )

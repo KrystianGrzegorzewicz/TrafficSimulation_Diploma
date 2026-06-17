@@ -2,6 +2,13 @@
 
 #include <algorithm>
 
+struct ArcLengthTarget
+{
+	Vec2 point;
+	int segment;
+	float t;
+};
+
 PathPlan PathPlanner::compute(
 	Travel& travel,
 	int segment,
@@ -61,28 +68,57 @@ Vec2 PathPlanner::computeTargetArcLength(
 	float lookaheadDist)
 {
 	const auto& p = travel.TravelPoints;
+
 	int seg = segment;
 	float localT = t;
-	float remainMeters = lookaheadDist;
 
-	while (remainMeters > 0 && seg + 2 < (int)p.size())
+	float traveled = 0.0f;
+
+	const float step = 0.01f;
+
+	while (seg + 2 < (int)p.size())
 	{
-		Vec2 deriv = travel.bezierDerivative(p[seg], p[seg + 1], p[seg + 2], localT);
-		float metersPerT = std::max(deriv.length(), 0.001f);
-		float dt = remainMeters / metersPerT;
+		Vec2 prev =
+			travel.bezier(
+				p[seg],
+				p[seg + 1],
+				p[seg + 2],
+				localT);
 
-		if (localT + dt <= 1.0f)
+		float nextT = localT + step;
+
+		if (nextT > 1.0f)
 		{
-			localT += dt;
-			remainMeters = 0;
-			break;
+			seg += 2;
+
+			if (seg + 2 >= (int)p.size())
+				return p.back();
+
+			localT = 0.0f;
+			continue;
 		}
 
-		remainMeters -= (1.0f - localT) * metersPerT;
-		seg += 2;
-		localT = 0;
+		Vec2 next =
+			travel.bezier(
+				p[seg],
+				p[seg + 1],
+				p[seg + 2],
+				nextT);
+
+		float ds = (next - prev).length();
+
+		if (traveled + ds >= lookaheadDist)
+		{
+			float alpha =
+				(lookaheadDist - traveled) /
+				std::max(ds, 0.0001f);
+
+			return prev + (next - prev) * alpha;
+		}
+
+		traveled += ds;
+		localT = nextT;
 	}
 
-	if (seg + 2 >= (int)p.size()) return p.back();
-	return travel.bezier(p[seg], p[seg + 1], p[seg + 2], localT);
+	return p.back();
 }

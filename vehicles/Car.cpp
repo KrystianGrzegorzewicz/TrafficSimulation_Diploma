@@ -113,6 +113,11 @@ void Car::updateClosestT()
 	float bestT = t;
 	float bestDist2 = FLT_MAX;
 	const int coarseSteps = 30;
+	if (bestDist2 > 9.0f)
+	{
+		startT = 0.f;
+		endT = 1.f;
+	}
 
 	for (int i = 0; i <= coarseSteps; ++i)
 	{

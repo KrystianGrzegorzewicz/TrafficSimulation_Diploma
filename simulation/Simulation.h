@@ -37,6 +37,8 @@ private:
 	WorldState worldState;
 	std::vector<std::unique_ptr<Car>> vehicles;
 
+	int vehicleCount = 0;
+	int maxVehicles = -1;
 	float spawnAccumulator = 0.0f;
 	float spawnPeriod = 1.0f;
 	float currentTime = 0.0f;
