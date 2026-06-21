@@ -43,7 +43,7 @@ Car::Car(float initialSpeed, Travel travelIn)
 		tangent.normalize();
 	}
 
-	const float minLaunchSpeed = 10.0f;
+	const float minLaunchSpeed = 0.0f;
 
 	speed = std::max(initialSpeed, minLaunchSpeed);
 	velocity = tangent * speed;

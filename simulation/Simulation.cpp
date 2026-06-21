@@ -185,11 +185,11 @@ void Simulation::spawnVehicle()
 
 	if (AVrate > 0.f && (rand() / (float)RAND_MAX) < AVrate)
 	{
-		vehicle = VehicleFactory::createAV(1.f, junction.getRandomTravel());
+		vehicle = VehicleFactory::createAV(0.0f, junction.getRandomTravel());
 	}
 	else
 	{
-		vehicle = VehicleFactory::createHuman(1.f, junction.getRandomTravel());
+		vehicle = VehicleFactory::createHuman(0.0f, junction.getRandomTravel());
 	}
 
 	if (saveCsv)
@@ -262,6 +262,7 @@ void Simulation::sendCsv()
 		v->getAnfisOutput().relDist > 100.0f ? tempRelDist = 100.0f : tempRelDist = v->getAnfisOutput().relDist;
 
 		anfisFile
+			<< v->getId() << "\t"
 			//<< v->getSpeed() << "\t"
 			//<< v->getAnfisOutput().desiredSpeed << "\t"
 			<< tempRelDist << "\t"

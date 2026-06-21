@@ -30,9 +30,9 @@ private:
 	// --- tuning ---
 	static constexpr float kLaneWidth = 3.0f;
 	static constexpr float kMaxViewDistMin = 30.0f;
-	static constexpr float kMaxViewDistMax = 80.0f;
-	static constexpr float kFovAngleNarrow = 50.0f;  // degrees, high speed
-	static constexpr float kFovAngleWide = 120.0f; // degrees, low speed
-	static constexpr float kBlockMaxView = 70.0f;
-	static constexpr float kBlockThreatDist = 50.0f;
+	static constexpr float kMaxViewDistMax = 100.0f;
+	static constexpr float kFovAngleNarrow = 40.0f;  // degrees, high speed
+	static constexpr float kFovAngleWide = 160.0f; // degrees, low speed
+	static constexpr float kBlockMaxView = 100.0f;
+	static constexpr float kBlockThreatDist = 150.0f;
 };

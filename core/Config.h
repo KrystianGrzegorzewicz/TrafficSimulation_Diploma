@@ -5,13 +5,13 @@
 struct Config
 {
 	bool gui = 1;
-	bool saveCsv = 1;
+	bool saveCsv = 0;
 
-	float simSpeed = 1.0f;
-	float spawnRate = 0.50f;
+	float simSpeed = 2.0f;
+	float spawnRate = 0.70f;
 	float AVRate = 0.0f;
 
-	int junction = 5;
+	int junction = 3;
 
 	float aggressionBias = 0.5f;
 	float aggressionSharpness = 0.5f;
