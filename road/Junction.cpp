@@ -28,6 +28,7 @@ Junction::Junction(int index)
 {
 	std::vector<Vec2> tp1, tp2, tp3, tp4, tp5, tp6, tp7, tp8, tp9, tp10, tp11, tp12, tp13, tp14;
 	float lightCycle, bufforTime;
+	ConflictPoint c;
 
 	switch (index)
 	{
@@ -123,6 +124,14 @@ Junction::Junction(int index)
 		travels.emplace_back(tp1, 5, 1);
 		travels.emplace_back(tp2, 5, 2);
 		travels.emplace_back(tp3, 2, 3);
+
+		c.position = Vec2(1.75f, -1.75f);
+		c.priorityTravels = { 1 };
+		c.yieldTravels = { 3 };
+		c.radius = 4.f;
+		conflictPoints.push_back(c);
+		circles.emplace_back(c.position.x, c.position.y, c.radius, true);
+
 		break;
 
 		// ------------------------------------------------------------------
@@ -247,6 +256,14 @@ Junction::Junction(int index)
 		travels.emplace_back(tp4, 1, 4);
 		travels.emplace_back(tp5, 1, 5);
 		travels.emplace_back(tp6, 1, 6);
+
+		conflictPoints.push_back({ Vec2(-17.f,1.75f),{1,2,4,5,6},{3},6.f });
+		conflictPoints.push_back({ Vec2(17.f,-1.75f),{1,2,3,5,6},{4},6.f });
+		conflictPoints.push_back({ Vec2(-1.75f,-17.f),{1,2,3,4},{5,6},6.f });
+
+		circles.emplace_back(-17.f, 1.75f, 6.f, true);
+		circles.emplace_back(17.f, -1.75f, 6.f, true);
+		circles.emplace_back(-1.75f, -17.f, 6.f, true);
 
 		break;
 
@@ -581,3 +598,5 @@ const Block* Junction::getPerceptionMaskForTravel(int travelId, const Vec2& poin
 
 	return nullptr;
 }
+
+const std::vector<ConflictPoint>& Junction::getConflictPoints() const { return conflictPoints; }

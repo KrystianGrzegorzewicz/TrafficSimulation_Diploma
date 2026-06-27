@@ -184,6 +184,7 @@
     <ClInclude Include="planning\PathPlanner.h" />
     <ClInclude Include="road\Block.h" />
     <ClInclude Include="road\Circle.h" />
+    <ClInclude Include="road\ConflictPoint.h" />
     <ClInclude Include="road\Junction.h" />
     <ClInclude Include="road\Line.h" />
     <ClInclude Include="road\Travel.h" />

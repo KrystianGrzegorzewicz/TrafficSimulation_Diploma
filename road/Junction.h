@@ -4,6 +4,7 @@
 #include "road/Travel.h"
 #include "road/Line.h"
 #include "road/Circle.h"
+#include "road/ConflictPoint.h"
 
 #include <vector>
 
@@ -20,10 +21,13 @@ public:
 	std::vector<Circle> drawTravel(std::vector<Vec2> travelPoints);
 	Travel getRandomTravel();
 	const Block* getPerceptionMaskForTravel(int travelId, const Vec2& point) const;
+	const std::vector<ConflictPoint>&
+		getConflictPoints() const;
 
 private:
 	std::vector<Block> blocks;
 	std::vector<Travel> travels;
 	std::vector<Line> lines;
 	std::vector<Circle> circles;
+	std::vector<ConflictPoint> conflictPoints;
 };

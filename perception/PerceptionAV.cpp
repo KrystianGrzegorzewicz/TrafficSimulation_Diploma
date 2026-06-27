@@ -14,11 +14,13 @@ void PerceptionAV::update(
 )
 {
 	out = PerceptionState{};
-
 	updateCarAhead(self, world, out);
 
 	if (world.junction)
+	{
 		updateBlockHazard(self, world, out);
+		updateConflictPoints(self, world, out);
+	}
 }
 
 void PerceptionAV::updateCarAhead(
@@ -55,30 +57,26 @@ void PerceptionAV::updateCarAhead(
 		Vec2  relPos = o.position - self.position;
 		float dist = relPos.length();
 
-		// Skip self (same position) and out-of-range
 		if ((dist < 0.001f || dist > fov.maxViewDistance) && o.id != self.id)
 			continue;
 
 		Vec2  dir = relPos / dist;
 
-		// FOV cone
 		if (forward.dot(dir) < fov.fovDot)
 			continue;
 
-		// Lane filter
 		if (std::fabs(relPos.dot(right)) > kLaneWidth)
 			continue;
 
-		// Only approach if the other vehicle is actually closing
 		Vec2  relVel = o.velocity - self.velocity;
 		float closingSpeed = -relVel.dot(dir);
+
 		if (closingSpeed <= 0.1f) {
 			if (dist < out.distanceToCarAhead)
 				out.distanceToCarAhead = dist;
 			continue;
 		}
 
-		// TTC score — lower is more urgent
 		float ttc = dist / closingSpeed;
 		if (ttc < bestScore)
 		{
@@ -91,7 +89,6 @@ void PerceptionAV::updateCarAhead(
 		}
 	}
 
-	// Store FOV params so callers can inspect them if needed
 	out.fovDot = fov.fovDot;
 	out.maxViewDistance = fov.maxViewDistance;
 }
@@ -123,7 +120,6 @@ void PerceptionAV::updateBlockHazard(
 			}
 		}
 		Vec2 toBlock = blocks[i].getCenter() - self.position;
-
 		float longitudinal = toBlock.dot(forward);
 		float lateral = std::fabs(toBlock.dot(right));
 
@@ -165,12 +161,11 @@ PerceptionAV::FOVResult PerceptionAV::calculateFOV(
 {
 	float speed = self.velocity.length();
 
-	// Speed factor: 0 at standstill → 1 at 15 m/s, with quadratic roll-off
 	float speedT = std::clamp(speed / 15.0f, 0.0f, 1.0f);
 	float speedFactor = speedT * speedT;
 
-	// Turning factor: high lateral acceleration → widen cone for awareness
-	Vec2  forward = (speed > 0.5f) ? self.velocity.normalized() : Vec2(1.f, 0.f);
+	Vec2  forward = (speed > 0.5f) ?
+		self.velocity.normalized() : Vec2(1.f, 0.f);
 	Vec2  right(-forward.y, forward.x);
 	float turningFactor = 0.0f;
 
@@ -180,17 +175,68 @@ PerceptionAV::FOVResult PerceptionAV::calculateFOV(
 		turningFactor = std::clamp(lateralAcc / 5.0f, 0.0f, 1.0f);
 	}
 
-	// Blend between wide (low speed) and narrow (high speed) cone
 	float minAngle = kFovAngleNarrow * DEG2RAD;
 	float maxAngle = kFovAngleWide * DEG2RAD;
 	float blendT = std::clamp(speedFactor - turningFactor * 0.7f, 0.0f, 1.0f);
+
 	float angle = maxAngle - blendT * (maxAngle - minAngle);
 	float fovDot = std::cos(angle);
 
-	// View distance: grows with speed (sqrt scaling)
 	float viewT = std::clamp(speed / 20.0f, 0.0f, 1.0f);
 	viewT = std::sqrt(viewT);
 	float maxViewDistance = kMaxViewDistMin + viewT * (kMaxViewDistMax - kMaxViewDistMin);
 
 	return { fovDot, maxViewDistance };
+}
+
+void PerceptionAV::updateConflictPoints(
+	const CarState& self,
+	const WorldState& world,
+	PerceptionState& out)
+{
+	const auto& cps = world.junction->getConflictPoints();
+	float selfSpeed = std::max(self.velocity.length(), 0.5f);
+
+	for (const auto& cp : cps)
+	{
+		if (!cp.mustYield(self.travelId)) continue;
+
+		Vec2 myToCp = cp.position - self.position;
+
+		// Jeśli punkt jest za nami, to znaczy że już wjechaliśmy/przejechaliśmy - nie hamujemy.
+		if (self.forward.dot(myToCp) < -1.5f) continue;
+
+		float myDist = myToCp.length();
+		if (myDist > 40.f) continue;
+
+		float myArrival = myDist / selfSpeed;
+
+		for (const auto& o : world.vehicleStates)
+		{
+			if (o.id == self.id) continue;
+			if (!cp.hasPriority(o.travelId)) continue;
+
+			Vec2 otherToCp = cp.position - o.position;
+
+			// Jeśli inny pojazd już przejechał przez swój punkt (z tolerancją -2.0m na długość zderzaka)
+			if (o.forward.dot(otherToCp) < -2.0f) continue;
+
+			float otherDist = otherToCp.length();
+			if (otherDist > 40.f) continue;
+
+			float otherSpeed = std::max(o.velocity.length(), 0.5f);
+			float otherArrival = otherDist / otherSpeed;
+
+			if (otherArrival < myArrival + 1.5f)
+			{
+				out.hasConflict = true;
+				out.conflictingCar = o;
+				out.conflictDistance = myDist;
+				out.myArrival = myArrival;
+				out.otherArrival = otherArrival;
+				out.conflictThreat = 1.f - std::clamp(otherArrival / (myArrival + 0.001f), 0.f, 1.f);
+				return;
+			}
+		}
+	}
 }

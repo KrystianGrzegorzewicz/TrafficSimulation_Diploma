@@ -74,6 +74,7 @@ MotionCommand BehaviorHuman::compute(
 
 	cmd.targetPoint = plan.targetPoint;
 	float desiredSpeed = std::min(maxSpeed, plan.maxCurveSpeed * personality.curveFactor);
+
 	float overspeed = speed - desiredSpeed;
 
 	if (overspeed > 0.0f)
@@ -81,11 +82,19 @@ MotionCommand BehaviorHuman::compute(
 		desiredSpeed -= overspeed * 0.55f;
 	}
 
-	if (perception.hasBlockHazard &&
-		perception.hazardIsActive)
+	if (perception.hasBlockHazard && perception.hazardIsActive)
 	{
 		float hazardFactor = std::clamp(perception.hazardDistance / 50.0f, 0.0f, 1.0f);
 		desiredSpeed *= hazardFactor;
+	}
+
+	// Ustępowanie pierwszeństwa (ludzie)
+	if (perception.hasConflict)
+	{
+		// Odległość zatrzymania jest modyfikowana przez charakter kierowcy
+		float stopDist = std::max(6.0f * personality.gapFactor, 3.0f);
+		float conflictFactor = std::clamp((perception.conflictDistance - stopDist) / 30.0f, 0.0f, 1.0f);
+		desiredSpeed *= conflictFactor;
 	}
 
 	cmd.desiredSpeed = desiredSpeed;
@@ -100,7 +109,7 @@ MotionCommand BehaviorHuman::compute(
 
 	reactionQueue.push_back({ desiredAccel,reactionTime });
 
-	// Apply delayed command
+	// Zastosowanie poleceń z opóźnieniem (czas reakcji człowieka)
 	if (haveDelayedCommand)
 	{
 		cmd.longitudinalAcceleration = delayedAccel;
@@ -110,16 +119,20 @@ MotionCommand BehaviorHuman::compute(
 		cmd.longitudinalAcceleration = 0.0f;
 	}
 
-	// Human restart delay
+	// Opóźnienie przy ruszaniu
 	if (startDelayTimer > 0.0f)
 	{
 		startDelayTimer -= dt;
 		cmd.longitudinalAcceleration = 0.0f;
 	}
 
-	// Emergency braking
-	if (perception.hasBlockHazard &&
-		perception.hazardDistance < 10.0f * personality.gapFactor)
+	// Hamowanie awaryjne
+	if (perception.hasBlockHazard && perception.hazardDistance < 10.0f * personality.gapFactor)
+	{
+		cmd.emergencyBrake = true;
+	}
+
+	if (perception.hasConflict && perception.conflictDistance < 5.0f * personality.gapFactor)
 	{
 		cmd.emergencyBrake = true;
 	}

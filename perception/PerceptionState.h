@@ -18,4 +18,11 @@ struct PerceptionState
 
 	float fovDot = 0.3f;
 	float maxViewDistance = 80.0f;
+
+	bool hasConflict = false;
+	CarState conflictingCar;
+	float conflictDistance = 999999.f;
+	float myArrival = 999999.f;
+	float otherArrival = 999999.f;
+	float conflictThreat = 0.f;
 };
