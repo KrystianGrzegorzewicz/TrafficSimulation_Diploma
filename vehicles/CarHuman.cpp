@@ -37,5 +37,6 @@ void CarHuman::update(
 		world,
 		*behavior,
 		*perception,
-		perceptionState);
+		perceptionState,
+		personality);
 }

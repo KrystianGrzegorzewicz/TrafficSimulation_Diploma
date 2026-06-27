@@ -1,6 +1,7 @@
 #pragma once
 
 #include "perception/IPerception.h"
+#include "vehicles/DriverPersonality.h"
 
 class PerceptionHuman : public IPerception
 {
@@ -27,8 +28,8 @@ private:
 	void updateConflictPoints(
 		const CarState& self,
 		const WorldState& world,
-		PerceptionState& out
-	);
+		const DriverPersonality& personality, // Dodajemy parametr osobowości
+		PerceptionState& out);
 
 	struct FOVResult { float fovDot; float maxViewDistance; };
 	FOVResult calculateFOV(const CarState& self) const;

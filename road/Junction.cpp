@@ -257,13 +257,13 @@ Junction::Junction(int index)
 		travels.emplace_back(tp5, 1, 5);
 		travels.emplace_back(tp6, 1, 6);
 
-		conflictPoints.push_back({ Vec2(-17.f,1.75f),{1,2,4,5,6},{3},6.f });
-		conflictPoints.push_back({ Vec2(17.f,-1.75f),{1,2,3,5,6},{4},6.f });
-		conflictPoints.push_back({ Vec2(-1.75f,-17.f),{1,2,3,4},{5,6},6.f });
+		conflictPoints.push_back({ Vec2(-13.f,5.f),{6},{1,2},4.f });
+		conflictPoints.push_back({ Vec2(13.f,-5.f),{3},{3,4},4.f });
+		conflictPoints.push_back({ Vec2(-5.f,-13.f),{1,2},{5,6},4.f });
 
-		circles.emplace_back(-17.f, 1.75f, 6.f, true);
-		circles.emplace_back(17.f, -1.75f, 6.f, true);
-		circles.emplace_back(-1.75f, -17.f, 6.f, true);
+		circles.emplace_back(-13.f, 5.f, 4.f, true);
+		circles.emplace_back(13.f, -5.f, 4.f, true);
+		circles.emplace_back(-5.f, -13.f, 4.f, true);
 
 		break;
 

@@ -19,7 +19,8 @@ void PerceptionHuman::update(
 	if (world.junction)
 	{
 		updateBlockHazard(self, world, out);
-		updateConflictPoints(self, world, out);
+		DriverPersonality personality =
+			updateConflictPoints(self, world, personality, out);
 	}
 }
 
@@ -187,18 +188,22 @@ PerceptionHuman::FOVResult PerceptionHuman::calculateFOV(const CarState& self) c
 void PerceptionHuman::updateConflictPoints(
 	const CarState& self,
 	const WorldState& world,
+	const DriverPersonality& personality, // Dodajemy parametr osobowości
 	PerceptionState& out)
 {
 	const auto& cps = world.junction->getConflictPoints();
 	float selfSpeed = std::max(self.velocity.length(), 0.5f);
+
+	// Mnożnik agresji: np. 0.5 (agresywny) do 2.0 (bardzo ostrożny)
+	// Zakładamy, że personality.gapFactor działa tak, że wyższa wartość to większy dystans
+	float aggressivenessMargin = 2.0f - personality.gapFactor;
+	aggressivenessMargin = std::clamp(aggressivenessMargin, 0.5f, 3.0f);
 
 	for (const auto& cp : cps)
 	{
 		if (!cp.mustYield(self.travelId)) continue;
 
 		Vec2 myToCp = cp.position - self.position;
-
-		// Uniknięcie zatrzymywania się dla punktu, który jest już za maską/środkiem samochodu
 		if (self.forward.dot(myToCp) < -1.5f) continue;
 
 		float myDist = myToCp.length();
@@ -212,23 +217,19 @@ void PerceptionHuman::updateConflictPoints(
 			if (!cp.hasPriority(o.travelId)) continue;
 
 			Vec2 otherToCp = cp.position - o.position;
-
-			// Jeśli inny samochód już opuścił strefę kolizji, zignoruj go
 			if (o.forward.dot(otherToCp) < -2.0f) continue;
 
 			float otherDist = otherToCp.length();
-			if (otherDist > 40.f) continue;
-
 			float otherSpeed = std::max(o.velocity.length(), 0.5f);
 			float otherArrival = otherDist / otherSpeed;
 
-			if (otherArrival < myArrival + 1.5f)
+			// Logika: Im wyższy aggressivenessMargin, tym bardziej kierowca "boi się"
+			// i potrzebuje większego odstępu czasowego od innego pojazdu.
+			if (otherArrival < myArrival + aggressivenessMargin)
 			{
 				out.hasConflict = true;
 				out.conflictingCar = o;
 				out.conflictDistance = myDist;
-				out.myArrival = myArrival;
-				out.otherArrival = otherArrival;
 				out.conflictThreat = 1.f - std::clamp(otherArrival / (myArrival + 0.001f), 0.f, 1.f);
 				return;
 			}
