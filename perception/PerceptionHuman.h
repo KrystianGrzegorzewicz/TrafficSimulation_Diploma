@@ -6,13 +6,13 @@
 class PerceptionHuman : public IPerception
 {
 public:
-	void update(
-		const CarState& self,
-		const WorldState& world,
-		PerceptionState& outState
-	) override;
+	explicit PerceptionHuman(const DriverPersonality& p) : personality(p) {}
+
+	void update(const CarState& self, const WorldState& world, PerceptionState& out) override;
 
 private:
+	DriverPersonality personality;
+
 	void updateCarAhead(
 		const CarState& self,
 		const WorldState& world,
@@ -28,8 +28,8 @@ private:
 	void updateConflictPoints(
 		const CarState& self,
 		const WorldState& world,
-		const DriverPersonality& personality, // Dodajemy parametr osobowości
-		PerceptionState& out);
+		PerceptionState& out
+	);
 
 	struct FOVResult { float fovDot; float maxViewDistance; };
 	FOVResult calculateFOV(const CarState& self) const;

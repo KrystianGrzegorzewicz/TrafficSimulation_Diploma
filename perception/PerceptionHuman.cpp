@@ -19,8 +19,7 @@ void PerceptionHuman::update(
 	if (world.junction)
 	{
 		updateBlockHazard(self, world, out);
-		DriverPersonality personality =
-			updateConflictPoints(self, world, personality, out);
+		updateConflictPoints(self, world, out);
 	}
 }
 
@@ -188,8 +187,8 @@ PerceptionHuman::FOVResult PerceptionHuman::calculateFOV(const CarState& self) c
 void PerceptionHuman::updateConflictPoints(
 	const CarState& self,
 	const WorldState& world,
-	const DriverPersonality& personality, // Dodajemy parametr osobowości
-	PerceptionState& out)
+	PerceptionState& out
+)
 {
 	const auto& cps = world.junction->getConflictPoints();
 	float selfSpeed = std::max(self.velocity.length(), 0.5f);

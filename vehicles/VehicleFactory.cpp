@@ -23,7 +23,7 @@ std::unique_ptr<Car> VehicleFactory::createHuman(float speed, Travel travel)
 			std::make_unique<IDMLongitudinalModel>(),
 			personality
 		),
-		std::make_unique<PerceptionHuman>()
+		std::make_unique<PerceptionHuman>(personality)
 	);
 }
 
