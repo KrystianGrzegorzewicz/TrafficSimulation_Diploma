@@ -184,19 +184,13 @@ PerceptionHuman::FOVResult PerceptionHuman::calculateFOV(const CarState& self) c
 	return { fovDot, maxViewDistance };
 }
 
-void PerceptionHuman::updateConflictPoints(
-	const CarState& self,
-	const WorldState& world,
-	PerceptionState& out
-)
+void PerceptionHuman::updateConflictPoints(const CarState& self, const WorldState& world, PerceptionState& out)
 {
 	const auto& cps = world.junction->getConflictPoints();
 	float selfSpeed = std::max(self.velocity.length(), 0.5f);
 
-	// Mnożnik agresji: np. 0.5 (agresywny) do 2.0 (bardzo ostrożny)
-	// Zakładamy, że personality.gapFactor działa tak, że wyższa wartość to większy dystans
-	float aggressivenessMargin = 2.0f - personality.gapFactor;
-	aggressivenessMargin = std::clamp(aggressivenessMargin, 0.5f, 3.0f);
+	float riskFactor = personality.gapFactor;
+	float aggressivenessMargin = 2.5f - (riskFactor * 1.5f);
 
 	for (const auto& cp : cps)
 	{
@@ -206,9 +200,9 @@ void PerceptionHuman::updateConflictPoints(
 		if (self.forward.dot(myToCp) < -1.5f) continue;
 
 		float myDist = myToCp.length();
-		if (myDist > 40.f) continue;
+		if (myDist > 40.0f) continue;
 
-		float myArrival = myDist / selfSpeed;
+		float myArrival = (myDist / selfSpeed) * riskFactor;
 
 		for (const auto& o : world.vehicleStates)
 		{
@@ -218,20 +212,25 @@ void PerceptionHuman::updateConflictPoints(
 			Vec2 otherToCp = cp.position - o.position;
 			if (o.forward.dot(otherToCp) < -2.0f) continue;
 
-			float otherDist = otherToCp.length();
-			float otherSpeed = std::max(o.velocity.length(), 0.5f);
-			float otherArrival = otherDist / otherSpeed;
+			float otherArrival = otherToCp.length() / std::max(o.velocity.length(), 0.5f);
 
-			// Logika: Im wyższy aggressivenessMargin, tym bardziej kierowca "boi się"
-			// i potrzebuje większego odstępu czasowego od innego pojazdu.
-			if (otherArrival < myArrival + aggressivenessMargin)
+			// LOGIKA HISTEREZY:
+			// 1. Jeśli już wjechaliśmy w konflikt, wymagamy znacznie większego marginesu,
+			// żeby przerwać wjazd (tzw. "posiadanie pierwszeństwa").
+			// 2. Jeśli jeszcze nie wjechaliśmy, wymagamy standardowego marginesu.
+
+			float hysteresisMargin = out.alreadyEnteringConflict ? (aggressivenessMargin + 1.0f) : aggressivenessMargin;
+
+			if (otherArrival < myArrival + hysteresisMargin)
 			{
 				out.hasConflict = true;
-				out.conflictingCar = o;
-				out.conflictDistance = myDist;
-				out.conflictThreat = 1.f - std::clamp(otherArrival / (myArrival + 0.001f), 0.f, 1.f);
+				out.alreadyEnteringConflict = false; // Wycofujemy się z zamiaru wjazdu
 				return;
 			}
 		}
 	}
+
+	// Jeśli pętla przeszła i nie wykryto blokującego konfliktu:
+	out.hasConflict = false;
+	out.alreadyEnteringConflict = true; // Potwierdzamy, że droga wolna, możemy wjechać
 }
