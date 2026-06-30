@@ -210,15 +210,33 @@ void PerceptionHuman::updateConflictPoints(const CarState& self, const WorldStat
 			if (!cp.hasPriority(o.travelId)) continue;
 
 			Vec2 otherToCp = cp.position - o.position;
+
+			// Zabezpieczenie 1: czy fizycznie minął już punkt?
 			if (o.forward.dot(otherToCp) < -2.0f) continue;
 
-			float otherArrival = otherToCp.length() / std::max(o.velocity.length(), 0.5f);
+			float otherDist = otherToCp.length();
+			if (otherDist < 0.1f) continue; // Unikamy dzielenia przez zero
+
+			// --- NOWA LOGIKA: PRĘDKOŚĆ ZBLIŻANIA ---
+			Vec2 dirToCp = otherToCp / otherDist; // Znormalizowany wektor kierunku do punktu
+			float approachSpeed = o.velocity.dot(dirToCp);
+
+			// Jeśli pojazd nie zbliża się w naszą stronę (np. jest po drugiej stronie ronda
+			// lub zjeżdża) to jego approachSpeed będzie małe albo ujemne.
+			// Dodajemy warunek otherDist > 5.0f, żeby nie ignorować kogoś, kto fizycznie
+			// blokuje już przejazd tuż przed naszym zderzakiem.
+			if (approachSpeed < 0.5f && otherDist > 5.0f)
+			{
+				continue; // Ignorujemy ten samochód, bo "nie patrzy/nie jedzie" w stronę punktu
+			}
+
+			// Obliczamy czas przyjazdu tylko na podstawie TEJ części prędkości,
+			// która faktycznie przybliża go do kolizji.
+			float effectiveSpeed = std::max(approachSpeed, 0.5f);
+			float otherArrival = otherDist / effectiveSpeed;
+			// ---------------------------------------
 
 			// LOGIKA HISTEREZY:
-			// 1. Jeśli już wjechaliśmy w konflikt, wymagamy znacznie większego marginesu,
-			// żeby przerwać wjazd (tzw. "posiadanie pierwszeństwa").
-			// 2. Jeśli jeszcze nie wjechaliśmy, wymagamy standardowego marginesu.
-
 			float hysteresisMargin = out.alreadyEnteringConflict ? (aggressivenessMargin + 1.0f) : aggressivenessMargin;
 
 			if (otherArrival < myArrival + hysteresisMargin)

@@ -21,8 +21,7 @@ public:
 	std::vector<Circle> drawTravel(std::vector<Vec2> travelPoints);
 	Travel getRandomTravel();
 	const Block* getPerceptionMaskForTravel(int travelId, const Vec2& point) const;
-	const std::vector<ConflictPoint>&
-		getConflictPoints() const;
+	const std::vector<ConflictPoint>& getConflictPoints() const;
 
 private:
 	std::vector<Block> blocks;
