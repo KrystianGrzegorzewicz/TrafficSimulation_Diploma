@@ -39,5 +39,7 @@ struct PerceptionState
 	float conflictThreat = 0.f;
 	float selfTtaEntry = 999999.f;
 	float selfTtaExit = 999999.f;
+	float otherTtaEntry = 999999.f;
+	float otherTtaExit = 999999.f;
 	std::vector<PriorityCarTTA> priorityCarsTTA;
 };

@@ -12,6 +12,240 @@ BehaviorHuman::BehaviorHuman(
 	reactionTime = 0.1f + 0.2f * personality.reactionFactor;
 }
 
+static float calculateHumanConflictMargin(
+	const DriverPersonality& personality,
+	const ConflictParameters& params)
+{
+	const float aggression =
+		std::clamp(
+			personality.aggression,
+			0.0f,
+			1.0f
+		);
+
+	/*
+	 * Potęgowanie sprawia, że agresywność
+	 * mocniej ujawnia się przy wysokich wartościach.
+	 */
+	const float aggressionEffect =
+		std::pow(aggression, 1.5f);
+
+	const float caution =
+		1.0f - aggressionEffect;
+
+	return
+		params.humanBaseMargin +
+		caution * params.humanAggressionMargin;
+}
+
+void BehaviorHuman::evaluateConflict(
+	const CarState& self,
+	float maxDecel,
+	float& desiredSpeed,
+	const PerceptionState& perception,
+	MotionCommand& cmd,
+	ConflictParameters& params,
+	float dt)
+{
+	constexpr float INF = 999999.0f;
+
+	/*
+	 * Aktualizujemy timer utrzymywania decyzji.
+	 */
+	if (conflictYieldTimer > 0.0f)
+	{
+		conflictYieldTimer -= dt;
+
+		if (conflictYieldTimer < 0.0f)
+			conflictYieldTimer = 0.0f;
+	}
+
+	/*
+	 * --------------------------------------------------------
+	 * Brak aktualnie wykrytego konfliktu
+	 * --------------------------------------------------------
+	 */
+
+	if (!perception.hasConflict ||
+		perception.alreadyEnteringConflict ||
+		perception.priorityCarsTTA.empty())
+	{
+		/*
+		 * Jeżeli już ustępujemy, nie ruszamy natychmiast
+		 * tylko dlatego, że jedna próbka TTA zniknęła.
+		 */
+		if (yieldingToConflict)
+		{
+			/*
+			 * Musimy mieć wystarczająco duży zapas czasowy,
+			 * żeby zakończyć decyzję o ustępowaniu.
+			 */
+			const float resumeMargin =
+				0.75f;
+
+			const float myEntry =
+				perception.selfTtaEntry;
+
+			const float otherExit =
+				perception.otherArrival;
+
+			const bool enoughSpace =
+				myEntry > otherExit +
+				resumeMargin;
+
+			if (conflictYieldTimer <= 0.0f &&
+				enoughSpace)
+			{
+				yieldingToConflict = false;
+				yieldingToCarId = -1;
+			}
+		}
+
+		/*
+		 * Jeżeli nadal ustępujemy, pozostajemy przy
+		 * niskiej prędkości.
+		 */
+		if (yieldingToConflict)
+		{
+			desiredSpeed =
+				std::min(
+					desiredSpeed,
+					0.5f
+				);
+		}
+
+		return;
+	}
+
+	const PriorityCarTTA& target =
+		perception.priorityCarsTTA.front();
+
+	/*
+	 * --------------------------------------------------------
+	 * Margines zależny od aggression
+	 * --------------------------------------------------------
+	 */
+
+	const float margin =
+		calculateHumanConflictMargin(
+			personality,
+			params
+		);
+
+	/*
+	 * --------------------------------------------------------
+	 * Warunek rozpoczęcia ustępowania
+	 * --------------------------------------------------------
+	 */
+
+	const bool temporalOverlap =
+		perception.selfTtaEntry <
+		target.ttaExit &&
+		target.ttaEntry <
+		perception.selfTtaExit;
+
+	const float arrivalDifference =
+		std::fabs(
+			perception.selfTtaEntry -
+			target.ttaEntry
+		);
+
+	const bool unsafe =
+		temporalOverlap &&
+		arrivalDifference < margin;
+
+	/*
+	 * --------------------------------------------------------
+	 * ROZPOCZYNAMY USTĘPOWANIE
+	 * --------------------------------------------------------
+	 */
+
+	if (!yieldingToConflict && unsafe)
+	{
+		yieldingToConflict = true;
+
+		yieldingToCarId =
+			target.carId;
+
+		conflictYieldTimer =
+			params.humanYieldHoldTime;
+	}
+
+	/*
+	 * --------------------------------------------------------
+	 * JEŻELI JUŻ USTĘPUJEMY
+	 * --------------------------------------------------------
+	 */
+
+	if (yieldingToConflict)
+	{
+		const float stopBuffer =
+			params.humanStopBuffer;
+
+		const float availableDistance =
+			std::max(
+				0.0f,
+				perception.conflictDistance -
+				stopBuffer
+			);
+
+		/*
+		 * Bezpieczna prędkość pozwalająca
+		 * zatrzymać się przed konfliktem.
+		 */
+		const float safeSpeed =
+			std::sqrt(
+				2.0f *
+				maxDecel *
+				availableDistance
+			);
+
+		desiredSpeed =
+			std::min(
+				desiredSpeed,
+				safeSpeed
+			);
+
+		/*
+		 * Nie pozwalamy IDM-owi znowu mocno przyspieszyć
+		 * podczas oczekiwania.
+		 */
+		if (availableDistance < 3.0f)
+		{
+			desiredSpeed =
+				std::min(
+					desiredSpeed,
+					1.0f
+				);
+		}
+
+		/*
+		 * Prawie przy punkcie konfliktowym:
+		 * zatrzymujemy się.
+		 */
+		if (availableDistance < 1.0f)
+		{
+			desiredSpeed = 0.0f;
+
+			if (perception.conflictDistance < 2.5f)
+			{
+				cmd.emergencyBrake = true;
+			}
+		}
+
+		return;
+	}
+
+	/*
+	 * --------------------------------------------------------
+	 * NIE USTĘPUJEMY
+	 * --------------------------------------------------------
+	 *
+	 * Tutaj nic nie robimy.
+	 * Samochód jedzie normalnie.
+	 */
+}
+
 MotionCommand BehaviorHuman::compute(
 	Travel& travel,
 	int segment,

@@ -490,6 +490,12 @@ void PerceptionHuman::analyzeConflictPoints(
 				out.otherArrival =
 					candidate.ttaEntry;
 
+				out.otherTtaEntry =
+					candidate.ttaEntry;
+
+				out.otherTtaExit =
+					candidate.ttaExit;
+
 				/*
 				 * Threat = im mniejsza różnica czasowa,
 				 * tym większe zagrożenie.

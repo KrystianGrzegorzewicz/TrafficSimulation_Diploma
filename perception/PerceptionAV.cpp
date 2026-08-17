@@ -450,6 +450,12 @@ void PerceptionAV::analyzeConflictPoints(
 				out.otherArrival =
 					candidate.ttaEntry;
 
+				out.otherTtaEntry =
+					candidate.ttaEntry;
+
+				out.otherTtaExit =
+					candidate.ttaExit;
+
 				const float timeDifference =
 					std::fabs(
 						out.selfTtaEntry -
