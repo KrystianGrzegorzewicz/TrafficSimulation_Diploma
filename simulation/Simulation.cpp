@@ -37,6 +37,7 @@ Simulation::Simulation(
 	, saveCsv(saveCsv)
 	, AVrate(AVrate)
 	, maxVehicles(conf.maxVehiclesFinished)
+	, AVModel(conf.AVModel)
 {
 	spawnPeriod =
 		(spawnRate > 0.f)
@@ -107,6 +108,7 @@ Simulation::Simulation(
 		logFile
 			<< "time,"
 			<< "id,"
+			<< "type,"
 			<< "travel_id,"
 			<< "x,"
 			<< "y,"
@@ -185,7 +187,7 @@ void Simulation::spawnVehicle()
 
 	if (AVrate > 0.f && (rand() / (float)RAND_MAX) < AVrate)
 	{
-		vehicle = VehicleFactory::createAV(0.0f, junction.getRandomTravel());
+		vehicle = VehicleFactory::createAV(0.0f, junction.getRandomTravel(), AVModel);
 	}
 	else
 	{
@@ -253,6 +255,7 @@ void Simulation::sendCsv()
 
 		logFile << currentTime << ","
 			<< v->getId() << ","
+			<< v->getTypeName() << ","
 			<< v->getTravelId() << ","
 			<< pos.x << "," << pos.y << ","
 			<< vel.x << "," << vel.y << ","

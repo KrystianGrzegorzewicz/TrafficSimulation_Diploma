@@ -23,6 +23,9 @@ Config parseConfig(int argc, char* argv[])
 		else if (arg == "--av")
 			conf.AVRate = std::stof(argv[++i]);
 
+		else if (arg == "--avmodel")
+			conf.AVModel = argv[++i];
+
 		else if (arg == "--junction")
 			conf.junction = std::stoi(argv[++i]);
 

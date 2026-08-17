@@ -18,6 +18,7 @@ public:
 	~CarHuman() override;
 
 	void update(float dt, const WorldState& world) override;
+	std::string getTypeName() const override { return "human"; }
 	const DriverPersonality* getPersonality() const override { return &personality; }
 
 private:

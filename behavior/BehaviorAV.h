@@ -26,4 +26,12 @@ public:
 private:
 	std::unique_ptr<ILongitudinalModel> longitudinalModel;
 	PathPlanner planner;
+
+	void evaluateConflictPoints(
+		const CarState& self,
+		float maxDecel,
+		float& desiredSpeed,
+		const PerceptionState& perception,
+		MotionCommand& cmd
+	);
 };

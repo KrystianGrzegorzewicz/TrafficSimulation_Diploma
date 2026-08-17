@@ -511,8 +511,8 @@ Junction::Junction(int index)
 		break;
 	case 6:
 		//mask
-		/*blocks.push_back(Block(-300.0f, -300.0f, 300.0f, 300.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
-		blocks.push_back(Block(11.0f, -100.0f, 100.0f, 0.2f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 1, 2, 3, 8, 9, 10 }));
+		blocks.push_back(Block(-300.0f, -300.0f, 300.0f, 300.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
+		/*blocks.push_back(Block(11.0f, -100.0f, 100.0f, 0.2f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {1, 2, 3, 8, 9, 10}));
 		blocks.push_back(Block(-100.0f, -0.2f, -11.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 4, 5, 6, 7, 12, 13 }));
 		blocks.push_back(Block(-11.0f, -100.0f, 11.0f, -3.5f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 4 }));
 		blocks.push_back(Block(-3.5f, -10.0f, 11.0f, 0.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 4 }));
@@ -520,57 +520,57 @@ Junction::Junction(int index)
 		blocks.push_back(Block(-11.0f, 0.0f, 3.5f, 10.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 8 }));
 		blocks.push_back(Block(-11.0f, -100.0f, 0.0f, -10.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 1, 2, 3, 4, 9, 10, 11, 12, 13, 14 }));
 		blocks.push_back(Block(0.0f, 10.0f, 11.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }));*/
-		blocks.push_back(Block(-3.f, -10.0f, 11.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 4 }));
+		//blocks.push_back(Block(-3.f, -10.0f, 11.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 4 }));
 
-/*		lightCycle = 50.f; // seconds
+		lightCycle = 30.f; // seconds
 		bufforTime = 5.f; // seconds of all-red buffer between light changes
-		//lights
-		blocks.emplace_back(0.0f, 18.0f, 3.5f, 20.0f,
-			0.8f * lightCycle + 4 * bufforTime,
-			0.2f * lightCycle,
-			0.0f * lightCycle + bufforTime); //down left 4
-		blocks.emplace_back(3.5f, 18.0f, 7.0f, 20.0f,
-			0.6f * lightCycle + 4 * bufforTime,
-			0.4f * lightCycle,
-			0.6f * lightCycle + 4 * bufforTime); //down right+up 1
-		blocks.emplace_back(7.0f, 18.0f, 10.5f, 20.0f,
-			0.6f * lightCycle + 4 * bufforTime,
-			0.4f * lightCycle,
-			0.6f * lightCycle + 4 * bufforTime); //down right+up 1
+		/*		//lights
+				blocks.emplace_back(0.0f, 18.0f, 3.5f, 20.0f,
+					0.8f * lightCycle + 4 * bufforTime,
+					0.2f * lightCycle,
+					0.0f * lightCycle + bufforTime); //down left 4
+				blocks.emplace_back(3.5f, 18.0f, 7.0f, 20.0f,
+					0.6f * lightCycle + 4 * bufforTime,
+					0.4f * lightCycle,
+					0.6f * lightCycle + 4 * bufforTime); //down right+up 1
+				blocks.emplace_back(7.0f, 18.0f, 10.5f, 20.0f,
+					0.6f * lightCycle + 4 * bufforTime,
+					0.4f * lightCycle,
+					0.6f * lightCycle + 4 * bufforTime); //down right+up 1
 
-		blocks.emplace_back(-3.5f, -20.0f, 0.0f, -18.0f,
-			0.8f * lightCycle + 4 * bufforTime,
-			0.2f * lightCycle,
-			0.0f * lightCycle + bufforTime); //up right 4
-		blocks.emplace_back(-7.0f, -20.0f, -3.5f, -18.0f,
-			0.6f * lightCycle + 4 * bufforTime,
-			0.4f * lightCycle,
-			0.6f * lightCycle + 4 * bufforTime); //up left+down 1
-		blocks.emplace_back(-10.5f, -20.0f, -7.0f, -18.0f,
-			0.6f * lightCycle + 4 * bufforTime,
-			0.4f * lightCycle,
-			0.6f * lightCycle + 4 * bufforTime); //up left+down 1
+				blocks.emplace_back(-3.5f, -20.0f, 0.0f, -18.0f,
+					0.8f * lightCycle + 4 * bufforTime,
+					0.2f * lightCycle,
+					0.0f * lightCycle + bufforTime); //up right 4*/
+					/*		blocks.emplace_back(-7.0f, -20.0f, -3.5f, -18.0f,
+								0.3f * lightCycle,
+								0.7f * lightCycle,
+								0.0f); //up left+down 1*/
+								/*blocks.emplace_back(-10.5f, -20.0f, -7.0f, -18.0f,
+									0.6f * lightCycle + 4 * bufforTime,
+									0.4f * lightCycle,
+									0.6f * lightCycle + 4 * bufforTime); //up left+down 1
 
-		blocks.emplace_back(20.0f, -3.5f, 22.0f, 0.0f,
-			0.8f * lightCycle + 4 * bufforTime,
-			0.2f * lightCycle,
-			0.4f * lightCycle + 3 * bufforTime); //right 2
-		blocks.emplace_back(-22.0f, 0.0f, -20.0f, 3.5f,
-			0.8f * lightCycle + 4 * bufforTime,
-			0.2f * lightCycle,
-			0.2f * lightCycle + 2 * bufforTime); //left 3*/
+								blocks.emplace_back(20.0f, -3.5f, 22.0f, 0.0f,
+									0.8f * lightCycle + 4 * bufforTime,
+									0.2f * lightCycle,
+									0.4f * lightCycle + 3 * bufforTime); //right 2
+								blocks.emplace_back(-22.0f, 0.0f, -20.0f, 3.5f,
+									0.8f * lightCycle + 4 * bufforTime,
+									0.2f * lightCycle,
+									0.2f * lightCycle + 2 * bufforTime); //left 3*/
 
 		lines.emplace_back(0.f, 10.f, 0.f, 250.f, 0.5f);
 		lines.emplace_back(-3.5f, 10.f, -3.5f, 250.f, 0.5f);
 		lines.emplace_back(0.f, 10.f, -3.5f, 10.f, 0.5f);
-		lines.emplace_back(-7.0f, 10.f, -7.0f, 250.f, 0.2f);
-		lines.emplace_back(-10.5f, 20.f, -10.5f, 250.f, 0.5f);
+		lines.emplace_back(-7.0f, 10.f, -7.0f, 250.f, 0.5f);
+		//lines.emplace_back(-10.5f, 20.f, -10.5f, 250.f, 0.5f);
 
 		lines.emplace_back(0.f, -10.f, 0.f, -250.f, 0.5f);
 		lines.emplace_back(3.5f, -10.f, 3.5f, -250.f, 0.5f);
 		lines.emplace_back(0.f, -10.f, 3.5f, -10.f, 0.5f);
-		lines.emplace_back(7.0f, -10.f, 7.0f, -250.f, 0.2f);
-		lines.emplace_back(10.5f, -20.f, 10.5f, -250.f, 0.5f);
+		lines.emplace_back(7.0f, -10.f, 7.0f, -250.f, 0.5f);
+		//lines.emplace_back(10.5f, -20.f, 10.5f, -250.f, 0.5f);
 
 		lines.emplace_back(20.f, -3.5f, 200.f, -3.5f, 0.5f);
 		lines.emplace_back(20.f, 0.0f, 200.f, 0.0f, 0.5f);
@@ -581,27 +581,27 @@ Junction::Junction(int index)
 		lines.emplace_back(-20.f, 3.5f, -200.f, 3.5f, 0.5f);
 
 		lines.emplace_back(3.5f, 10.f, 3.5f, 100.f, 0.2f);
-		lines.emplace_back(7.0f, 10.f, 7.0f, 100.f, 0.2f);
-		lines.emplace_back(10.5f, 20.f, 10.5f, 100.f, 0.5f);
+		lines.emplace_back(7.0f, 10.f, 7.0f, 100.f, 0.5f);
+		//lines.emplace_back(10.5f, 20.f, 10.5f, 100.f, 0.5f);
 		lines.emplace_back(3.5f, 100.f, 0.0f, 130.f, 0.2f);
-		lines.emplace_back(7.0f, 100.f, 3.5f, 130.f, 0.2f);
-		lines.emplace_back(10.5f, 100.f, 7.0f, 130.f, 0.5f);
-		lines.emplace_back(3.5f, 130.f, 3.5f, 250.f, 0.2f);
-		lines.emplace_back(7.0f, 130.f, 7.0f, 250.f, 0.5f);
+		lines.emplace_back(7.0f, 100.f, 3.5f, 130.f, 0.5f);
+		//lines.emplace_back(10.5f, 100.f, 7.0f, 130.f, 0.5f);
+		lines.emplace_back(3.5f, 130.f, 3.5f, 250.f, 0.5f);
+		//lines.emplace_back(7.0f, 130.f, 7.0f, 250.f, 0.5f);
 
 		lines.emplace_back(-3.5f, -10.f, -3.5f, -100.f, 0.2f);
-		lines.emplace_back(-7.0f, -10.f, -7.0f, -100.f, 0.2f);
-		lines.emplace_back(-10.5f, -20.f, -10.5f, -100.f, 0.5f);
+		lines.emplace_back(-7.0f, -10.f, -7.0f, -100.f, 0.5f);
+		//lines.emplace_back(-10.5f, -20.f, -10.5f, -100.f, 0.5f);
 		lines.emplace_back(-3.5f, -100.f, 0.0f, -130.f, 0.2f);
-		lines.emplace_back(-7.0f, -100.f, -3.5f, -130.f, 0.2f);
-		lines.emplace_back(-10.5f, -100.f, -7.0f, -130.f, 0.5f);
-		lines.emplace_back(-3.5f, -130.f, -3.5f, -250.f, 0.2f);
-		lines.emplace_back(-7.0f, -130.f, -7.0f, -250.f, 0.5f);
+		lines.emplace_back(-7.0f, -100.f, -3.5f, -130.f, 0.5f);
+		//lines.emplace_back(-10.5f, -100.f, -7.0f, -130.f, 0.5f);
+		lines.emplace_back(-3.5f, -130.f, -3.5f, -250.f, 0.5f);
+		//lines.emplace_back(-7.0f, -130.f, -7.0f, -250.f, 0.5f);
 
-		lines.emplace_back(10.5f, 20.f, 20.0f, 3.5f, 0.5f);
-		lines.emplace_back(-10.5f, -20.f, -20.0f, -3.5f, 0.5f);
-		lines.emplace_back(20.0f, -3.5f, 10.5f, -20.0f, 0.5f);
-		lines.emplace_back(-20.0f, 3.5f, -10.5f, 20.0f, 0.5f);
+		lines.emplace_back(7.0f, 10.f, 20.0f, 3.5f, 0.5f);
+		lines.emplace_back(-7.0f, -10.f, -20.0f, -3.5f, 0.5f);
+		lines.emplace_back(20.0f, -3.5f, 7.0f, -10.0f, 0.5f);
+		lines.emplace_back(-20.0f, 3.5f, -7.0f, 10.0f, 0.5f);
 
 		//down right
 		tp1 = {
@@ -737,10 +737,10 @@ Junction::Junction(int index)
 		//travels.emplace_back(tp1, 3, 1);
 		//travels.emplace_back(tp2, 6, 2);
 		//travels.emplace_back(tp3, 6, 3);
-		travels.emplace_back(tp4, 3, 1);
+		travels.emplace_back(tp4, 3, 1); //1
 		//travels.emplace_back(tp5, 3, 5);
 		//travels.emplace_back(tp6, 6, 6);
-		travels.emplace_back(tp7, 6, 2);
+		travels.emplace_back(tp7, 6, 2); //2
 		//travels.emplace_back(tp8, 3, 8);
 		/*travels.emplace_back(tp9, 2, 9);
 		travels.emplace_back(tp10, 2, 10);
@@ -749,14 +749,15 @@ Junction::Junction(int index)
 		travels.emplace_back(tp13, 2, 13);
 		travels.emplace_back(tp14, 2, 14);*/
 
-		conflictPoints.push_back({ Vec2(-5.25f,0.f), {7}, {4}, 4.f });
-		circles.emplace_back(-5.25f, -0.f, 2.f, true);/*
+		conflictPoints.push_back({ Vec2(-5.25f,0.f), {1}, {2}, 2.f });
+		circles.emplace_back(-5.25f, 1.0f, 1.f, true);
 		conflictPoints.push_back({ Vec2(-13.f,-5.f), {6,7}, {4}, 0.f });
-		circles.emplace_back(-13.f, 5.f, 2.f, true);*/
+		circles.emplace_back(5.25f, -1.f, 1.f, true);
 
 		/*circles.append_range(drawTravel(tp4));
-		circles.append_range(drawTravel(tp6));
-		circles.append_range(drawTravel(tp7));*/
+		circles.append_range(drawTravel(tp7));
+		circles.append_range(drawTravel(tp3));
+		circles.append_range(drawTravel(tp8));*/
 	default:
 		std::cerr << "Junction: unknown index " << index << "\n";
 		break;
@@ -809,7 +810,7 @@ std::vector<Circle> Junction::drawTravel(std::vector<Vec2> travelPoints) {
 	const float STEP = 0.05f;
 	std::vector<Circle> circles;
 	for (const Vec2& point : travelPoints) {
-		circles.push_back(Circle(point.x, point.y, 0.5f, false));
+		//circles.push_back(Circle(point.x, point.y, 0.5f, false));
 	}
 	for (size_t i = 0; i + 2 < travelPoints.size(); i += 2)
 	{
@@ -821,7 +822,7 @@ std::vector<Circle> Junction::drawTravel(std::vector<Vec2> travelPoints) {
 			Vec2 point = tempTravel.bezier(p0, p1, p2, t);
 
 			circles.push_back(
-				Circle(point.x, point.y, 0.3f, false)
+				Circle(point.x, point.y, 0.2f, true)
 			);
 		}
 	}

@@ -10,4 +10,5 @@ struct CarState
 	Vec2 forward;
 	int travelId = -1;
 	int id = -1;
+	bool isAV = false;
 };

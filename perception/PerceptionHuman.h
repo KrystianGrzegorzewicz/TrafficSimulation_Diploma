@@ -25,7 +25,7 @@ private:
 		PerceptionState& out
 	);
 
-	void updateConflictPoints(
+	void analyzeConflictPoints(
 		const CarState& self,
 		const WorldState& world,
 		PerceptionState& out

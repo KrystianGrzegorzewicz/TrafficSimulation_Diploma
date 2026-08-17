@@ -19,7 +19,7 @@ void PerceptionHuman::update(
 	if (world.junction)
 	{
 		updateBlockHazard(self, world, out);
-		updateConflictPoints(self, world, out);
+		analyzeConflictPoints(self, world, out);
 	}
 }
 
@@ -184,71 +184,341 @@ PerceptionHuman::FOVResult PerceptionHuman::calculateFOV(const CarState& self) c
 	return { fovDot, maxViewDistance };
 }
 
-void PerceptionHuman::updateConflictPoints(const CarState& self, const WorldState& world, PerceptionState& out)
+static float calculateKinematicTime(
+	float distance,
+	float speed,
+	float acceleration)
 {
-	const auto& cps = world.junction->getConflictPoints();
-	float selfSpeed = std::max(self.velocity.length(), 0.5f);
+	constexpr float INF = 999999.f;
 
-	float riskFactor = personality.gapFactor;
-	float aggressivenessMargin = 2.5f - (riskFactor * 1.5f);
+	if (distance <= 0.0f)
+		return 0.0f;
 
-	for (const auto& cp : cps)
+	speed = std::max(speed, 0.0f);
+
+	// Ruch praktycznie jednostajny
+	if (std::fabs(acceleration) < 0.01f)
 	{
-		if (!cp.mustYield(self.travelId)) continue;
+		if (speed < 0.05f)
+			return INF;
 
-		Vec2 myToCp = cp.position - self.position;
-		if (self.forward.dot(myToCp) < -1.5f) continue;
-
-		float myDist = myToCp.length();
-		if (myDist > 40.0f) continue;
-
-		float myArrival = (myDist / selfSpeed) * riskFactor;
-
-		for (const auto& o : world.vehicleStates)
-		{
-			if (o.id == self.id) continue;
-			if (!cp.hasPriority(o.travelId)) continue;
-
-			Vec2 otherToCp = cp.position - o.position;
-
-			// Zabezpieczenie 1: czy fizycznie minął już punkt?
-			if (o.forward.dot(otherToCp) < -2.0f) continue;
-
-			float otherDist = otherToCp.length();
-			if (otherDist < 0.1f) continue; // Unikamy dzielenia przez zero
-
-			// --- NOWA LOGIKA: PRĘDKOŚĆ ZBLIŻANIA ---
-			Vec2 dirToCp = otherToCp / otherDist; // Znormalizowany wektor kierunku do punktu
-			float approachSpeed = o.velocity.dot(dirToCp);
-
-			// Jeśli pojazd nie zbliża się w naszą stronę (np. jest po drugiej stronie ronda
-			// lub zjeżdża) to jego approachSpeed będzie małe albo ujemne.
-			// Dodajemy warunek otherDist > 5.0f, żeby nie ignorować kogoś, kto fizycznie
-			// blokuje już przejazd tuż przed naszym zderzakiem.
-			if (approachSpeed < 0.5f && otherDist > 5.0f)
-			{
-				continue; // Ignorujemy ten samochód, bo "nie patrzy/nie jedzie" w stronę punktu
-			}
-
-			// Obliczamy czas przyjazdu tylko na podstawie TEJ części prędkości,
-			// która faktycznie przybliża go do kolizji.
-			float effectiveSpeed = std::max(approachSpeed, 0.5f);
-			float otherArrival = otherDist / effectiveSpeed;
-			// ---------------------------------------
-
-			// LOGIKA HISTEREZY:
-			float hysteresisMargin = out.alreadyEnteringConflict ? (aggressivenessMargin + 1.0f) : aggressivenessMargin;
-
-			if (otherArrival < myArrival + hysteresisMargin)
-			{
-				out.hasConflict = true;
-				out.alreadyEnteringConflict = false; // Wycofujemy się z zamiaru wjazdu
-				return;
-			}
-		}
+		return distance / speed;
 	}
 
-	// Jeśli pętla przeszła i nie wykryto blokującego konfliktu:
+	const float discriminant =
+		speed * speed +
+		2.0f * acceleration * distance;
+
+	// Pojazd zatrzyma się przed osiągnięciem punktu
+	if (discriminant < 0.0f)
+		return INF;
+
+	const float finalSpeed = std::sqrt(discriminant);
+
+	const float time =
+		(finalSpeed - speed) / acceleration;
+
+	if (time < 0.0f)
+		return INF;
+
+	return time;
+}
+
+void PerceptionHuman::analyzeConflictPoints(
+	const CarState& self,
+	const WorldState& world,
+	PerceptionState& out)
+{
 	out.hasConflict = false;
-	out.alreadyEnteringConflict = true; // Potwierdzamy, że droga wolna, możemy wjechać
+	out.alreadyEnteringConflict = false;
+
+	out.conflictDistance = 999999.f;
+	out.myArrival = 999999.f;
+	out.otherArrival = 999999.f;
+	out.conflictThreat = 0.f;
+
+	out.selfTtaEntry = 999999.f;
+	out.selfTtaExit = 999999.f;
+
+	out.conflictingCar = CarState{};
+	out.priorityCarsTTA.clear();
+
+	if (!world.junction)
+		return;
+
+	const auto& conflictPoints =
+		world.junction->getConflictPoints();
+
+	const FOVResult fov = calculateFOV(self);
+
+	const float selfSpeed = self.velocity.length();
+
+	for (const auto& cp : conflictPoints)
+	{
+		// Ten punkt konfliktowy nie dotyczy naszej trasy.
+		if (!cp.mustYield(self.travelId))
+			continue;
+
+		const Vec2 toConflict =
+			cp.position - self.position;
+
+		const float distance =
+			toConflict.length();
+
+		// Punkt za samochodem - został już przejechany.
+		if (self.forward.dot(toConflict) < -cp.radius)
+			continue;
+
+		if (distance > fov.maxViewDistance)
+			continue;
+
+		// Człowiek ma ograniczone pole widzenia.
+		if (distance > 0.001f)
+		{
+			const Vec2 direction =
+				toConflict.normalized();
+
+			if (self.forward.dot(direction) < fov.fovDot)
+				continue;
+		}
+
+		/*
+		 * Jeżeli samochód znajduje się już w strefie konfliktowej,
+		 * nie powinien zaczynać hamowania z powodu tego punktu.
+		 */
+		if (distance <= cp.radius)
+		{
+			out.alreadyEnteringConflict = true;
+			continue;
+		}
+		float kConflictRadius = cp.radius;
+		const float entryDistance =
+			std::max(
+				0.0f,
+				distance - kConflictRadius
+			);
+
+		const float exitDistance =
+			distance + kConflictRadius;
+
+		/*
+		 * Estymacja naszego TTA.
+		 */
+		float selfAcceleration =
+			self.acceleration.dot(self.forward);
+
+		float planningSpeed = selfSpeed;
+
+		if (planningSpeed < 0.5f)
+		{
+			// Człowiek stojący przed skrzyżowaniem
+			// może ruszyć po czasie reakcji.
+			planningSpeed = 0.0f;
+			selfAcceleration = 2.5f;
+		}
+		else
+		{
+			/*
+			 * Nie zakładamy agresywnego hamowania przy
+			 * przewidywaniu czasu dotarcia.
+			 */
+			selfAcceleration =
+				std::max(selfAcceleration, 0.0f);
+		}
+
+		out.selfTtaEntry =
+			calculateKinematicTime(
+				entryDistance,
+				planningSpeed,
+				selfAcceleration
+			);
+
+		out.selfTtaExit =
+			calculateKinematicTime(
+				exitDistance,
+				planningSpeed,
+				selfAcceleration
+			);
+
+		/*
+		 * Szukamy wszystkich pojazdów mających pierwszeństwo
+		 * przed naszą trasą.
+		 */
+		for (const auto& other : world.vehicleStates)
+		{
+			if (other.id == self.id)
+				continue;
+
+			if (!cp.hasPriority(other.travelId))
+				continue;
+
+			const Vec2 otherToConflict =
+				cp.position - other.position;
+
+			const float otherDistance =
+				otherToConflict.length();
+
+			/*
+			 * Pojazd, który już przejechał konflikt,
+			 * nie jest zagrożeniem.
+			 */
+			if (other.forward.dot(otherToConflict) < -cp.radius)
+				continue;
+
+			if (otherDistance > fov.maxViewDistance)
+				continue;
+
+			/*
+			 * Człowiek widzi pojazd tylko wtedy, gdy znajduje
+			 * się w jego polu widzenia.
+			 */
+			if (otherDistance > 0.001f)
+			{
+				const Vec2 direction =
+					(other.position - self.position).normalized();
+
+				if (self.forward.dot(direction) < fov.fovDot)
+					continue;
+			}
+
+			const float otherEntryDistance =
+				std::max(
+					0.0f,
+					otherDistance - kConflictRadius
+				);
+
+			const float otherExitDistance =
+				otherDistance + kConflictRadius;
+
+			float otherSpeed =
+				other.velocity.length();
+
+			float otherAcceleration =
+				other.acceleration.dot(other.forward);
+
+			if (otherSpeed < 0.05f)
+			{
+				/*
+				 * Stojący pojazd ma bardzo duże TTA.
+				 * Nie zakładamy automatycznie, że ruszy.
+				 */
+				otherAcceleration = 0.0f;
+			}
+
+			PriorityCarTTA tta;
+
+			tta.carId = other.id;
+			tta.distanceToCp = otherDistance;
+			tta.isAV = other.isAV;
+
+			tta.ttaEntry =
+				calculateKinematicTime(
+					otherEntryDistance,
+					otherSpeed,
+					otherAcceleration
+				);
+
+			tta.ttaExit =
+				calculateKinematicTime(
+					otherExitDistance,
+					otherSpeed,
+					otherAcceleration
+				);
+
+			out.priorityCarsTTA.push_back(tta);
+		}
+
+		if (out.priorityCarsTTA.empty())
+			continue;
+
+		/*
+		 * Najbardziej istotny jest pojazd, który pierwszy
+		 * wjeżdża w strefę konfliktu.
+		 */
+		std::sort(
+			out.priorityCarsTTA.begin(),
+			out.priorityCarsTTA.end(),
+			[](const PriorityCarTTA& a,
+				const PriorityCarTTA& b)
+			{
+				return a.ttaEntry < b.ttaEntry;
+			}
+		);
+
+		/*
+		 * Szukamy rzeczywistego nakładania się czasów.
+		 *
+		 * Jeżeli:
+		 *
+		 * selfEntry -> selfExit
+		 *
+		 * oraz
+		 *
+		 * otherEntry -> otherExit
+		 *
+		 * mają część wspólną, istnieje potencjalny konflikt.
+		 */
+		for (const auto& candidate :
+			out.priorityCarsTTA)
+		{
+			if (candidate.ttaEntry >= 999998.f)
+				continue;
+
+			const bool temporalOverlap =
+				out.selfTtaEntry < candidate.ttaExit &&
+				candidate.ttaEntry < out.selfTtaExit;
+
+			if (!temporalOverlap)
+				continue;
+
+			for (const auto& other :
+				world.vehicleStates)
+			{
+				if (other.id != candidate.carId)
+					continue;
+
+				out.hasConflict = true;
+
+				out.conflictingCar = other;
+
+				out.conflictDistance =
+					distance;
+
+				out.myArrival =
+					out.selfTtaEntry;
+
+				out.otherArrival =
+					candidate.ttaEntry;
+
+				/*
+				 * Threat = im mniejsza różnica czasowa,
+				 * tym większe zagrożenie.
+				 */
+				const float timeDifference =
+					std::fabs(
+						out.selfTtaEntry -
+						candidate.ttaEntry
+					);
+
+				out.conflictThreat =
+					1.0f -
+					std::clamp(
+						timeDifference / 5.0f,
+						0.0f,
+						1.0f
+					);
+
+				break;
+			}
+
+			if (out.hasConflict)
+				break;
+		}
+
+		/*
+		 * Mamy już najbliższy istotny konflikt.
+		 */
+		if (out.hasConflict)
+			return;
+	}
 }

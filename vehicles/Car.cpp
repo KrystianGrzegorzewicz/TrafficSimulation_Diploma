@@ -62,7 +62,7 @@ int* Car::getColor() const { return const_cast<int*>(color); }
 
 CarState Car::getState() const
 {
-	return { position, velocity, acceleration, forward, travelId, id };
+	return { position, velocity, acceleration, forward, travelId, id, isAutonomous() };
 }
 
 bool Car::isPathValid() const

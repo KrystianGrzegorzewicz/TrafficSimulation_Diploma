@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "road/Travel.h"
 #include "vehicles/CarState.h"
 #include "physics/SteeringModel.h"
@@ -26,6 +28,11 @@ public:
 
 	virtual void update(float dt, const WorldState& world) = 0;
 	int	getId() const;
+	virtual std::string getTypeName() const = 0;
+	virtual bool isAutonomous() const
+	{
+		return false;
+	}
 	int	getTravelId() const;
 	Vec2 getPosition() const;
 	Vec2 getVelocityVector() const;

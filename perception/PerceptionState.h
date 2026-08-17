@@ -1,6 +1,17 @@
 #pragma once
 
+#include "core/Vec2.h"
 #include "vehicles/CarState.h"
+#include <vector>
+
+struct PriorityCarTTA
+{
+	int carId = -1;
+	float ttaEntry = 999999.f; // Czas do wjazdu w strefę (s)
+	float ttaExit = 999999.f;  // Czas do opuszczenia strefy (s)
+	float distanceToCp = 999999.f;
+	bool isAV = false;
+};
 
 struct PerceptionState
 {
@@ -26,4 +37,7 @@ struct PerceptionState
 	float myArrival = 999999.f;
 	float otherArrival = 999999.f;
 	float conflictThreat = 0.f;
+	float selfTtaEntry = 999999.f;
+	float selfTtaExit = 999999.f;
+	std::vector<PriorityCarTTA> priorityCarsTTA;
 };

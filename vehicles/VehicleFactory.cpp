@@ -27,13 +27,19 @@ std::unique_ptr<Car> VehicleFactory::createHuman(float speed, Travel travel)
 	);
 }
 
-std::unique_ptr<Car> VehicleFactory::createAV(float speed, Travel travel)
+std::unique_ptr<Car> VehicleFactory::createAV(float speed, Travel travel, const std::string& avModel)
 {
+	std::unique_ptr<ILongitudinalModel> model;
+	if (avModel == "fis")
+		model = std::make_unique<FuzzyLongitudinalModel>();
+	else
+		model = std::make_unique<IDMLongitudinalModel>();
+
 	return std::make_unique<CarAV>(
 		speed,
 		std::move(travel),
 		std::make_unique<BehaviorAV>(
-			std::make_unique<FuzzyLongitudinalModel>()
+			std::move(model)
 		),
 		std::make_unique<PerceptionAV>()
 	);

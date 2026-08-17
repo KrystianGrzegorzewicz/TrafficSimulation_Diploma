@@ -9,6 +9,7 @@ for /L %%i in (3,1,5) do (
 						--nogui ^
 						--spawn %%m ^
 						--av 0.0 ^
+						--AVModel "fis" ^
 						--junction %%i ^
 						--bias %%k ^
 						--sharpness %%l ^
