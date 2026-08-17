@@ -23,10 +23,6 @@ static float calculateHumanConflictMargin(
 			1.0f
 		);
 
-	/*
-	 * Potęgowanie sprawia, że agresywność
-	 * mocniej ujawnia się przy wysokich wartościach.
-	 */
 	const float aggressionEffect =
 		std::pow(aggression, 1.5f);
 
@@ -49,9 +45,6 @@ void BehaviorHuman::evaluateConflict(
 {
 	constexpr float INF = 999999.0f;
 
-	/*
-	 * Aktualizujemy timer utrzymywania decyzji.
-	 */
 	if (conflictYieldTimer > 0.0f)
 	{
 		conflictYieldTimer -= dt;
@@ -60,26 +53,12 @@ void BehaviorHuman::evaluateConflict(
 			conflictYieldTimer = 0.0f;
 	}
 
-	/*
-	 * --------------------------------------------------------
-	 * Brak aktualnie wykrytego konfliktu
-	 * --------------------------------------------------------
-	 */
-
 	if (!perception.hasConflict ||
 		perception.alreadyEnteringConflict ||
 		perception.priorityCarsTTA.empty())
 	{
-		/*
-		 * Jeżeli już ustępujemy, nie ruszamy natychmiast
-		 * tylko dlatego, że jedna próbka TTA zniknęła.
-		 */
 		if (yieldingToConflict)
 		{
-			/*
-			 * Musimy mieć wystarczająco duży zapas czasowy,
-			 * żeby zakończyć decyzję o ustępowaniu.
-			 */
 			const float resumeMargin =
 				0.75f;
 
@@ -101,10 +80,6 @@ void BehaviorHuman::evaluateConflict(
 			}
 		}
 
-		/*
-		 * Jeżeli nadal ustępujemy, pozostajemy przy
-		 * niskiej prędkości.
-		 */
 		if (yieldingToConflict)
 		{
 			desiredSpeed =
@@ -120,23 +95,11 @@ void BehaviorHuman::evaluateConflict(
 	const PriorityCarTTA& target =
 		perception.priorityCarsTTA.front();
 
-	/*
-	 * --------------------------------------------------------
-	 * Margines zależny od aggression
-	 * --------------------------------------------------------
-	 */
-
 	const float margin =
 		calculateHumanConflictMargin(
 			personality,
 			params
 		);
-
-	/*
-	 * --------------------------------------------------------
-	 * Warunek rozpoczęcia ustępowania
-	 * --------------------------------------------------------
-	 */
 
 	const bool temporalOverlap =
 		perception.selfTtaEntry <
@@ -154,12 +117,6 @@ void BehaviorHuman::evaluateConflict(
 		temporalOverlap &&
 		arrivalDifference < margin;
 
-	/*
-	 * --------------------------------------------------------
-	 * ROZPOCZYNAMY USTĘPOWANIE
-	 * --------------------------------------------------------
-	 */
-
 	if (!yieldingToConflict && unsafe)
 	{
 		yieldingToConflict = true;
@@ -170,12 +127,6 @@ void BehaviorHuman::evaluateConflict(
 		conflictYieldTimer =
 			params.humanYieldHoldTime;
 	}
-
-	/*
-	 * --------------------------------------------------------
-	 * JEŻELI JUŻ USTĘPUJEMY
-	 * --------------------------------------------------------
-	 */
 
 	if (yieldingToConflict)
 	{
@@ -189,10 +140,6 @@ void BehaviorHuman::evaluateConflict(
 				stopBuffer
 			);
 
-		/*
-		 * Bezpieczna prędkość pozwalająca
-		 * zatrzymać się przed konfliktem.
-		 */
 		const float safeSpeed =
 			std::sqrt(
 				2.0f *
@@ -206,10 +153,6 @@ void BehaviorHuman::evaluateConflict(
 				safeSpeed
 			);
 
-		/*
-		 * Nie pozwalamy IDM-owi znowu mocno przyspieszyć
-		 * podczas oczekiwania.
-		 */
 		if (availableDistance < 3.0f)
 		{
 			desiredSpeed =
@@ -219,10 +162,6 @@ void BehaviorHuman::evaluateConflict(
 				);
 		}
 
-		/*
-		 * Prawie przy punkcie konfliktowym:
-		 * zatrzymujemy się.
-		 */
 		if (availableDistance < 1.0f)
 		{
 			desiredSpeed = 0.0f;
@@ -235,15 +174,6 @@ void BehaviorHuman::evaluateConflict(
 
 		return;
 	}
-
-	/*
-	 * --------------------------------------------------------
-	 * NIE USTĘPUJEMY
-	 * --------------------------------------------------------
-	 *
-	 * Tutaj nic nie robimy.
-	 * Samochód jedzie normalnie.
-	 */
 }
 
 MotionCommand BehaviorHuman::compute(
@@ -272,12 +202,6 @@ MotionCommand BehaviorHuman::compute(
 
 	constexpr float dt = 0.01f;
 
-	/*
-	 * --------------------------------------------------------
-	 * Opóźnienie reakcji człowieka
-	 * --------------------------------------------------------
-	 */
-
 	for (auto& item : reactionQueue)
 		item.timeRemaining -= dt;
 
@@ -304,12 +228,6 @@ MotionCommand BehaviorHuman::compute(
 	const float speed =
 		self.velocity.length();
 
-	/*
-	 * --------------------------------------------------------
-	 * Opóźnienie ruszania
-	 * --------------------------------------------------------
-	 */
-
 	if (speed < 0.2f)
 	{
 		if (!wasStopped)
@@ -323,12 +241,6 @@ MotionCommand BehaviorHuman::compute(
 	{
 		wasStopped = false;
 	}
-
-	/*
-	 * --------------------------------------------------------
-	 * Planowanie trasy
-	 * --------------------------------------------------------
-	 */
 
 	PathPlan plan =
 		planner.compute(
@@ -349,10 +261,6 @@ MotionCommand BehaviorHuman::compute(
 			personality.curveFactor
 		);
 
-	/*
-	 * Kierowca reaguje na przekroczenie
-	 * prędkości wynikającej z geometrii trasy.
-	 */
 	const float overspeed =
 		speed - desiredSpeed;
 
@@ -361,12 +269,6 @@ MotionCommand BehaviorHuman::compute(
 		desiredSpeed -=
 			overspeed * 0.55f;
 	}
-
-	/*
-	 * --------------------------------------------------------
-	 * Przeszkody
-	 * --------------------------------------------------------
-	 */
 
 	if (perception.hasBlockHazard &&
 		perception.hazardIsActive)
@@ -383,12 +285,6 @@ MotionCommand BehaviorHuman::compute(
 			hazardFactor;
 	}
 
-	/*
-	 * --------------------------------------------------------
-	 * PUNKTY KONFLIKTOWE
-	 * --------------------------------------------------------
-	 */
-
 	if (perception.hasConflict &&
 		!perception.alreadyEnteringConflict &&
 		!perception.priorityCarsTTA.empty())
@@ -396,19 +292,10 @@ MotionCommand BehaviorHuman::compute(
 		const PriorityCarTTA& target =
 			perception.priorityCarsTTA.front();
 
-		/*
-		 * Indywidualny margines kierowcy.
-		 */
 		const float safetyGap =
 			1.0f +
 			personality.gapFactor;
 
-		/*
-		 * Okno czasowe:
-		 *
-		 * 1. self exit < other entry
-		 * 2. other exit < self entry
-		 */
 		const bool canCrossBefore =
 			perception.selfTtaExit +
 			safetyGap <
@@ -436,10 +323,6 @@ MotionCommand BehaviorHuman::compute(
 					stopBuffer
 				);
 
-			/*
-			 * Prędkość pozwalająca zatrzymać się
-			 * przed punktem konfliktowym.
-			 */
 			const float safeSpeed =
 				std::sqrt(
 					2.0f *
@@ -464,12 +347,6 @@ MotionCommand BehaviorHuman::compute(
 		}
 	}
 
-	/*
-	 * --------------------------------------------------------
-	 * Model wzdłużny
-	 * --------------------------------------------------------
-	 */
-
 	cmd.desiredSpeed =
 		std::max(
 			0.0f,
@@ -485,9 +362,6 @@ MotionCommand BehaviorHuman::compute(
 			maxDecel
 		);
 
-	/*
-	 * Kierowca nie wykonuje decyzji natychmiast.
-	 */
 	reactionQueue.push_back(
 		{
 			desiredAccel,
@@ -505,9 +379,6 @@ MotionCommand BehaviorHuman::compute(
 		cmd.longitudinalAcceleration = 0.0f;
 	}
 
-	/*
-	 * Opóźnienie ruszania.
-	 */
 	if (startDelayTimer > 0.0f)
 	{
 		startDelayTimer -= dt;
@@ -515,12 +386,6 @@ MotionCommand BehaviorHuman::compute(
 		cmd.longitudinalAcceleration =
 			0.0f;
 	}
-
-	/*
-	 * --------------------------------------------------------
-	 * Awaryjne hamowanie
-	 * --------------------------------------------------------
-	 */
 
 	if (perception.hasBlockHazard &&
 		perception.hazardDistance <

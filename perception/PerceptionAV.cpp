@@ -201,7 +201,6 @@ static float calculateKinematicTime(
 
 	speed = std::max(speed, 0.0f);
 
-	// Ruch praktycznie jednostajny
 	if (std::fabs(acceleration) < 0.01f)
 	{
 		if (speed < 0.05f)
@@ -214,7 +213,6 @@ static float calculateKinematicTime(
 		speed * speed +
 		2.0f * acceleration * distance;
 
-	// Pojazd zatrzyma się przed osiągnięciem punktu
 	if (discriminant < 0.0f)
 		return INF;
 
@@ -276,11 +274,6 @@ void PerceptionAV::analyzeConflictPoints(
 		if (distance > kMaxConflictDistance)
 			continue;
 
-		/*
-		 * Jeżeli AV już znajduje się w strefie konfliktowej,
-		 * nie rozpoczynamy procedury ustępowania.
-		 */
-
 		if (distance <= cp.radius)
 		{
 			out.alreadyEnteringConflict = true;
@@ -305,10 +298,6 @@ void PerceptionAV::analyzeConflictPoints(
 		{
 			planningSpeed = 0.0f;
 
-			/*
-			 * Dla AV możemy założyć deterministyczne
-			 * ruszanie z przyjętym przyspieszeniem.
-			 */
 			selfAcceleration = 2.5f;
 		}
 		else
@@ -331,12 +320,6 @@ void PerceptionAV::analyzeConflictPoints(
 				selfAcceleration
 			);
 
-		/*
-		 * Analizujemy wszystkie pojazdy z pierwszeństwem.
-		 *
-		 * W przeciwieństwie do człowieka AV nie ogranicza
-		 * tej analizy przez FOV.
-		 */
 		for (const auto& other :
 			world.vehicleStates)
 		{
@@ -412,9 +395,6 @@ void PerceptionAV::analyzeConflictPoints(
 			}
 		);
 
-		/*
-		 * Szukamy rzeczywistego konfliktu czasowego.
-		 */
 		for (const auto& candidate :
 			out.priorityCarsTTA)
 		{
@@ -428,9 +408,6 @@ void PerceptionAV::analyzeConflictPoints(
 			if (!temporalOverlap)
 				continue;
 
-			/*
-			 * Pobieramy pełny CarState konfliktowego pojazdu.
-			 */
 			for (const auto& other :
 				world.vehicleStates)
 			{

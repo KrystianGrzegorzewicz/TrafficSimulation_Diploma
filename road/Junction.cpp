@@ -606,7 +606,7 @@ Junction::Junction(int index)
 		// ------------------------------------------------------------------
 	case 7: // Phantom round
 		//mask
-		//blocks.push_back(Block(-300.0f, -100.0f, 300.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
+		blocks.push_back(Block(-300.0f, -100.0f, 300.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
 
 		circles.emplace_back(.0f, .0f, 25.0f, false);
 		circles.emplace_back(.0f, .0f, 28.5f, false);

@@ -196,7 +196,6 @@ static float calculateKinematicTime(
 
 	speed = std::max(speed, 0.0f);
 
-	// Ruch praktycznie jednostajny
 	if (std::fabs(acceleration) < 0.01f)
 	{
 		if (speed < 0.05f)
@@ -209,7 +208,6 @@ static float calculateKinematicTime(
 		speed * speed +
 		2.0f * acceleration * distance;
 
-	// Pojazd zatrzyma się przed osiągnięciem punktu
 	if (discriminant < 0.0f)
 		return INF;
 
@@ -255,7 +253,6 @@ void PerceptionHuman::analyzeConflictPoints(
 
 	for (const auto& cp : conflictPoints)
 	{
-		// Ten punkt konfliktowy nie dotyczy naszej trasy.
 		if (!cp.mustYield(self.travelId))
 			continue;
 
@@ -265,14 +262,12 @@ void PerceptionHuman::analyzeConflictPoints(
 		const float distance =
 			toConflict.length();
 
-		// Punkt za samochodem - został już przejechany.
 		if (self.forward.dot(toConflict) < -cp.radius)
 			continue;
 
 		if (distance > fov.maxViewDistance)
 			continue;
 
-		// Człowiek ma ograniczone pole widzenia.
 		if (distance > 0.001f)
 		{
 			const Vec2 direction =
@@ -282,10 +277,6 @@ void PerceptionHuman::analyzeConflictPoints(
 				continue;
 		}
 
-		/*
-		 * Jeżeli samochód znajduje się już w strefie konfliktowej,
-		 * nie powinien zaczynać hamowania z powodu tego punktu.
-		 */
 		if (distance <= cp.radius)
 		{
 			out.alreadyEnteringConflict = true;
@@ -301,9 +292,6 @@ void PerceptionHuman::analyzeConflictPoints(
 		const float exitDistance =
 			distance + kConflictRadius;
 
-		/*
-		 * Estymacja naszego TTA.
-		 */
 		float selfAcceleration =
 			self.acceleration.dot(self.forward);
 
@@ -311,17 +299,11 @@ void PerceptionHuman::analyzeConflictPoints(
 
 		if (planningSpeed < 0.5f)
 		{
-			// Człowiek stojący przed skrzyżowaniem
-			// może ruszyć po czasie reakcji.
 			planningSpeed = 0.0f;
 			selfAcceleration = 2.5f;
 		}
 		else
 		{
-			/*
-			 * Nie zakładamy agresywnego hamowania przy
-			 * przewidywaniu czasu dotarcia.
-			 */
 			selfAcceleration =
 				std::max(selfAcceleration, 0.0f);
 		}
@@ -340,10 +322,6 @@ void PerceptionHuman::analyzeConflictPoints(
 				selfAcceleration
 			);
 
-		/*
-		 * Szukamy wszystkich pojazdów mających pierwszeństwo
-		 * przed naszą trasą.
-		 */
 		for (const auto& other : world.vehicleStates)
 		{
 			if (other.id == self.id)
@@ -358,20 +336,12 @@ void PerceptionHuman::analyzeConflictPoints(
 			const float otherDistance =
 				otherToConflict.length();
 
-			/*
-			 * Pojazd, który już przejechał konflikt,
-			 * nie jest zagrożeniem.
-			 */
 			if (other.forward.dot(otherToConflict) < -cp.radius)
 				continue;
 
 			if (otherDistance > fov.maxViewDistance)
 				continue;
 
-			/*
-			 * Człowiek widzi pojazd tylko wtedy, gdy znajduje
-			 * się w jego polu widzenia.
-			 */
 			if (otherDistance > 0.001f)
 			{
 				const Vec2 direction =
@@ -398,10 +368,6 @@ void PerceptionHuman::analyzeConflictPoints(
 
 			if (otherSpeed < 0.05f)
 			{
-				/*
-				 * Stojący pojazd ma bardzo duże TTA.
-				 * Nie zakładamy automatycznie, że ruszy.
-				 */
 				otherAcceleration = 0.0f;
 			}
 
@@ -431,10 +397,6 @@ void PerceptionHuman::analyzeConflictPoints(
 		if (out.priorityCarsTTA.empty())
 			continue;
 
-		/*
-		 * Najbardziej istotny jest pojazd, który pierwszy
-		 * wjeżdża w strefę konfliktu.
-		 */
 		std::sort(
 			out.priorityCarsTTA.begin(),
 			out.priorityCarsTTA.end(),
@@ -445,19 +407,6 @@ void PerceptionHuman::analyzeConflictPoints(
 			}
 		);
 
-		/*
-		 * Szukamy rzeczywistego nakładania się czasów.
-		 *
-		 * Jeżeli:
-		 *
-		 * selfEntry -> selfExit
-		 *
-		 * oraz
-		 *
-		 * otherEntry -> otherExit
-		 *
-		 * mają część wspólną, istnieje potencjalny konflikt.
-		 */
 		for (const auto& candidate :
 			out.priorityCarsTTA)
 		{
@@ -496,10 +445,6 @@ void PerceptionHuman::analyzeConflictPoints(
 				out.otherTtaExit =
 					candidate.ttaExit;
 
-				/*
-				 * Threat = im mniejsza różnica czasowa,
-				 * tym większe zagrożenie.
-				 */
 				const float timeDifference =
 					std::fabs(
 						out.selfTtaEntry -
@@ -521,9 +466,6 @@ void PerceptionHuman::analyzeConflictPoints(
 				break;
 		}
 
-		/*
-		 * Mamy już najbliższy istotny konflikt.
-		 */
 		if (out.hasConflict)
 			return;
 	}
