@@ -43,6 +43,7 @@ private:
 	float spawnPeriod = 1.0f;
 	float currentTime = 0.0f;
 	float AVrate = 0.0f;
+	std::string AVModel;
 
 	bool saveCsv = false;
 	float csvAccumulator = 0.0f;

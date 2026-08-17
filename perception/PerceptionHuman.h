@@ -1,17 +1,18 @@
 #pragma once
 
 #include "perception/IPerception.h"
+#include "vehicles/DriverPersonality.h"
 
 class PerceptionHuman : public IPerception
 {
 public:
-	void update(
-		const CarState& self,
-		const WorldState& world,
-		PerceptionState& outState
-	) override;
+	explicit PerceptionHuman(const DriverPersonality& p) : personality(p) {}
+
+	void update(const CarState& self, const WorldState& world, PerceptionState& out) override;
 
 private:
+	DriverPersonality personality;
+
 	void updateCarAhead(
 		const CarState& self,
 		const WorldState& world,
@@ -19,6 +20,12 @@ private:
 	);
 
 	void updateBlockHazard(
+		const CarState& self,
+		const WorldState& world,
+		PerceptionState& out
+	);
+
+	void analyzeConflictPoints(
 		const CarState& self,
 		const WorldState& world,
 		PerceptionState& out

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "behavior/IBehavior.h"
+#include "behavior/ConflictParameters.h"
 #include "behavior/longitudinal/ILongitudinalModel.h"
 #include "planning/PathPlanner.h"
 #include "vehicles/DriverPersonality.h"
@@ -27,6 +28,15 @@ public:
 		float lookaheadSpeedFactor,
 		const PerceptionState& perception) override;
 	DriverPersonality personality;
+	void evaluateConflict(
+		const CarState& self,
+		float maxDecel,
+		float& desiredSpeed,
+		const PerceptionState& perception,
+		MotionCommand& cmd,
+		ConflictParameters& params,
+		float dt
+	);
 
 private:
 	std::unique_ptr<ILongitudinalModel> longitudinalModel;
@@ -44,4 +54,7 @@ private:
 	float accumulatedTime = 0.0f;
 	bool wasStopped = false;
 	float startDelayTimer = 0.0f;
+	bool yieldingToConflict = false;
+	float conflictYieldTimer = 0.0f;
+	int yieldingToCarId = -1;
 };

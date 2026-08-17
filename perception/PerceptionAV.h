@@ -24,6 +24,12 @@ private:
 		PerceptionState& out
 	);
 
+	void analyzeConflictPoints(
+		const CarState& self,
+		const WorldState& world,
+		PerceptionState& out
+	);
+
 	struct FOVResult { float fovDot; float maxViewDistance; };
 	FOVResult calculateFOV(const CarState& self) const;
 

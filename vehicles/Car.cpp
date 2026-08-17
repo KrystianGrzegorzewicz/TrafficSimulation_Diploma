@@ -62,7 +62,7 @@ int* Car::getColor() const { return const_cast<int*>(color); }
 
 CarState Car::getState() const
 {
-	return { position, velocity, acceleration, forward, travelId, id };
+	return { position, velocity, acceleration, forward, travelId, id, isAutonomous() };
 }
 
 bool Car::isPathValid() const
@@ -196,15 +196,32 @@ void Car::integrate(const Vec2& desiredAcceleration, float dt)
 	float maxLatAvailable = std::sqrt(std::max(0.f, tireGrip * tireGrip - aLong * aLong));
 
 	aLat = std::clamp(aLat, -maxLatAvailable, maxLatAvailable);
+
+	// 1. TWARDE ZATRZYMANIE (HARD STOP)
+	// Jeśli auto jedzie bardzo wolno (poniżej 0.05 m/s) i algorytm żąda hamowania,
+	// całkowicie usypiamy wektory ruchu, aby zapobiec oscylacjom.
+	float currentForwardSpeed = velocity.dot(forward);
+	if (currentForwardSpeed < 0.05f && aLong < 0.0f)
+	{
+		velocity = Vec2(0.f, 0.f);
+		acceleration = Vec2(0.f, 0.f);
+		this->speed = 0.0f;
+		// Zakończ tutaj, nie aktualizuj position
+		return;
+	}
+
 	acceleration = forward * aLong + right * aLat;
 
 	// semi-implicit Euler
 	velocity += acceleration * dt;
 	float forwardSpeed = velocity.dot(forward);
 
-	if (forwardSpeed < 0.0f)
+	// 2. ZABEZPIECZENIE PRZED COFANIEM
+	// Jeśli po odjęciu przyspieszenia wektor prędkości odwrócił się do tyłu,
+	// zerujemy go całkowicie (zarówno składową wzdłużną, jak i boczną!).
+	if (forwardSpeed <= 0.0f)
 	{
-		velocity -= forward * forwardSpeed;
+		velocity = Vec2(0.f, 0.f);
 	}
 
 	float speed = velocity.length();

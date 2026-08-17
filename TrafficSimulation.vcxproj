@@ -165,6 +165,7 @@
     <ClInclude Include="behavior\BehaviorAV.h" />
     <ClInclude Include="behavior\BehaviorHuman.h" />
     <ClInclude Include="behavior\BehaviorOutput.h" />
+    <ClInclude Include="behavior\ConflictParameters.h" />
     <ClInclude Include="behavior\IBehavior.h" />
     <ClInclude Include="behavior\longitudinal\carFollow_fis.h" />
     <ClInclude Include="behavior\longitudinal\FuzzyLongitudinalModel.h" />
@@ -184,6 +185,7 @@
     <ClInclude Include="planning\PathPlanner.h" />
     <ClInclude Include="road\Block.h" />
     <ClInclude Include="road\Circle.h" />
+    <ClInclude Include="road\ConflictPoint.h" />
     <ClInclude Include="road\Junction.h" />
     <ClInclude Include="road\Line.h" />
     <ClInclude Include="road\Travel.h" />

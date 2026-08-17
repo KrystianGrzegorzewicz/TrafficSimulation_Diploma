@@ -28,6 +28,7 @@ Junction::Junction(int index)
 {
 	std::vector<Vec2> tp1, tp2, tp3, tp4, tp5, tp6, tp7, tp8, tp9, tp10, tp11, tp12, tp13, tp14;
 	float lightCycle, bufforTime;
+	ConflictPoint c;
 
 	switch (index)
 	{
@@ -123,6 +124,14 @@ Junction::Junction(int index)
 		travels.emplace_back(tp1, 5, 1);
 		travels.emplace_back(tp2, 5, 2);
 		travels.emplace_back(tp3, 2, 3);
+
+		c.position = Vec2(1.75f, -1.75f);
+		c.priorityTravels = { 1 };
+		c.yieldTravels = { 3 };
+		c.radius = 4.f;
+		conflictPoints.push_back(c);
+		circles.emplace_back(c.position.x, c.position.y, c.radius, true);
+
 		break;
 
 		// ------------------------------------------------------------------
@@ -247,6 +256,14 @@ Junction::Junction(int index)
 		travels.emplace_back(tp4, 1, 4);
 		travels.emplace_back(tp5, 1, 5);
 		travels.emplace_back(tp6, 1, 6);
+
+		/*conflictPoints.push_back({ Vec2(-13.f,5.f), {6}, {1,2}, 0.f });
+		conflictPoints.push_back({ Vec2(13.f,-5.f), {2}, {3,4}, 0.f });
+		conflictPoints.push_back({ Vec2(-5.f,-13.f), {4}, {5,6}, 0.f });
+
+		circles.emplace_back(-13.f, 5.f, 2.f, true);
+		circles.emplace_back(13.f, -5.f, 2.f, true);
+		circles.emplace_back(-5.f, -13.f, 2.f, true);*/
 
 		break;
 
@@ -492,6 +509,120 @@ Junction::Junction(int index)
 
 		//circles.append_range(drawTravel(tp1));
 		break;
+	case 6:
+		//mask
+		blocks.push_back(Block(-300.0f, -300.0f, 300.0f, 300.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
+		blocks.push_back(Block(-3.f, -10.0f, 11.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 3 }));
+		blocks.push_back(Block(-11.f, -100.0f, 3.0f, 10.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, { 1 }));
+
+		lines.emplace_back(0.f, 10.f, 0.f, 250.f, 0.5f);
+		lines.emplace_back(-3.5f, 10.f, -3.5f, 250.f, 0.5f);
+		lines.emplace_back(0.f, 10.f, -3.5f, 10.f, 0.5f);
+		lines.emplace_back(-7.0f, 10.f, -7.0f, 250.f, 0.5f);
+
+		lines.emplace_back(0.f, -10.f, 0.f, -250.f, 0.5f);
+		lines.emplace_back(3.5f, -10.f, 3.5f, -250.f, 0.5f);
+		lines.emplace_back(0.f, -10.f, 3.5f, -10.f, 0.5f);
+		lines.emplace_back(7.0f, -10.f, 7.0f, -250.f, 0.5f);
+
+		lines.emplace_back(20.f, -3.5f, 200.f, -3.5f, 0.5f);
+		lines.emplace_back(20.f, 0.0f, 200.f, 0.0f, 0.5f);
+		lines.emplace_back(20.f, 3.5f, 200.f, 3.5f, 0.5f);
+
+		lines.emplace_back(-20.f, -3.5f, -200.f, -3.5f, 0.5f);
+		lines.emplace_back(-20.f, 0.0f, -200.f, 0.0f, 0.5f);
+		lines.emplace_back(-20.f, 3.5f, -200.f, 3.5f, 0.5f);
+
+		lines.emplace_back(3.5f, 10.f, 3.5f, 100.f, 0.2f);
+		lines.emplace_back(7.0f, 10.f, 7.0f, 100.f, 0.5f);
+		lines.emplace_back(3.5f, 100.f, 0.0f, 130.f, 0.2f);
+		lines.emplace_back(7.0f, 100.f, 3.5f, 130.f, 0.5f);
+		lines.emplace_back(3.5f, 130.f, 3.5f, 250.f, 0.5f);
+
+		lines.emplace_back(-3.5f, -10.f, -3.5f, -100.f, 0.2f);
+		lines.emplace_back(-7.0f, -10.f, -7.0f, -100.f, 0.5f);
+		lines.emplace_back(-3.5f, -100.f, 0.0f, -130.f, 0.2f);
+		lines.emplace_back(-7.0f, -100.f, -3.5f, -130.f, 0.5f);
+		lines.emplace_back(-3.5f, -130.f, -3.5f, -250.f, 0.5f);
+
+		lines.emplace_back(7.0f, 10.f, 20.0f, 3.5f, 0.5f);
+		lines.emplace_back(-7.0f, -10.f, -20.0f, -3.5f, 0.5f);
+		lines.emplace_back(20.0f, -3.5f, 7.0f, -10.0f, 0.5f);
+		lines.emplace_back(-20.0f, 3.5f, -7.0f, 10.0f, 0.5f);
+
+		//down up 1
+		tp1 = {
+			Vec2(1.75f,250.f), Vec2(1.75f,240.f), Vec2(1.75f,200.f),
+			Vec2(1.75f,150.f), Vec2(1.75f,130.f), Vec2(1.75f,122.5f),
+			Vec2(4.0f,115.f), Vec2(5.25f,107.5f), Vec2(5.25f,100.f),
+			Vec2(5.25f,80.f), Vec2(5.25f,50.f), Vec2(5.25f,30.f),
+			Vec2(5.25f,20.f), Vec2(5.25f,0.f), Vec2(5.25f,-20.f),
+			Vec2(5.25f,-50.f), Vec2(5.25f,-100.f), Vec2(5.25f,-150.f),
+			Vec2(5.25f,-200.f), Vec2(5.25f,-240.f), Vec2(5.25f,-250.f)
+		};
+		//down left
+		tp2 = {
+			Vec2(1.75f,250.f), Vec2(1.75f,240.f), Vec2(1.75f,200.f),
+			Vec2(1.75f,150.f), Vec2(1.75f,130.f), Vec2(1.75f,100.0f),
+			Vec2(1.75f,80.f), Vec2(1.75f,50.f), Vec2(1.75f,12.0f),
+			Vec2(1.75f,-1.75f), Vec2(-20.0f,-1.75f), Vec2(-50.0f,-1.75f),
+			Vec2(-80.0f,-1.75f), Vec2(-120.0f,-1.75f), Vec2(-150.0f,-1.75f),
+			Vec2(-180.0f,-1.75f), Vec2(-200.0f,-1.75f)
+		};
+		//up down 1
+		tp3 = {
+			Vec2(-1.75f,-250.f), Vec2(-1.75f,-240.f), Vec2(-1.75f,-200.f),
+			Vec2(-1.75f,-150.f), Vec2(-1.75f,-130.f), Vec2(-1.75f,-122.5f),
+			Vec2(-4.0f,-115.f), Vec2(-5.25f,-107.5f), Vec2(-5.25f,-100.f),
+			Vec2(-5.25f,-80.f), Vec2(-5.25f,-50.f), Vec2(-5.25f,-30.f),
+			Vec2(-5.25f,-20.f), Vec2(-5.25f,-0.f), Vec2(-5.25f,20.f),
+			Vec2(-5.25f,50.f), Vec2(-5.25f,100.f), Vec2(-5.25f,150.f),
+			Vec2(-5.25f,200.f), Vec2(-5.25f,240.f), Vec2(-5.25f,250.f)
+		};
+		//up right
+		tp4 = {
+			Vec2(-1.75f,-250.f), Vec2(-1.75f,-240.f), Vec2(-1.75f,-200.f),
+			Vec2(-1.75f,-150.f), Vec2(-1.75f,-130.f), Vec2(-1.75f,-100.0f),
+			Vec2(-1.75f,-80.f), Vec2(-1.75f,-50.f), Vec2(-1.75f,-12.0f),
+			Vec2(-1.75f,1.75f), Vec2(20.0f,1.75f), Vec2(50.0f,1.75f),
+			Vec2(80.0f,1.75f), Vec2(120.0f,1.75f), Vec2(150.0f,1.75f),
+			Vec2(180.0f,1.75f), Vec2(200.0f,1.75f)
+		};
+
+		travels.emplace_back(tp1, 6, 1); //priority
+		travels.emplace_back(tp2, 3, 2); //yield
+		travels.emplace_back(tp3, 6, 3); //priority
+		travels.emplace_back(tp4, 3, 4); //yield
+
+		conflictPoints.push_back({ Vec2(-5.25f,0.f), {3}, {2}, 2.f });
+		circles.emplace_back(-5.25f, 1.0f, 1.f, true);
+		conflictPoints.push_back({ Vec2(-13.f,-5.f), {1}, {4}, 2.f });
+		circles.emplace_back(5.25f, -1.f, 1.f, true);
+
+		/*circles.append_range(drawTravel(tp4));
+		circles.append_range(drawTravel(tp7));
+		circles.append_range(drawTravel(tp3));
+		circles.append_range(drawTravel(tp8));*/
+		// ------------------------------------------------------------------
+	case 7: // Phantom round
+		//mask
+		blocks.push_back(Block(-300.0f, -100.0f, 300.0f, 100.0f, 0.0f, 1.0f, 0.0f, BlockType::PerceptionMask, {}));
+
+		circles.emplace_back(.0f, .0f, 25.0f, false);
+		circles.emplace_back(.0f, .0f, 28.5f, false);
+
+		tp1 = {
+			Vec2(0.0f,26.75f)
+		};
+		tp2 = { Vec2(25.f, 25.f), Vec2(26.75f, 0.f), Vec2(25.f, -25.f), Vec2(0.0f, -26.75f),
+				Vec2(-25.f, -25.f), Vec2(-26.75f, 0.f), Vec2(-25.f, 25.f), Vec2(0.0f, 26.75f) };
+		for (int i = 0; i < 100; i++)
+		{
+			tp1.insert(tp1.end(), tp2.begin(), tp2.end());
+		}
+		travels.emplace_back(tp1, 1, 1);
+
+		break;
 	default:
 		std::cerr << "Junction: unknown index " << index << "\n";
 		break;
@@ -544,7 +675,7 @@ std::vector<Circle> Junction::drawTravel(std::vector<Vec2> travelPoints) {
 	const float STEP = 0.05f;
 	std::vector<Circle> circles;
 	for (const Vec2& point : travelPoints) {
-		circles.push_back(Circle(point.x, point.y, 0.5f, false));
+		//circles.push_back(Circle(point.x, point.y, 0.5f, false));
 	}
 	for (size_t i = 0; i + 2 < travelPoints.size(); i += 2)
 	{
@@ -556,7 +687,7 @@ std::vector<Circle> Junction::drawTravel(std::vector<Vec2> travelPoints) {
 			Vec2 point = tempTravel.bezier(p0, p1, p2, t);
 
 			circles.push_back(
-				Circle(point.x, point.y, 0.3f, false)
+				Circle(point.x, point.y, 0.2f, true)
 			);
 		}
 	}
@@ -581,3 +712,5 @@ const Block* Junction::getPerceptionMaskForTravel(int travelId, const Vec2& poin
 
 	return nullptr;
 }
+
+const std::vector<ConflictPoint>& Junction::getConflictPoints() const { return conflictPoints; }

@@ -16,6 +16,8 @@ public:
 	~CarAV() override;
 
 	void update(float dt, const WorldState& world) override;
+	std::string getTypeName() const override { return "av"; }
+	bool isAutonomous() const override { return true; }
 
 private:
 	std::unique_ptr<IBehavior> behavior;
